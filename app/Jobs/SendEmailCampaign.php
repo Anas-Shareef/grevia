@@ -31,12 +31,8 @@ class SendEmailCampaign implements ShouldQueue
         
         Subscriber::where('is_subscribed', true)->chunk(50, function ($subscribers) {
             foreach ($subscribers as $subscriber) {
-                try {
-                    Mail::to($subscriber->email)->send(new PromotionalEmail($this->campaign, $subscriber));
-                } catch (\Exception $e) {
-                    // Log error or continue
-                    logger()->error("Failed to send campaign {$this->campaign->id} to {$subscriber->email}: " . $e->getMessage());
-                }
+                // Removed try/catch for debugging
+                Mail::to($subscriber->email)->send(new PromotionalEmail($this->campaign, $subscriber));
             }
         });
 
