@@ -58,7 +58,7 @@ const ProductsPage = () => {
         // Filter was explicitly set
         if (filters.category === "" && category === "sweeteners") {
           // "All Sweeteners" selected - show all sweeteners
-          return "sweeteners";
+          return "natural-sweeteners";
         } else if (filters.category === "" && category === "other-products") {
           // "All Other Products" selected - show bakery and pickles
           return "other-products";
