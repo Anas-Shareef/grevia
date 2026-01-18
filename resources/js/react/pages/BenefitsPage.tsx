@@ -91,8 +91,6 @@ const BenefitsPage = () => {
           // alignment 'left' = Image Left, Text Right. 'right' = Text Left, Image Right.
           const isImageLeft = section.alignment === 'left';
 
-          console.log(`Rendering Section ${idx}:`, section); // DEBUG LOG
-
 
           return (
             <section key={idx} className={`py-12 md:py-24 ${idx % 2 !== 0 ? 'bg-secondary/30' : ''}`}>
