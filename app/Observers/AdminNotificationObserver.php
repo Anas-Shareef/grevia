@@ -6,7 +6,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\ProductReview;
-use App\Models\Payment;
+use App\Models\Payment; 
 use App\Models\Refund;
 use App\Models\SiteSetting;
 use Filament\Actions\Action;
@@ -51,7 +51,7 @@ class AdminNotificationObserver
                     ->actions([
                         Action::make('view')
                             ->button()
-                            ->url(route('filament.admin.resources.admin-users.index')),
+                            ->url(route('filament.admin.resources.users.index')),
                     ]),
                 $recipients
             );
