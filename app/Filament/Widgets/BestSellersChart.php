@@ -14,8 +14,10 @@ class BestSellersChart extends ChartWidget
 
     protected function getData(): array
     {
-        $topProducts = OrderItem::select('product_name', DB::raw('sum(quantity) as total_qty'))
-            ->groupBy('product_name')
+        $topProducts = OrderItem::query()
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select('products.name as product_name', DB::raw('sum(order_items.quantity) as total_qty'))
+            ->groupBy('products.name')
             ->orderByDesc('total_qty')
             ->limit(5)
             ->get();
