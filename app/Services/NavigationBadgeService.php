@@ -32,7 +32,7 @@ class NavigationBadgeService
         return Cache::remember('nav_customer_activity', 300, function () {
             $pendingReviews = ProductReview::where('status', 'pending')->count();
             $newCustomers = User::whereDate('created_at', today())
-                ->where('role', 'customer')
+                ->where('email', 'not like', '%@grevia.com%')
                 ->count();
             
             return $pendingReviews + $newCustomers;
