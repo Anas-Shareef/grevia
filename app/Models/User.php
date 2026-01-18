@@ -19,8 +19,9 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow access if email ends with @grevia.in OR is specific admin emails
+        // Allow access if email ends with @grevia.in OR @grevia.com OR is specific admin emails
         return str_ends_with($this->email, '@grevia.in') 
+            || str_ends_with($this->email, '@grevia.com')
             || $this->email === 'asnafvaram435@gmail.com'
             || $this->email === 'admin@grevia.in';
     }

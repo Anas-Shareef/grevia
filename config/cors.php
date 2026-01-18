@@ -24,11 +24,10 @@ return [
         'http://localhost:5173',
         'http://localhost:8000',
         'http://127.0.0.1:8000',
-        'http://localhost:8080',
-        'https://grevia-foods.web.app',
-        'https://grevia-foods.firebaseapp.com',
-        'https://grevia.com',
-        'https://www.grevia.com'
+        'https://grevia.in',
+        'https://www.grevia.in',
+        'https://auth.grevia.in',
+        'https://grevia-612f7.firebaseapp.com',
     ],
 
     'allowed_origins_patterns' => [],
@@ -39,6 +38,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];

@@ -35,14 +35,35 @@ class ProductController extends Controller
             } 
             // Check if it's a subcategory (stevia, monkfruit)
             elseif (in_array($categorySlug, ['stevia', 'monkfruit'])) {
-                // Filter by subcategory field
-                $query->where('subcategory', $categorySlug);
+                 // Try to match by Category Slug OR Subcategory text field (hybrid approach)
+                 $query->where(function($q) use ($categorySlug) {
+                    $q->whereHas('category', fn($c) => $c->where('slug', $categorySlug))
+                      ->orWhere('subcategory', $categorySlug);
+                 });
             } 
             else {
-                // Normal category filtering
-                $query->whereHas('category', function($q) use ($categorySlug) {
-                    $q->where('slug', $categorySlug)->orWhere('id', $categorySlug);
-                });
+                // Robust Category Filtering: Include Children
+                // 1. Find the category by slug (Exact match)
+                $cat = \App\Models\Category::where('slug', $categorySlug)->first();
+                
+                // 2. Fallback: Fuzzy match (e.g. 'sweeteners' finds 'premium-sweeteners')
+                if (!$cat) {
+                    $cat = \App\Models\Category::where('slug', 'like', "%{$categorySlug}%")->first();
+                }
+
+                if ($cat) {
+                    // Get this category ID and all its children IDs
+                    $ids = \App\Models\Category::where('id', $cat->id)
+                        ->orWhere('parent_id', $cat->id)
+                        ->pluck('id');
+                    
+                    $query->whereIn('category_id', $ids);
+                } else {
+                    // Fallback to strict slug match if not found (or id)
+                     $query->whereHas('category', function($q) use ($categorySlug) {
+                        $q->where('slug', $categorySlug)->orWhere('id', $categorySlug);
+                    });
+                }
             }
         }
 

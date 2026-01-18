@@ -57,7 +57,10 @@ Route::get('/fix-storage', function () {
 });
 
 Route::get('/debug-categories', function () {
-    return \App\Models\Category::all(['id', 'name', 'slug']);
+    return [
+        'categories' => \App\Models\Category::all(['id', 'name', 'slug', 'parent_id']),
+        'products' => \App\Models\Product::all(['id', 'name', 'slug', 'category_id', 'subcategory', 'in_stock'])
+    ];
 });
 
 // Order Export Routes

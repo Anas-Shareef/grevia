@@ -32,7 +32,9 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('email', 'not like', '%@grevia.com%');
+        return parent::getEloquentQuery()
+            ->where('email', 'not like', '%@grevia.com%')
+            ->where('email', 'not like', '%@grevia.in%');
     }
 
     public static function form(Schema $schema): Schema

@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\Api\CategoryController;
@@ -97,3 +98,7 @@ Route::get('/content/footer', [App\Http\Controllers\Api\ContentController::class
 // Contact (Public)
 Route::get('/content/contact', [App\Http\Controllers\Api\ContactController::class, 'index']);
 Route::post('/contact', [App\Http\Controllers\Api\ContactController::class, 'store'])->middleware('throttle:5,1');
+
+Route::get('/content/footer', [ContentController::class, 'footer']);
+Route::get('/content/contact', [ContentController::class, 'contact']);
+

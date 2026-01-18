@@ -81,13 +81,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadCart();
   }, [user]);
 
-  // Clear cart when user logs out
-  useEffect(() => {
-    if (!user && isInitialized) {
-      console.log('[CartContext] User logged out, clearing cart');
-      setItems([]);
-    }
-  }, [user, isInitialized]);
+  // Clear cart when user logs out - REMOVED as it clears guest cart on init
+  // logic is handled by loadCart switching to local storage on logout
+  // useEffect(() => {
+  //   if (!user && isInitialized) {
+  //     console.log('[CartContext] User logged out, clearing cart');
+  //     setItems([]);
+  //   }
+  // }, [user, isInitialized]);
 
   // Helper: Get cart from localStorage
   const getLocalCart = (): CartItem[] => {
