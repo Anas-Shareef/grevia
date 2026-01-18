@@ -61,7 +61,7 @@ export const useProducts = (filters?: FilterState) => {
                 Object.entries(filters).forEach(([key, value]) => {
                     if (Array.isArray(value)) {
                         value.forEach(v => queryParams.append(`${key}[]`, v));
-                    } else if (value) {
+                    } else if (value !== null && value !== undefined) {
                         queryParams.append(key, String(value));
                     }
                 });

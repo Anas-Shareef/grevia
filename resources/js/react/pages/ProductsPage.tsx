@@ -71,8 +71,6 @@ const ProductsPage = () => {
     })()
   };
 
-  console.log('ProductsPage Debug:', { category, filters, effectiveFilters });
-
   const { data: response, isLoading: isProductsLoading } = useProducts(effectiveFilters);
   const { data: allCategories, isLoading: isCategoriesLoading } = useCategories();
 
