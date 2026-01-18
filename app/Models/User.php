@@ -9,10 +9,21 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Allow access if email ends with @grevia.in OR is specific admin emails
+        return str_ends_with($this->email, '@grevia.in') 
+            || $this->email === 'asnafvaram435@gmail.com'
+            || $this->email === 'admin@grevia.in';
+    }
 
     public function addresses()
     {
