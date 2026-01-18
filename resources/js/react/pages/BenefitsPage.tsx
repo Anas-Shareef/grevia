@@ -86,7 +86,7 @@ const BenefitsPage = () => {
         {/* 2. STORY SECTIONS (Iterate through Sections) */}
         {/* 2. STORY SECTIONS (Iterate through Sections) */}
         {pageData.sections?.map((section, idx) => {
-          if (!section.is_active) return null;
+          // if (!section.is_active) return null; // Field not in DB
           const hasImage = !!section.image;
           // alignment 'left' = Image Left, Text Right. 'right' = Text Left, Image Right.
           const isImageLeft = section.alignment === 'left';
@@ -146,7 +146,7 @@ const BenefitsPage = () => {
                 {section.features && section.features.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {section.features.sort((a, b) => a.order - b.order).map((feature, fIdx) => {
-                      if (!feature.is_active) return null;
+                      // if (!feature.is_active) return null; // Field not in DB
                       const IconComponent = iconMap[feature.icon] || Sparkles;
 
                       return (
