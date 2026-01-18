@@ -24,7 +24,9 @@ class UsersTable
                 TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('roles.name')
+                TextColumn::make('role_label')
+                    ->label('Role')
+                    ->default('Customer')
                     ->badge()
                     ->color('success'),
                 TextColumn::make('created_at')
