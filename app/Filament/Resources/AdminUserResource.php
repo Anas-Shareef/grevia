@@ -28,7 +28,10 @@ class AdminUserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('email', 'like', '%@grevia.com%');
+        return parent::getEloquentQuery()->where(function ($query) {
+            $query->where('email', 'like', '%@grevia.com%')
+                  ->orWhere('email', 'like', '%@grevia.in%');
+        });
     }
 
     public static function form(Schema $schema): Schema
@@ -58,6 +61,11 @@ class AdminUserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('email')->searchable(),
+                Tables\Columns\TextColumn::make('role_label')
+                    ->label('Role')
+                    ->default('Admin')
+                    ->badge()
+                    ->color('danger'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime(),
             ])
             ->filters([

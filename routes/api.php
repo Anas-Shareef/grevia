@@ -57,10 +57,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
     });
 
-    // Content (Protected)
-    Route::prefix('content')->group(function () {
-        Route::get('/benefits-page', [BenefitsPageController::class, 'index']);
-    });
+    // Content (Protected) - Removed as it conflicted with public route
+    // Route::prefix('content')->group(function () {
+    //    Route::get('/benefits-page', [BenefitsPageController::class, 'index']);
+    // });
     
     // Checkout & Payment
     Route::prefix('checkout')->group(function () {
