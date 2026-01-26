@@ -132,6 +132,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+
+    // Google login disabled - Firebase not configured
+    const loginWithGoogle = async () => {
+        toast({
+            variant: "destructive",
+            title: "Feature Disabled",
+            description: "Google login is currently disabled. Please use email/password login.",
+        });
+        setIsLoading(false);
+    };
+
+    /* Original Google Login - Disabled
     const loginWithGoogle = async () => {
         setIsLoading(true);
         try {
@@ -166,6 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoading(false);
         }
     };
+    */
 
     return (
         <AuthContext.Provider value={{ user, isLoading, login, register, logout, checkAuth, loginWithGoogle }}>
