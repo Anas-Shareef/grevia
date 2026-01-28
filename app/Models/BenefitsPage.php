@@ -75,12 +75,16 @@ class BenefitsPage extends Model
             return $url;
         }
 
-        // Only replace localhost URLs if we're in production
-        if (config('app.env') === 'production') {
-            $url = str_replace('http://localhost:8000', config('app.url'), $url);
-            $url = str_replace('http://127.0.0.1:8000', config('app.url'), $url);
+        // If it's already a full URL, handle localhost replacement in production
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            if (config('app.env') === 'production') {
+                $url = str_replace('http://localhost:8000', config('app.url'), $url);
+                $url = str_replace('http://127.0.0.1:8000', config('app.url'), $url);
+            }
+            return $url;
         }
         
-        return $url;
+        // If it's a relative path (e.g., "benefits-page/image.jpg"), prepend storage URL
+        return config('app.url') . '/storage/' . $url;
     }
 }
