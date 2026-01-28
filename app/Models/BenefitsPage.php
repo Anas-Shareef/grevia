@@ -75,9 +75,11 @@ class BenefitsPage extends Model
             return $url;
         }
 
-        // Replace localhost:8000 with production URL
-        $url = str_replace('http://localhost:8000', config('app.url'), $url);
-        $url = str_replace('http://127.0.0.1:8000', config('app.url'), $url);
+        // Only replace localhost URLs if we're in production
+        if (config('app.env') === 'production') {
+            $url = str_replace('http://localhost:8000', config('app.url'), $url);
+            $url = str_replace('http://127.0.0.1:8000', config('app.url'), $url);
+        }
         
         return $url;
     }
