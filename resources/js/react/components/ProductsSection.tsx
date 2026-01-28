@@ -35,7 +35,7 @@ const ProductsSection = () => {
   const allProducts = Array.isArray(response) ? response : response?.data || [];
 
   // Get first 6 sweetener products for homepage
-  const displayProducts = allProducts.filter(p => p.category === 'sweeteners').slice(0, 6);
+  const displayProducts = allProducts.filter(p => p.category?.slug === 'sweeteners').slice(0, 6);
 
   const handleAddToCart = (product: Product) => {
     addToCart(product);

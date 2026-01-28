@@ -20,7 +20,7 @@ export interface Product {
   average_rating?: number; // Dynamic average from approved reviews
   image: string;
   images?: string[];
-  category: string;
+  category: string | { id: number; name: string; slug: string; parent_id?: number | null }; // Support both string and API object
   subcategory?: string;
   badge?: string;
   inStock: boolean;
