@@ -10,9 +10,11 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\BenefitsPageController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\NewsletterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\NewsletterController;
 
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
 
@@ -27,8 +29,10 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/settings', [SiteSettingController::class, 'index']);
 Route::post('/auth/firebase', [AuthController::class, 'firebase']);
-Route::get('/content/benefits-page', [App\Http\Controllers\Api\ContentController::class, 'getBenefitsPage']);
-Route::get('/content/hero-banner', [App\Http\Controllers\Api\ContentController::class, 'getHeroBanner']);
+Route::get('/content/benefits-page', [ContentController::class, 'getBenefitsPage']);
+Route::get('/content/hero-banner', [ContentController::class, 'getHeroBanner']);
+Route::get('/content/footer', [ContentController::class, 'getFooter']);
+Route::get('/content/contact', [ContactController::class, 'index']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -81,8 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/clear', [\App\Http\Controllers\Api\CartController::class, 'clear']);
     });
     
-    // Orders (Customer)
-    Route::get('/orders', [App\Http\Controllers\Api\OrderController::class, 'index']);
+    // Reviews (Customer)
     Route::put('/reviews/{id}', [ReviewController::class, 'update']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 });
@@ -93,12 +96,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/reviews', [ReviewController::class, 'index']); // Public reviews list
 Route::post('/reviews', [ReviewController::class, 'store']); // Public submit (handles guest/auth)
 Route::get('/shipping-methods', [App\Http\Controllers\Api\ShippingMethodController::class, 'index']);
-Route::get('/content/footer', [App\Http\Controllers\Api\ContentController::class, 'getFooter']);
 
 // Contact (Public)
-Route::get('/content/contact', [App\Http\Controllers\Api\ContactController::class, 'index']);
-Route::post('/contact', [App\Http\Controllers\Api\ContactController::class, 'store'])->middleware('throttle:5,1');
-
-Route::get('/content/footer', [ContentController::class, 'footer']);
-Route::get('/content/contact', [ContentController::class, 'contact']);
-
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');
