@@ -52,7 +52,7 @@ const transformProduct = (data: any): Product => {
 
 import { FilterState } from "./useProductFilters";
 
-export const useProducts = (filters?: FilterState) => {
+export const useProducts = (filters?: Partial<FilterState>) => {
     return useQuery({
         queryKey: ["products", filters],
         queryFn: async () => {
