@@ -25,6 +25,7 @@ class Product extends Model
         'subcategory',
         'badge',
         'in_stock',
+        'is_featured',
         'tags',
     ];
 
@@ -36,6 +37,7 @@ class Product extends Model
         'original_price' => 'decimal:2',
         'rating' => 'decimal:2',
         'in_stock' => 'boolean',
+        'is_featured' => 'boolean',
     ];
 
     protected $appends = ['image_url', 'reviews_count', 'average_rating'];

@@ -28,14 +28,14 @@ const itemVariants = {
 };
 
 const ProductsSection = () => {
-  const { data: response } = useProducts();
+  const { data: response } = useProducts({ featured: '1' });
   const { addToCart } = useCart();
 
   // Handle both array response (old) and paginated response (new)
   const allProducts = Array.isArray(response) ? response : response?.data || [];
 
-  // Get first 6 sweetener products for homepage
-  const displayProducts = allProducts.filter(p => p.category?.slug === 'sweeteners').slice(0, 6);
+  // Get first 6 featured products for homepage
+  const displayProducts = allProducts.slice(0, 6);
 
   const handleAddToCart = (product: Product) => {
     addToCart(product);

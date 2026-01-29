@@ -42,12 +42,14 @@ class ProductsTable
                 IconColumn::make('in_stock')
                     ->boolean()
                     ->sortable(),
+                IconColumn::make('is_featured')
+                    ->label('Featured')
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
                 TrashedFilter::make(),
             ])
             ->recordActions([

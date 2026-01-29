@@ -23,7 +23,12 @@ class ProductController extends Controller
             });
         }
 
-        // 2. Category Filter
+        // 2. Featured Filter
+        if ($request->filled('featured')) {
+            $query->where('is_featured', true);
+        }
+
+        // 3. Category Filter
         if ($request->filled('category')) {
             $categorySlug = $request->category;
             

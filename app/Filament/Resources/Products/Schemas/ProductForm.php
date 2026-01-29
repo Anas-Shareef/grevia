@@ -57,6 +57,10 @@ class ProductForm
                             ->placeholder('e.g. Best Seller, New'),
                         Toggle::make('in_stock')
                             ->default(true),
+                        Toggle::make('is_featured')
+                            ->label('Featured Product')
+                            ->helperText('Show this product on the homepage')
+                            ->default(false),
                     ]),
                 Section::make('Media')
                     ->components([

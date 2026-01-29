@@ -11,6 +11,7 @@ export type FilterState = {
     sort_by: string;
     page: string;
     in_stock: string;
+    featured?: string;
 };
 
 export const useProductFilters = () => {
