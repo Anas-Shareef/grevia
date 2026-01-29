@@ -50,6 +50,8 @@ class ProductsTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
                 TrashedFilter::make(),
             ])
             ->recordActions([
