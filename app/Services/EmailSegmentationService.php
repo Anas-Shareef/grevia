@@ -46,16 +46,16 @@ class EmailSegmentationService
     protected function getNewsletterSubscribers()
     {
         return DB::table('subscribers')
-            ->whereNull('unsubscribed_at')
-            ->where('status', 'subscribed')
+            ->where('is_subscribed', true)
+            ->whereNull('deleted_at')
             ->get();
     }
 
     protected function getNewsletterSubscribersCount(): int
     {
         return DB::table('subscribers')
-            ->whereNull('unsubscribed_at')
-            ->where('status', 'subscribed')
+            ->where('is_subscribed', true)
+            ->whereNull('deleted_at')
             ->count();
     }
 
@@ -110,8 +110,8 @@ class EmailSegmentationService
             ->get();
 
         $subscribers = DB::table('subscribers')
-            ->whereNull('unsubscribed_at')
-            ->where('status', 'subscribed')
+            ->where('is_subscribed', true)
+            ->whereNull('deleted_at')
             ->get();
 
         return $users->merge($subscribers);
@@ -124,8 +124,8 @@ class EmailSegmentationService
             ->count();
 
         $subscribersCount = DB::table('subscribers')
-            ->whereNull('unsubscribed_at')
-            ->where('status', 'subscribed')
+            ->where('is_subscribed', true)
+            ->whereNull('deleted_at')
             ->count();
 
         return $usersCount + $subscribersCount;
