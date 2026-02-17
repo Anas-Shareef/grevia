@@ -67,11 +67,6 @@ class EmailLogResource extends Resource
                         'success' => 'sent',
                         'danger' => 'failed',
                     ])
-                    ->icons([
-                        'heroicon-o-clock' => 'pending',
-                        'heroicon-o-check-circle' => 'sent',
-                        'heroicon-o-x-circle' => 'failed',
-                    ])
                     ->sortable(),
                     
                 Tables\Columns\TextColumn::make('sent_at')
@@ -127,7 +122,8 @@ class EmailLogResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('retry')
+                // Retry action for failed emails
+                \Filament\Tables\Actions\Action::make('retry')
                     ->label('Retry')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
@@ -135,7 +131,6 @@ class EmailLogResource extends Resource
                     ->requiresConfirmation()
                     ->action(function ($record) {
                         try {
-                            // Re-dispatch the send job
                             if ($record->campaign) {
                                 \App\Jobs\SendSingleEmail::dispatch(
                                     campaign: $record->campaign,
@@ -164,7 +159,8 @@ class EmailLogResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('retry_failed')
+                    // Retry failed emails in bulk
+                    \Filament\Tables\Actions\BulkAction::make('retry_failed')
                         ->label('Retry Failed')
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
