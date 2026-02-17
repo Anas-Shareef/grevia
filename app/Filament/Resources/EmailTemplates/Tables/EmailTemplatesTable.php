@@ -36,12 +36,6 @@ class EmailTemplatesTable
                     ->boolean()
                     ->sortable(),
                 
-                TextColumn::make('campaigns_count')
-                    ->label('Campaigns')
-                    ->counts('campaigns')
-                    ->badge()
-                    ->color('success'),
-                
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
