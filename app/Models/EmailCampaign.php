@@ -63,11 +63,27 @@ class EmailCampaign extends Model
         return round(($this->sent_count / $this->total_recipients) * 100, 2);
     }
 
+    public function getRecipients()
+    {
+        $segmentationService = new \App\Services\EmailSegmentationService();
+        return $segmentationService->getRecipients($this->target_segment);
+    }
+
+    public function updateRecipientCount()
+    {
+        $segmentationService = new \App\Services\EmailSegmentationService();
+        $this->total_recipients = $segmentationService->getRecipientCount($this->target_segment);
+        $this->save();
+    }
+
     public function send()
     {
         if ($this->status !== 'draft' && $this->status !== 'scheduled') {
             return false;
         }
+
+        // Update recipient count before sending
+        $this->updateRecipientCount();
 
         $this->update(['status' => 'sending']);
         

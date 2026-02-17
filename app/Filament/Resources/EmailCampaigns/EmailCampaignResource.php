@@ -18,10 +18,7 @@ class EmailCampaignResource extends Resource
 {
     protected static ?string $model = EmailCampaign::class;
 
-    // Icon removed - parent group 'Marketing' has icon
-    // protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Marketing';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'title';
 
