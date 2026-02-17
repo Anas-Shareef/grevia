@@ -101,7 +101,7 @@ class EmailTemplateResource extends Resource
                     try {
                         \Mail::to($data['test_email'])->send(
                             new \App\Mail\TestEmail(
-                                subject: $record->subject,
+                                emailSubject: $record->subject,
                                 htmlContent: $record->html_content,
                                 variables: $record->demo_variables ?? []
                             )

@@ -69,7 +69,7 @@ class SendSingleEmail implements ShouldQueue
             // Send email
             Mail::to($email)->send(
                 new CampaignEmail(
-                    subject: $this->campaign->subject,
+                    emailSubject: $this->campaign->subject,
                     htmlContent: $content,
                     variables: $variables,
                     unsubscribeUrl: $unsubscribeUrl
