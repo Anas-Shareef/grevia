@@ -4,6 +4,8 @@ namespace App\Filament\Resources\EmailLogs;
 
 use App\Filament\Resources\EmailLogs\Pages\ListEmailLogs;
 use App\Models\EmailLog;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -121,41 +123,9 @@ class EmailLogResource extends Resource
                             ->when($data['sent_until'], fn ($q, $date) => $q->whereDate('sent_at', '<=', $date));
                     }),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    // Retry failed emails in bulk
-                    Tables\Actions\BulkAction::make('retry_failed')
-                        ->label('Retry Failed Emails')
-                        ->icon('heroicon-o-arrow-path')
-                        ->color('warning')
-                        ->requiresConfirmation()
-                        ->modalHeading('Retry Failed Emails')
-                        ->modalDescription('Are you sure you want to retry sending these failed emails?')
-                        ->action(function ($records) {
-                            $retried = 0;
-                            foreach ($records as $record) {
-                                if ($record->status === 'failed' && $record->campaign) {
-                                    \App\Jobs\SendSingleEmail::dispatch(
-                                        campaign: $record->campaign,
-                                        recipient: (object)[
-                                            'email' => $record->email,
-                                            'name' => $record->user?->name ?? 'Customer',
-                                            'id' => $record->user_id,
-                                        ]
-                                    )->onQueue('emails');
-                                    
-                                    $record->update(['status' => 'pending']);
-                                    $retried++;
-                                }
-                            }
-                            
-                            \Filament\Notifications\Notification::make()
-                                ->title("Queued {$retried} emails for retry")
-                                ->success()
-                                ->send();
-                        }),
-                        
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
