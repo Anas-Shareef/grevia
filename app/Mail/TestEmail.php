@@ -13,7 +13,7 @@ class TestEmail extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public string $subject,
+        public string $emailSubject,
         public string $htmlContent,
         public array $variables = []
     ) {}
@@ -21,7 +21,7 @@ class TestEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->subject,
+            subject: $this->emailSubject,
         );
     }
 
