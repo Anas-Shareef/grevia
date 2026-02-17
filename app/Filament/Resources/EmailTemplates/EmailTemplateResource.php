@@ -17,8 +17,6 @@ use Filament\Tables\Table;
 class EmailTemplateResource extends Resource
 {
     protected static ?string $model = EmailTemplate::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
     
     protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
     
