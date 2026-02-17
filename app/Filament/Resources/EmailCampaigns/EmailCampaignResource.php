@@ -73,6 +73,47 @@ class EmailCampaignResource extends Resource
     public static function getEditHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('send_campaign')
+                ->label('Send Campaign')
+                ->icon('heroicon-o-paper-airplane')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading('Send Campaign')
+                ->modalDescription(fn ($record) => "Are you sure you want to send this campaign to {$record->total_recipients} recipients?")
+                ->modalSubmitActionLabel('Yes, Send Campaign')
+                ->visible(fn ($record) => $record->status === 'draft' || $record->status === 'failed')
+                ->action(function ($record) {
+                    try {
+                        // Update recipient count before sending
+                        $record->updateRecipientCount();
+                        
+                        if ($record->total_recipients === 0) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Cannot send campaign')
+                                ->warning()
+                                ->body('No recipients found for this segment.')
+                                ->send();
+                            return;
+                        }
+                        
+                        // Dispatch the campaign sending job
+                        \App\Jobs\SendCampaignEmails::dispatch($record);
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Campaign queued for sending!')
+                            ->success()
+                            ->body("Sending to {$record->total_recipients} recipients. Check Email Logs for progress.")
+                            ->send();
+                            
+                    } catch (\Exception $e) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Failed to queue campaign')
+                            ->danger()
+                            ->body($e->getMessage())
+                            ->send();
+                    }
+                }),
+            
             \Filament\Actions\Action::make('preview')
                 ->label('Preview Campaign')
                 ->icon('heroicon-o-eye')
