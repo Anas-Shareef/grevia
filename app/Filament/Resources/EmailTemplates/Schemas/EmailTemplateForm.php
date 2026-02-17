@@ -56,7 +56,6 @@ class EmailTemplateForm
                                 'underline',
                                 'strike',
                                 'link',
-                                'heading',
                                 'bulletList',
                                 'orderedList',
                                 'blockquote',
