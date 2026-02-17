@@ -69,7 +69,6 @@ class EmailCampaignForm
                             ->options(collect($segments)->mapWithKeys(fn($seg, $key) => [
                                 $key => $seg['label'] . ' - ' . $seg['use_case']
                             ]))
-                            ->descriptions(collect($segments)->map(fn($seg) => $seg['description']))
                             ->default('all_consented')
                             ->required()
                             ->live()
