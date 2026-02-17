@@ -69,4 +69,57 @@ class EmailTemplateResource extends Resource
             'edit' => EditEmailTemplate::route('/{record}/edit'),
         ];
     }
+    
+    public static function getEditHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\Action::make('preview')
+                ->label('Preview')
+                ->icon('heroicon-o-eye')
+                ->color('gray')
+                ->modalHeading('Email Preview')
+                ->modalWidth('3xl')
+                ->modalContent(fn ($record) => view('filament.email-preview', [
+                    'content' => $record->render($record->demo_variables ?? []),
+                ]))
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Close'),
+            
+            \Filament\Actions\Action::make('test_send')
+                ->label('Send Test')
+                ->icon('heroicon-o-paper-airplane')
+                ->color('primary')
+                ->form([
+                    \Filament\Forms\Components\TextInput::make('test_email')
+                        ->label('Send to Email')
+                        ->email()
+                        ->required()
+                        ->default(fn () => auth()->user()->email)
+                        ->helperText('Enter the email address to send a test email'),
+                ])
+                ->action(function ($record, array $data) {
+                    try {
+                        \Mail::to($data['test_email'])->send(
+                            new \App\Mail\TestEmail(
+                                subject: $record->subject,
+                                htmlContent: $record->html_content,
+                                variables: $record->demo_variables ?? []
+                            )
+                        );
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Test email sent successfully!')
+                            ->success()
+                            ->body("Email sent to {$data['test_email']}")
+                            ->send();
+                    } catch (\Exception $e) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Failed to send test email')
+                            ->danger()
+                            ->body($e->getMessage())
+                            ->send();
+                    }
+                }),
+        ];
+    }
 }

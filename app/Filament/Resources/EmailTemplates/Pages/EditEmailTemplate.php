@@ -12,8 +12,9 @@ class EditEmailTemplate extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            DeleteAction::make(),
-        ];
+        return array_merge(
+            [DeleteAction::make()],
+            EmailTemplateResource::getEditHeaderActions()
+        );
     }
 }
