@@ -121,50 +121,16 @@ class EmailLogResource extends Resource
                             ->when($data['sent_until'], fn ($q, $date) => $q->whereDate('sent_at', '<=', $date));
                     }),
             ])
-            ->actions([
-                // Retry action for failed emails
-                \Filament\Tables\Actions\Action::make('retry')
-                    ->label('Retry')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('warning')
-                    ->visible(fn ($record) => $record->status === 'failed')
-                    ->requiresConfirmation()
-                    ->action(function ($record) {
-                        try {
-                            if ($record->campaign) {
-                                \App\Jobs\SendSingleEmail::dispatch(
-                                    campaign: $record->campaign,
-                                    recipient: (object)[
-                                        'email' => $record->email,
-                                        'name' => $record->user?->name ?? 'Customer',
-                                        'id' => $record->user_id,
-                                    ]
-                                )->onQueue('emails');
-                                
-                                $record->update(['status' => 'pending']);
-                                
-                                \Filament\Notifications\Notification::make()
-                                    ->title('Email queued for retry')
-                                    ->success()
-                                    ->send();
-                            }
-                        } catch (\Exception $e) {
-                            \Filament\Notifications\Notification::make()
-                                ->title('Failed to retry email')
-                                ->danger()
-                                ->body($e->getMessage())
-                                ->send();
-                        }
-                    }),
-            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     // Retry failed emails in bulk
-                    \Filament\Tables\Actions\BulkAction::make('retry_failed')
-                        ->label('Retry Failed')
+                    Tables\Actions\BulkAction::make('retry_failed')
+                        ->label('Retry Failed Emails')
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
                         ->requiresConfirmation()
+                        ->modalHeading('Retry Failed Emails')
+                        ->modalDescription('Are you sure you want to retry sending these failed emails?')
                         ->action(function ($records) {
                             $retried = 0;
                             foreach ($records as $record) {
