@@ -23,6 +23,12 @@ class EmailTemplateResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
+    
+    // Temporarily hide until migrations are run on production
+    public static function shouldRegisterNavigation(): bool
+    {
+        return \Schema::hasTable('email_templates');
+    }
 
     public static function form(Schema $schema): Schema
     {
