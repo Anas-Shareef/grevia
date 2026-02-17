@@ -82,3 +82,9 @@ Route::get('/invoices/{invoice}/view', [\App\Http\Controllers\InvoiceController:
 // Legacy alias to prevent breaks if used elsewhere
 Route::get('/invoices/{invoice}/pdf', [\App\Http\Controllers\InvoiceController::class, 'download'])
     ->name('invoices.pdf');
+
+// Marketing unsubscribe routes
+Route::get('/unsubscribe', [\App\Http\Controllers\UnsubscribeController::class, 'unsubscribe'])
+    ->name('unsubscribe');
+Route::post('/resubscribe', [\App\Http\Controllers\UnsubscribeController::class, 'resubscribe'])
+    ->name('resubscribe');
