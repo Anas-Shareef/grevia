@@ -24,10 +24,24 @@ class EmailTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
     
-    // Temporarily hide until migrations are run on production
+    // Prevent access until migrations are run on production
+    public static function canAccess(): bool
+    {
+        try {
+            return \Schema::hasTable('email_templates');
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+    
+    public static function canViewAny(): bool
+    {
+        return static::canAccess();
+    }
+    
     public static function shouldRegisterNavigation(): bool
     {
-        return \Schema::hasTable('email_templates');
+        return static::canAccess();
     }
 
     public static function form(Schema $schema): Schema
