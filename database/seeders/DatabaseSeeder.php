@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             ShippingMethodSeeder::class,
+            EmailTemplateSeeder::class,
+            DemoMarketingUsersSeeder::class,
+            EmailCampaignSeeder::class,
         ]);
     }
 }
