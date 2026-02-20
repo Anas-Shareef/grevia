@@ -5,7 +5,7 @@
     <title>Invoice #{{ $invoice->invoice_number }}</title>
     <style>
         @page {
-            margin: 25.4mm 19mm;
+            margin: 0;
             size: A4;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,6 +14,11 @@
             font-size: 12px;
             line-height: 1.45;
             color: #333;
+        }
+
+        /* ── OUTER WRAPPER — controls all margins ── */
+        .page {
+            padding: 25.4mm 19mm 25.4mm 19mm; /* top 1in | right 0.75in | bottom 1in | left 0.75in */
         }
 
         /* ── HEADER ── */
@@ -51,23 +56,23 @@
             margin-top: 1px;
         }
 
-        /* Divider line */
+        /* ── DIVIDERS ── */
         .divider {
             border: none;
             border-top: 2px solid #2d7a2d;
-            margin: 0 0 10px 0;
+            margin: 0 0 12px 0;
         }
         .divider-thin {
             border: none;
             border-top: 1px solid #ddd;
-            margin: 8px 0;
+            margin: 10px 0;
         }
 
-        /* ── META ROW ── */
+        /* ── META INFO ── */
         .meta-row {
             display: table;
             width: 100%;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         .meta-col {
             display: table-cell;
@@ -79,26 +84,29 @@
         .meta-col .label { color: #555; }
         .meta-col .value { font-weight: bold; color: #111; }
 
-        /* ── ADDRESS SECTION ── */
+        /* ── ADDRESS ── */
         .address-row {
             display: table;
             width: 100%;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         .address-col {
             display: table-cell;
             width: 50%;
             vertical-align: top;
-            padding-right: 12px;
+            padding-right: 20px;
             font-size: 11px;
             line-height: 1.7;
         }
-        .address-col:last-child { padding-right: 0; padding-left: 12px; }
+        .address-col:last-child {
+            padding-right: 0;
+            padding-left: 20px;
+        }
         .address-heading {
             font-size: 12px;
             font-weight: bold;
             color: #2d7a2d;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -115,56 +123,55 @@
             color: #fff;
         }
         table.items thead th {
-            padding: 6px 8px;
+            padding: 7px 10px;
             text-align: left;
             font-weight: bold;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
+        table.items thead th:nth-child(3),
+        table.items thead th:nth-child(4) { text-align: center; }
+        table.items thead th:last-child    { text-align: right; }
+
         table.items tbody tr:nth-child(even) { background: #f4faf4; }
         table.items tbody tr:nth-child(odd)  { background: #fff; }
         table.items tbody td {
-            padding: 6px 8px;
+            padding: 7px 10px;
             border-bottom: 1px solid #e5ece5;
         }
-        table.items th:nth-child(3),
-        table.items th:nth-child(4),
-        table.items td:nth-child(3),
-        table.items td:nth-child(4) { text-align: center; }
-        table.items th:last-child,
-        table.items td:last-child { text-align: right; }
+        table.items tbody td:nth-child(3),
+        table.items tbody td:nth-child(4) { text-align: center; }
+        table.items tbody td:last-child    { text-align: right; }
 
         /* ── TOTALS ── */
         .totals-wrap {
             display: table;
             width: 100%;
-            margin-top: 6px;
+            margin-top: 8px;
         }
         .totals-spacer { display: table-cell; width: 55%; }
-        .totals-box {
-            display: table-cell;
-            width: 45%;
-            vertical-align: top;
-        }
+        .totals-box    { display: table-cell; width: 45%; vertical-align: top; }
+
         table.totals {
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
         }
         table.totals td {
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-bottom: 1px solid #eee;
         }
-        table.totals td:last-child { text-align: right; }
+        table.totals td:first-child { color: #555; }
+        table.totals td:last-child  { text-align: right; font-weight: 500; }
+
         .grand-total-row {
             background: #2d7a2d;
-            color: #fff !important;
             font-weight: bold;
             font-size: 12px;
         }
         .grand-total-row td {
+            color: #fff !important;
             border-bottom: none !important;
-            color: #fff;
         }
 
         /* ── BADGE ── */
@@ -183,9 +190,9 @@
 
         /* ── FOOTER ── */
         .footer {
-            margin-top: 14px;
+            margin-top: 16px;
             border-top: 2px solid #2d7a2d;
-            padding-top: 6px;
+            padding-top: 8px;
             font-size: 10px;
             color: #888;
             text-align: center;
@@ -193,6 +200,7 @@
     </style>
 </head>
 <body>
+<div class="page">
 
     {{-- ══ HEADER ══ --}}
     <div class="header">
@@ -209,14 +217,14 @@
     {{-- ══ META INFO ══ --}}
     <div class="meta-row">
         <div class="meta-col">
-            <p><span class="label">Invoice ID:</span> &nbsp;<span class="value">{{ $invoice->invoice_number }}</span></p>
-            <p><span class="label">Invoice Date:</span> &nbsp;<span class="value">{{ $invoice->issued_at->format('d-m-Y') }}</span></p>
-            <p><span class="label">Status:</span> &nbsp;<span class="badge badge-{{ $invoice->status }}">{{ ucfirst($invoice->status) }}</span></p>
+            <p><span class="label">Invoice ID: </span><span class="value">{{ $invoice->invoice_number }}</span></p>
+            <p><span class="label">Invoice Date: </span><span class="value">{{ $invoice->issued_at->format('d-m-Y') }}</span></p>
+            <p><span class="label">Status: </span><span class="badge badge-{{ $invoice->status }}">{{ ucfirst($invoice->status) }}</span></p>
         </div>
         <div class="meta-col" style="text-align:right;">
-            <p><span class="label">Order ID:</span> &nbsp;<span class="value">{{ $invoice->order->order_number }}</span></p>
-            <p><span class="label">Order Date:</span> &nbsp;<span class="value">{{ $invoice->order->created_at->format('d-m-Y') }}</span></p>
-            <p><span class="label">Customer:</span> &nbsp;<span class="value">{{ $invoice->order->user->name ?? $invoice->order->name }}</span></p>
+            <p><span class="label">Order ID: </span><span class="value">{{ $invoice->order->order_number }}</span></p>
+            <p><span class="label">Order Date: </span><span class="value">{{ $invoice->order->created_at->format('d-m-Y') }}</span></p>
+            <p><span class="label">Customer: </span><span class="value">{{ $invoice->order->user->name ?? $invoice->order->name }}</span></p>
         </div>
     </div>
 
@@ -276,8 +284,8 @@
             <tr>
                 <td>{{ $item->sku ?? 'N/A' }}</td>
                 <td>{{ $item->product_name }}</td>
-                <td style="text-align:center;">Rs. {{ number_format($item->price, 2) }}</td>
-                <td style="text-align:center;">{{ $item->quantity }}</td>
+                <td>Rs. {{ number_format($item->price, 2) }}</td>
+                <td>{{ $item->quantity }}</td>
                 <td>Rs. {{ number_format($item->total, 2) }}</td>
             </tr>
             @endforeach
@@ -291,18 +299,18 @@
             <table class="totals">
                 <tr>
                     <td>Subtotal</td>
-                    <td style="text-align:center; color:#aaa;">&mdash;</td>
+                    <td style="text-align:center; color:#bbb;">&mdash;</td>
                     <td>Rs. {{ number_format($invoice->subtotal, 2) }}</td>
                 </tr>
                 <tr>
                     <td>Tax</td>
-                    <td style="text-align:center; color:#aaa;">&mdash;</td>
+                    <td style="text-align:center; color:#bbb;">&mdash;</td>
                     <td>Rs. {{ number_format($invoice->tax, 2) }}</td>
                 </tr>
                 @if($invoice->discount > 0)
                 <tr>
                     <td>Discount</td>
-                    <td style="text-align:center; color:#aaa;">&mdash;</td>
+                    <td style="text-align:center; color:#bbb;">&mdash;</td>
                     <td>- Rs. {{ number_format($invoice->discount, 2) }}</td>
                 </tr>
                 @endif
@@ -320,5 +328,6 @@
         Thank you for shopping with Grevia &mdash; Healthy Natural Foods &nbsp;|&nbsp; grevia.in
     </div>
 
+</div>
 </body>
 </html>
