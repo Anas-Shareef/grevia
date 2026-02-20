@@ -181,6 +181,7 @@
             border-radius: 3px;
             font-size: 10px;
             font-weight: bold;
+            vertical-align: middle;
         }
         .badge-paid       { background: #d1fae5; color: #065f46; }
         .badge-pending    { background: #fef3c7; color: #92400e; }
