@@ -5,7 +5,7 @@
     <title>Invoice #{{ $invoice->invoice_number }}</title>
     <style>
         @page {
-            margin: 10mm 14mm;
+            margin: 25.4mm 19mm;
             size: A4;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
