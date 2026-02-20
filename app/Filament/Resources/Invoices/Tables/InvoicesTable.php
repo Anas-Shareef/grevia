@@ -81,7 +81,7 @@ class InvoicesTable
                 \Filament\Actions\Action::make('download_pdf')
                     ->label('Download PDF')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Invoice $record) => route('invoice.download', $record))
+                    ->url(fn (Invoice $record) => route('invoices.download', $record))
                     ->openUrlInNewTab(),
             ])
             ->toolbarActions([
