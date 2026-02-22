@@ -133,25 +133,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
 
-    // Google login disabled - Firebase not configured
-    const loginWithGoogle = async () => {
-        toast({
-            variant: "destructive",
-            title: "Feature Disabled",
-            description: "Google login is currently disabled. Please use email/password login.",
-        });
-        setIsLoading(false);
-    };
-
-    /* Original Google Login - Disabled
     const loginWithGoogle = async () => {
         setIsLoading(true);
         try {
             const provider = new GoogleAuthProvider();
             const result = await signInWithPopup(auth, provider);
             const token = await result.user.getIdToken();
-            const email = result.user.email;
-            const displayName = result.user.displayName;
 
             // Send to backend to verify & create session
             const response = await api.post('/auth/firebase', {
@@ -166,7 +153,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 title: "Login Successful",
                 description: `Welcome, ${response.user.name}!`,
             });
-            navigate('/');
+            const origin = (location.state as any)?.from?.pathname || '/';
+            navigate(origin);
         } catch (error: any) {
             console.error("Google Login Error", error);
             toast({
@@ -178,7 +166,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoading(false);
         }
     };
-    */
+
 
     return (
         <AuthContext.Provider value={{ user, isLoading, login, register, logout, checkAuth, loginWithGoogle }}>
