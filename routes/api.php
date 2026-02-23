@@ -28,11 +28,11 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/settings', [SiteSettingController::class, 'index']);
-Route::post('/auth/firebase', [AuthController::class, 'firebase']);
-Route::get('/content/benefits-page', [ContentController::class, 'getBenefitsPage']);
-Route::get('/content/hero-banner', [ContentController::class, 'getHeroBanner']);
-Route::get('/content/footer', [ContentController::class, 'getFooter']);
-Route::get('/content/contact', [ContactController::class, 'index']);
+Route::post('/auth/firebase', [\App\Http\Controllers\Api\AuthController::class, 'firebase']);
+Route::get('/content/benefits-page', [\App\Http\Controllers\Api\ContentController::class, 'getBenefitsPage']);
+Route::get('/content/hero-banner', [\App\Http\Controllers\Api\ContentController::class, 'getHeroBanner']);
+Route::get('/content/footer', [\App\Http\Controllers\Api\ContentController::class, 'getFooter']);
+Route::get('/content/contact', [\App\Http\Controllers\Api\ContactController::class, 'index']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
