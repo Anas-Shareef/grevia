@@ -137,6 +137,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(true);
         try {
             const provider = new GoogleAuthProvider();
+            provider.addScope('email');
+            provider.addScope('profile');
             const result = await signInWithPopup(auth, provider);
             const token = await result.user.getIdToken();
             const email = result.user.email;

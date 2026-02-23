@@ -137,7 +137,19 @@ class AuthController extends Controller
         $displayName = $firebaseUser['displayName'] ?? $request->input('name', 'User');
 
         if (!$email) {
-            Log::warning('Firebase Login: Email missing for UID: ' . $uid, [
+            // Last resort: Generate a unique placeholder email for the verified identity
+            $email = "user_{$uid}@firebase.grevia.in";
+            $extraction_log[] = "generated fallback email";
+            
+            Log::info('Firebase Login: Generated fallback email for UID: ' . $uid, [
+                'uid' => $uid,
+                'email' => $email
+            ]);
+        }
+
+        // Final check just in case, though email should now exist
+        if (!$email) {
+            Log::warning('Firebase Login: Still missing email for UID: ' . $uid, [
                 'firebase_user_keys' => array_keys($firebaseUser),
                 'request_keys' => array_keys($request->all()),
                 'extraction_log' => $extraction_log
