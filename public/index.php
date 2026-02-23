@@ -2,6 +2,10 @@
 
 use Illuminate\Http\Request;
 
+// Resolve Cross-Origin-Opener-Policy issues for Firebase Popups
+header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
+header('Cross-Origin-Embedder-Policy: unsafe-none');
+
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...

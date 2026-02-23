@@ -141,14 +141,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             provider.addScope('profile');
             const result = await signInWithPopup(auth, provider);
             const token = await result.user.getIdToken();
-            const email = result.user.email;
-            const displayName = result.user.displayName;
+
+            // Robust email extraction from result.user and providerData
+            let email = result.user.email;
+            if (!email && result.user.providerData.length > 0) {
+                email = result.user.providerData[0].email;
+            }
+
+            const displayName = result.user.displayName || (result.user.providerData.length > 0 ? result.user.providerData[0].displayName : 'User');
 
             const payload = {
                 token,
                 email,
                 name: displayName,
-                firebase_email: email, // New diagnostic field
+                firebase_email: result.user.email, // Original field for diagnostics
                 newsletter: true
             };
 
