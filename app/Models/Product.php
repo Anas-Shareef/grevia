@@ -101,6 +101,11 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
     public function mainImage()
     {
         return $this->hasOne(ProductImage::class)->where('is_main', true);

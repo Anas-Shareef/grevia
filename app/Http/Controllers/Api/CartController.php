@@ -18,15 +18,18 @@ class CartController extends Controller
         }
 
         $cartItems = CartItem::where('user_id', $user->id)
-            ->with('product')
+            ->with(['product', 'variant'])
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => $item->product->slug ?? $item->product->id, // Use slug to match frontend
+                    'id' => $item->product->slug ?? $item->product->id,
+                    'variant_id' => $item->variant_id,
                     'name' => $item->product->name,
-                    'price' => $item->product->price,
+                    'price' => $item->variant ? $item->variant->effective_price : $item->product->price,
                     'image' => $item->product->image_url,
                     'quantity' => $item->quantity,
+                    'weight' => $item->variant ? $item->variant->weight : null,
+                    'pack_size' => $item->variant ? $item->variant->pack_size : null,
                 ];
             });
 
@@ -43,16 +46,12 @@ class CartController extends Controller
         }
 
         $items = $request->input('items', []);
-
-        // Flatten duplicates if any (summing quantities or taking last)
-        // Since frontend should handle specific item logic, we'll just unique by ID to prevent crashes
-        // but robustly, we should map them to actual product IDs first.
         
         // Clear existing cart
         CartItem::where('user_id', $user->id)->delete();
         
-        // Track added product IDs to prevent SQL unique constraint errors within this transaction
-        $addedProductIds = [];
+        // Track unique combos to prevent duplicate entries
+        $addedCombos = [];
 
         foreach ($items as $item) {
             // Find product by slug or ID
@@ -61,22 +60,24 @@ class CartController extends Controller
                 ->first();
             
             if (!$product) {
-                \Log::warning('Product not found for cart sync', ['product_id' => $item['id']]);
                 continue;
             }
 
-            // Skip if we already added this product in this sync cycle
-            if (in_array($product->id, $addedProductIds)) {
+            $variantId = $item['variant_id'] ?? null;
+            $comboKey = $product->id . '_' . ($variantId ?? '0');
+
+            if (in_array($comboKey, $addedCombos)) {
                 continue;
             }
 
             CartItem::create([
                 'user_id' => $user->id,
-                'product_id' => $product->id, // Use numeric ID
+                'product_id' => $product->id,
+                'variant_id' => $variantId,
                 'quantity' => $item['quantity'],
             ]);
             
-            $addedProductIds[] = $product->id;
+            $addedCombos[] = $comboKey;
         }
 
         return response()->json(['success' => true]);
@@ -93,6 +94,7 @@ class CartController extends Controller
 
         $validated = $request->validate([
             'product_id' => 'required',
+            'variant_id' => 'nullable|exists:product_variants,id',
             'quantity' => 'required|integer|min:1',
         ]);
 
@@ -105,10 +107,21 @@ class CartController extends Controller
             return response()->json(['error' => 'Product not found'], 404);
         }
 
+        // Validate variant belongs to product if provided
+        if ($validated['variant_id']) {
+            $variant = \App\Models\ProductVariant::where('id', $validated['variant_id'])
+                ->where('product_id', $product->id)
+                ->first();
+            if (!$variant) {
+                return response()->json(['error' => 'Invalid variant for this product'], 422);
+            }
+        }
+
         CartItem::updateOrCreate(
             [
                 'user_id' => $user->id,
-                'product_id' => $product->id, // Use numeric ID
+                'product_id' => $product->id,
+                'variant_id' => $validated['variant_id'],
             ],
             [
                 'quantity' => $validated['quantity'],
@@ -127,9 +140,23 @@ class CartController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        CartItem::where('user_id', $user->id)
-            ->where('product_id', $productId)
-            ->delete();
+        $variantId = $request->query('variant_id');
+
+        $query = CartItem::where('user_id', $user->id);
+        
+        if (is_numeric($productId)) {
+            $query->where('product_id', $productId);
+        } else {
+            $query->whereHas('product', function($q) use ($productId) {
+                $q->where('slug', $productId);
+            });
+        }
+
+        if ($variantId) {
+            $query->where('variant_id', $variantId);
+        }
+
+        $query->delete();
 
         return response()->json(['success' => true]);
     }

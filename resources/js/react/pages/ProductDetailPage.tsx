@@ -8,7 +8,7 @@ import { Product } from "@/data/products";
 import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ImageZoom from "@/components/ImageZoom";
 import WishlistButton from "@/components/WishlistButton";
 import ReviewsSection from "@/components/ReviewsSection";
@@ -18,9 +18,42 @@ const ProductDetailPage = () => {
   const { addToCart, setIsCartOpen } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedWeight, setSelectedWeight] = useState<string | null>(null);
+  const [selectedPackSize, setSelectedPackSize] = useState<number | null>(null);
 
   const { data: product, isLoading: isProductLoading } = useProduct(id || "");
   const { data: allProducts } = useProducts();
+
+  // Auto-select default variant
+  useEffect(() => {
+    if (product?.variants && product.variants.length > 0) {
+      // Find cheapest active variant
+      const cheapest = [...product.variants]
+        .filter(v => v.status === 'active')
+        .sort((a, b) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
+
+      if (cheapest) {
+        setSelectedWeight(cheapest.weight);
+        setSelectedPackSize(cheapest.pack_size);
+      }
+    }
+  }, [product]);
+
+  const currentVariant = product?.variants?.find(v =>
+    v.weight === selectedWeight && v.pack_size === selectedPackSize
+  );
+
+  const displayPrice = currentVariant
+    ? Number(currentVariant.discount_price || currentVariant.price)
+    : product?.price;
+
+  const displayOriginalPrice = currentVariant?.discount_price
+    ? Number(currentVariant.price)
+    : product?.originalPrice;
+
+  const isInStock = currentVariant
+    ? currentVariant.stock_quantity > 0
+    : product?.inStock;
 
   const relatedProducts = product && allProducts
     ? (Array.isArray(allProducts) ? allProducts : allProducts?.data || []).filter((p) => p.category === product.category && p.id !== product.id).slice(0, 3)
@@ -28,8 +61,8 @@ const ProductDetailPage = () => {
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart(product, quantity);
-      toast.success(`${product.name} added to cart!`, {
+      addToCart(product, quantity, currentVariant?.id);
+      toast.success(`${product.name}${currentVariant ? ` (${currentVariant.weight}, Pack of ${currentVariant.pack_size})` : ''} added to cart!`, {
         duration: 2000,
       });
     }
@@ -72,7 +105,9 @@ const ProductDetailPage = () => {
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+              Back to {typeof product.category === 'string'
+                ? product.category.charAt(0).toUpperCase() + product.category.slice(1)
+                : product.category.name}
             </Link>
           </motion.div>
 
@@ -181,15 +216,69 @@ const ProductDetailPage = () => {
                 </div>
               </div>
 
+              {/* Variant Selectors */}
+              {product.variants && product.variants.length > 0 && (
+                <div className="space-y-6 mb-6">
+                  {/* Weight Selector */}
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wide mb-3">
+                      Select Weight
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {Array.from(new Set(product.variants.map(v => v.weight))).map(weight => (
+                        <button
+                          key={weight}
+                          onClick={() => {
+                            setSelectedWeight(weight);
+                            // Auto-select first available pack size for this weight
+                            const firstPack = product.variants?.find(v => v.weight === weight);
+                            if (firstPack) setSelectedPackSize(firstPack.pack_size);
+                          }}
+                          className={`px-4 py-2 rounded-squircle text-sm font-bold transition-all border-2 ${selectedWeight === weight
+                            ? "border-lime bg-lime/10 text-foreground"
+                            : "border-border hover:border-lime/30 text-muted-foreground"
+                            }`}
+                        >
+                          {weight}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pack Size Selector */}
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wide mb-3">
+                      Pack Size
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {product.variants
+                        .filter(v => v.weight === selectedWeight)
+                        .map(v => (
+                          <button
+                            key={v.id}
+                            onClick={() => setSelectedPackSize(v.pack_size)}
+                            className={`px-4 py-2 rounded-squircle text-sm font-bold transition-all border-2 ${selectedPackSize === v.pack_size
+                              ? "border-lime bg-lime/10 text-foreground"
+                              : "border-border hover:border-lime/30 text-muted-foreground"
+                              }`}
+                          >
+                            Pack of {v.pack_size}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Price */}
               <div className="mb-6">
                 <div className="flex items-baseline gap-3">
                   <span className="text-4xl font-black text-foreground">
-                    ₹{product.price}
+                    ₹{displayPrice}
                   </span>
-                  {product.originalPrice && (
+                  {displayOriginalPrice && displayOriginalPrice > (displayPrice || 0) && (
                     <span className="text-xl text-muted-foreground line-through">
-                      ₹{product.originalPrice}
+                      ₹{displayOriginalPrice}
                     </span>
                   )}
                 </div>
@@ -225,9 +314,10 @@ const ProductDetailPage = () => {
                   size="xl"
                   className="flex-1"
                   onClick={handleAddToCart}
+                  disabled={!isInStock}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  Add to Cart
+                  {isInStock ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
                 <Button
                   variant="outline"
@@ -249,10 +339,15 @@ const ProductDetailPage = () => {
 
               {/* Stock Status */}
               <div className="mt-4 flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${product.inStock ? 'bg-lime' : 'bg-destructive'}`} />
+                <div className={`w-2 h-2 rounded-full ${isInStock ? 'bg-lime' : 'bg-destructive'}`} />
                 <span className="text-sm text-muted-foreground">
-                  {product.inStock ? 'In Stock' : 'Out of Stock'}
+                  {isInStock ? 'In Stock' : 'Out of Stock'}
                 </span>
+                {currentVariant && currentVariant.stock_quantity < 10 && currentVariant.stock_quantity > 0 && (
+                  <span className="text-xs font-bold text-orange-500 ml-2">
+                    Only {currentVariant.stock_quantity} left!
+                  </span>
+                )}
               </div>
             </motion.div>
           </div>

@@ -6,14 +6,17 @@ import { api } from "@/lib/api";
 
 export interface CartItem {
   product: Product;
+  variantId?: string | number;
+  weight?: string;
+  packSize?: number;
   quantity: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity?: number, variantId?: string | number) => void;
+  removeFromCart: (productId: string, variantId?: string | number) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string | number) => void;
   clearCart: () => void;
   getCartTotal: () => number;
   getCartCount: () => number;
@@ -50,6 +53,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
               price: item.price,
               image: item.image,
             } as Product,
+            variantId: item.variant_id,
+            weight: item.weight,
+            packSize: item.pack_size,
             quantity: item.quantity,
           }));
 
@@ -111,15 +117,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const merged = new Map<string, CartItem>();
 
     [...cart1, ...cart2].forEach(item => {
-      const existing = merged.get(item.product.id);
+      const variantKey = item.variantId ? `_${item.variantId}` : '';
+      const key = `${item.product.id}${variantKey}`;
+
+      const existing = merged.get(key);
       if (existing) {
         // Sum quantities
-        merged.set(item.product.id, {
+        merged.set(key, {
           ...existing,
           quantity: existing.quantity + item.quantity
         });
       } else {
-        merged.set(item.product.id, item);
+        merged.set(key, item);
       }
     });
 
@@ -136,6 +145,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const items = cart.map(item => ({
         id: item.product.id,
+        variant_id: item.variantId,
         quantity: item.quantity,
       }));
 
@@ -158,37 +168,52 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const addToCart = useCallback(async (product: Product, quantity: number = 1) => {
-    const existingItem = items.find(item => item.product.id === product.id);
+  const addToCart = useCallback(async (product: Product, quantity: number = 1, variantId?: string | number) => {
+    const variant = product.variants?.find(v => v.id == variantId);
+
+    const existingItem = items.find(item =>
+      item.product.id === product.id && item.variantId == variantId
+    );
 
     let newItems: CartItem[];
     if (existingItem) {
       newItems = items.map(item =>
-        item.product.id === product.id
+        (item.product.id === product.id && item.variantId == variantId)
           ? { ...item, quantity: item.quantity + quantity }
           : item
       );
-      toast.success(`Updated ${product.name} quantity to ${existingItem.quantity + quantity}`);
+      toast.success(`Updated quantity in cart`);
     } else {
-      newItems = [...items, { product, quantity }];
+      newItems = [...items, {
+        product,
+        quantity,
+        variantId,
+        weight: variant?.weight,
+        packSize: variant?.pack_size
+      }];
+      toast.success(`Added to cart`);
     }
 
     await updateCart(newItems);
   }, [items, updateCart]);
 
-  const removeFromCart = useCallback(async (productId: string) => {
-    const newItems = items.filter(item => item.product.id !== productId);
+  const removeFromCart = useCallback(async (productId: string, variantId?: string | number) => {
+    const newItems = items.filter(item =>
+      !(item.product.id === productId && item.variantId == variantId)
+    );
     await updateCart(newItems);
   }, [items, updateCart]);
 
-  const updateQuantity = useCallback(async (productId: string, quantity: number) => {
+  const updateQuantity = useCallback(async (productId: string, quantity: number, variantId?: string | number) => {
     if (quantity <= 0) {
-      await removeFromCart(productId);
+      await removeFromCart(productId, variantId);
       return;
     }
 
     const newItems = items.map(item =>
-      item.product.id === productId ? { ...item, quantity } : item
+      (item.product.id === productId && item.variantId == variantId)
+        ? { ...item, quantity }
+        : item
     );
     await updateCart(newItems);
   }, [items, updateCart, removeFromCart]);
@@ -206,7 +231,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, updateCart]);
 
   const getCartTotal = useCallback(() => {
-    return items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+    return items.reduce((total, item) => {
+      const variant = item.product.variants?.find(v => v.id == item.variantId);
+      const price = variant ? Number(variant.discount_price || variant.price) : Number(item.product.price);
+      return total + price * item.quantity;
+    }, 0);
   }, [items]);
 
   const getCartCount = useCallback(() => {

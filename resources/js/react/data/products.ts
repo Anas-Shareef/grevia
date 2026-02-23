@@ -4,6 +4,18 @@ import product3 from "@/assets/product-3.jpg";
 import bakeryCategory from "@/assets/bakery-category.jpg";
 import picklesCategory from "@/assets/pickles-category.jpg";
 
+export interface ProductVariant {
+  id: number;
+  product_id: number;
+  weight: string;
+  pack_size: number;
+  price: number | string;
+  discount_price?: number | string;
+  stock_quantity: number;
+  sku: string;
+  status: 'active' | 'inactive';
+}
+
 export interface Product {
   id: string;
   dbId?: number; // Added for backend compatibility
@@ -33,6 +45,7 @@ export interface Product {
   mainImage?: {
     url: string;
   };
+  variants?: ProductVariant[];
 }
 
 export const products: Product[] = [

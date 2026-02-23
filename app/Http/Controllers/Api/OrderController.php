@@ -12,12 +12,9 @@ class OrderController extends Controller
     {
         $user = $request->user();
         $orders = $user->orders()
-            ->with(['orderItems.product'])
+            ->with(['orderItems.product', 'orderItems.variant'])
             ->latest()
             ->get();
-
-        // Get all orders in database for comparison
-        $allOrders = \App\Models\Order::select('id', 'user_id', 'name')->get();
 
         return response()->json($orders);
     }
@@ -30,17 +27,16 @@ class OrderController extends Controller
         try {
             if (!is_numeric($id)) {
                 $decryptedId = decrypt($id);
-                // Verify the decrypted ID belongs to the user or if basic ID match
                 $id = $decryptedId;
             }
         } catch (\Exception $e) {
-            // If decryption fails, continue with original ID (might be numeric)
+            // Continue with original ID
         }
 
         // Find order belonging to the user
         $order = Order::where('id', $id)
             ->where('user_id', $user->id)
-            ->with(['orderItems.product', 'transactions', 'payments'])
+            ->with(['orderItems.product', 'orderItems.variant', 'transactions', 'payments'])
             ->first();
 
         if (!$order) {
@@ -60,11 +56,8 @@ class OrderController extends Controller
         ]);
 
         $user = $request->user();
-        
-        // Calculate total on server side (mock logic for speed)
         $finalAmount = $request->amount; 
         
-        // Create Local Order
         $order = Order::create([
             'user_id' => $user->id,
             'status' => 'pending',
@@ -73,7 +66,7 @@ class OrderController extends Controller
             'discount' => 0,
             'total' => $finalAmount,
             'payment_method' => $request->payment_method,
-            'payment_status' => 'pending', // Pending for COD
+            'payment_status' => 'pending',
             'name' => $request->name ?? $user->name,
             'email' => $request->email ?? $user->email,
             'phone' => $request->phone ?? '',
@@ -83,18 +76,37 @@ class OrderController extends Controller
 
         // Create Order Items
         foreach ($request->items as $item) {
-             // Find product by slug or ID
              $product = \App\Models\Product::where('slug', $item['product_id'])
-             ->orWhere('id', $item['product_id'])
-             ->first();
+                ->orWhere('id', $item['product_id'])
+                ->first();
          
              if ($product) {
+                 $variant = null;
+                 $price = $product->price;
+                 $weight = null;
+                 $packSize = null;
+
+                 if (!empty($item['variant_id'])) {
+                     $variant = \App\Models\ProductVariant::find($item['variant_id']);
+                     if ($variant && $variant->product_id == $product->id) {
+                         $price = $variant->effective_price;
+                         $weight = $variant->weight;
+                         $packSize = $variant->pack_size;
+                         
+                         // Deduct stock
+                         $variant->decrement('stock_quantity', $item['quantity']);
+                     }
+                 }
+
                  $order->orderItems()->create([
                      'product_id' => $product->id,
+                     'variant_id' => $variant ? $variant->id : null,
                      'product_name' => $product->name,
-                     'price' => $product->price,
+                     'weight' => $weight,
+                     'pack_size' => $packSize,
+                     'price' => $price,
                      'quantity' => $item['quantity'],
-                     'total' => $product->price * $item['quantity'],
+                     'total' => $price * $item['quantity'],
                  ]);
              }
         }
@@ -107,6 +119,7 @@ class OrderController extends Controller
             'message' => 'Order placed successfully'
         ]);
     }
+
     public function cancel($id, Request $request)
     {
         $user = $request->user();
@@ -120,15 +133,18 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order cannot be cancelled in current status'], 400);
         }
 
-        // Cancel the order
         $order->status = 'cancelled';
-        $order->cancelled_at = now(); // Ensure column exists or model handles it
+        $order->cancelled_at = now();
         $order->save();
 
-        // Optional: Restore boolean stock (if applicable)
+        // Restore stock
         foreach ($order->orderItems as $item) {
-            if ($item->product) {
-                // Optimistically mark as in stock if it was out
+            if ($item->variant_id) {
+                $variant = \App\Models\ProductVariant::find($item->variant_id);
+                if ($variant) {
+                    $variant->increment('stock_quantity', $item->quantity);
+                }
+            } elseif ($item->product) {
                 $item->product->update(['in_stock' => true]);
             }
         }
@@ -141,7 +157,7 @@ class OrderController extends Controller
         $user = $request->user();
         $order = Order::where('id', $id)
             ->where('user_id', $user->id)
-            ->with('orderItems.product')
+            ->with(['orderItems.product', 'orderItems.variant'])
             ->first();
 
         if (!$order) {
@@ -153,27 +169,33 @@ class OrderController extends Controller
 
         foreach ($order->orderItems as $item) {
             $product = $item->product;
+            $variant = $item->variant;
             
-            if (!$product || !$product->in_stock) {
+            // Check availability
+            $isAvailable = false;
+            if ($variant) {
+                $isAvailable = $variant->status === 'active' && $variant->stock_quantity >= $item->quantity;
+            } elseif ($product) {
+                $isAvailable = $product->in_stock;
+            }
+
+            if (!$isAvailable) {
                 $itemsSkipped++;
                 continue;
             }
 
             // Restore logic: Update or Create CartItem
-            $cartItem = \App\Models\CartItem::where('user_id', $user->id)
-                ->where('product_id', $product->id)
-                ->first();
-
-            if ($cartItem) {
-                $cartItem->quantity += $item->quantity;
-                $cartItem->save();
-            } else {
-                \App\Models\CartItem::create([
+            \App\Models\CartItem::updateOrCreate(
+                [
                     'user_id' => $user->id,
                     'product_id' => $product->id,
-                    'quantity' => $item->quantity
-                ]);
-            }
+                    'variant_id' => $item->variant_id
+                ],
+                [
+                    'quantity' => \DB::raw('quantity + ' . $item->quantity)
+                ]
+            );
+
             $itemsAdded++;
         }
 
@@ -186,7 +208,7 @@ class OrderController extends Controller
         }
 
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => $message,
             'items_added' => $itemsAdded
         ]);
