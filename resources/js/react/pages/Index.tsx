@@ -6,15 +6,22 @@ import ProductsSection from "@/components/ProductsSection";
 import BeyondSweetenersSection from "@/components/BeyondSweetenersSection";
 import ConversionBanner from "@/components/ConversionBanner";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main>
         <HeroSection />
-        <BenefitsSection />
-        <IngredientsSection />
+        {!user && (
+          <>
+            <BenefitsSection />
+            <IngredientsSection />
+          </>
+        )}
         <ProductsSection />
         <BeyondSweetenersSection />
         <ConversionBanner />
