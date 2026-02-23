@@ -139,10 +139,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const provider = new GoogleAuthProvider();
             const result = await signInWithPopup(auth, provider);
             const token = await result.user.getIdToken();
+            const email = result.user.email;
+            const displayName = result.user.displayName;
 
             // Send to backend to verify & create session
             const response = await api.post('/auth/firebase', {
                 token,
+                email,
+                name: displayName,
                 newsletter: true
             });
 

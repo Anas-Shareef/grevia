@@ -102,10 +102,10 @@ class AuthController extends Controller
         $firebaseUser = $data['users'][0];
         $uid = $firebaseUser['localId'];
         
-        // Robust email extraction
-        $email = $firebaseUser['email'] ?? null;
+        // Robust email extraction: check Firebase response first, then fallback to request
+        $email = $firebaseUser['email'] ?? $request->input('email');
         
-        // If email is missing at top level, check providerInfo
+        // If email still missing, check providerInfo
         if (!$email && !empty($firebaseUser['providerInfo'])) {
             foreach ($firebaseUser['providerInfo'] as $provider) {
                 if (!empty($provider['email'])) {
@@ -115,10 +115,13 @@ class AuthController extends Controller
             }
         }
 
-        $displayName = $firebaseUser['displayName'] ?? 'User';
+        $displayName = $firebaseUser['displayName'] ?? $request->input('name', 'User');
 
         if (!$email) {
-            Log::warning('Firebase Login: Email missing for UID: ' . $uid, ['firebase_user' => $firebaseUser]);
+            Log::warning('Firebase Login: Email missing for UID: ' . $uid, [
+                'firebase_user' => $firebaseUser,
+                'request_email' => $request->input('email')
+            ]);
             return response()->json(['message' => 'Email is required from Firebase provider'], 422);
         }
 
