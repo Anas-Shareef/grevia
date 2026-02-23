@@ -92,16 +92,33 @@ class AuthController extends Controller
 
         $data = $response->json();
         
+        // Detailed logging for debugging
+        Log::info('Firebase Token Lookup Response', ['response' => $data]);
+
         if (empty($data['users'][0])) {
             return response()->json(['message' => 'User not found in Firebase'], 404);
         }
 
         $firebaseUser = $data['users'][0];
         $uid = $firebaseUser['localId'];
+        
+        // Robust email extraction
         $email = $firebaseUser['email'] ?? null;
+        
+        // If email is missing at top level, check providerInfo
+        if (!$email && !empty($firebaseUser['providerInfo'])) {
+            foreach ($firebaseUser['providerInfo'] as $provider) {
+                if (!empty($provider['email'])) {
+                    $email = $provider['email'];
+                    break;
+                }
+            }
+        }
+
         $displayName = $firebaseUser['displayName'] ?? 'User';
 
         if (!$email) {
+            Log::warning('Firebase Login: Email missing for UID: ' . $uid, ['firebase_user' => $firebaseUser]);
             return response()->json(['message' => 'Email is required from Firebase provider'], 422);
         }
 
