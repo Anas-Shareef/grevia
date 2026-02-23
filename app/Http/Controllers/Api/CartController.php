@@ -17,19 +17,26 @@ class CartController extends Controller
             return response()->json(['items' => []], 401);
         }
 
+        $relations = ['product'];
+        $hasVariantsTable = \Schema::hasTable('product_variants');
+        if ($hasVariantsTable) {
+            $relations[] = 'variant';
+        }
+
         $cartItems = CartItem::where('user_id', $user->id)
-            ->with(['product', 'variant'])
+            ->with($relations)
             ->get()
-            ->map(function ($item) {
+            ->map(function ($item) use ($hasVariantsTable) {
+                $hasVariant = $hasVariantsTable && $item->variant;
                 return [
                     'id' => $item->product->slug ?? $item->product->id,
                     'variant_id' => $item->variant_id,
                     'name' => $item->product->name,
-                    'price' => $item->variant ? $item->variant->effective_price : $item->product->price,
+                    'price' => $hasVariant ? $item->variant->effective_price : $item->product->price,
                     'image' => $item->product->image_url,
                     'quantity' => $item->quantity,
-                    'weight' => $item->variant ? $item->variant->weight : null,
-                    'pack_size' => $item->variant ? $item->variant->pack_size : null,
+                    'weight' => $hasVariant ? $item->variant->weight : null,
+                    'pack_size' => $hasVariant ? $item->variant->pack_size : null,
                 ];
             });
 
@@ -92,11 +99,19 @@ class CartController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $validated = $request->validate([
+        $rules = [
             'product_id' => 'required',
-            'variant_id' => 'nullable|exists:product_variants,id',
             'quantity' => 'required|integer|min:1',
-        ]);
+        ];
+
+        // Only validate exists if table exists
+        if (\Schema::hasTable('product_variants')) {
+            $rules['variant_id'] = 'nullable|exists:product_variants,id';
+        } else {
+            $rules['variant_id'] = 'nullable';
+        }
+
+        $validated = $request->validate($rules);
 
         // Find product by slug or ID
         $product = \App\Models\Product::where('slug', $validated['product_id'])
@@ -107,8 +122,8 @@ class CartController extends Controller
             return response()->json(['error' => 'Product not found'], 404);
         }
 
-        // Validate variant belongs to product if provided
-        if ($validated['variant_id']) {
+        // Validate variant belongs to product if provided and table exists
+        if ($validated['variant_id'] && \Schema::hasTable('product_variants')) {
             $variant = \App\Models\ProductVariant::where('id', $validated['variant_id'])
                 ->where('product_id', $product->id)
                 ->first();
