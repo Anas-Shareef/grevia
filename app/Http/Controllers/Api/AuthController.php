@@ -76,6 +76,11 @@ class AuthController extends Controller
             'token' => 'required|string',
         ]);
 
+        Log::info('Firebase Auth Request Received', [
+            'raw_request' => $request->all(),
+            'keys' => array_keys($request->all())
+        ]);
+
         $firebaseToken = $request->input('token');
         // Use the API KEY provided by the user
         $apiKey = "AIzaSyDAW_bfNcKUguIlf9It7rkMThfQP5Ic6NE"; 
@@ -103,13 +108,27 @@ class AuthController extends Controller
         $uid = $firebaseUser['localId'];
         
         // Robust email extraction: check Firebase response first, then fallback to request
-        $email = $firebaseUser['email'] ?? $request->input('email');
+        $extraction_log = [];
+        
+        $email = $firebaseUser['email'] ?? null;
+        if ($email) $extraction_log[] = "found in firebase_user['email']";
+
+        if (!$email) {
+            $email = $request->input('email');
+            if ($email) $extraction_log[] = "found in request->input('email')";
+        }
+
+        if (!$email) {
+            $email = $request->input('firebase_email');
+            if ($email) $extraction_log[] = "found in request->input('firebase_email')";
+        }
         
         // If email still missing, check providerInfo
         if (!$email && !empty($firebaseUser['providerInfo'])) {
             foreach ($firebaseUser['providerInfo'] as $provider) {
                 if (!empty($provider['email'])) {
                     $email = $provider['email'];
+                    $extraction_log[] = "found in providerInfo";
                     break;
                 }
             }
@@ -119,10 +138,20 @@ class AuthController extends Controller
 
         if (!$email) {
             Log::warning('Firebase Login: Email missing for UID: ' . $uid, [
-                'firebase_user' => $firebaseUser,
-                'request_email' => $request->input('email')
+                'firebase_user_keys' => array_keys($firebaseUser),
+                'request_keys' => array_keys($request->all()),
+                'extraction_log' => $extraction_log
             ]);
-            return response()->json(['message' => 'Email is required from Firebase provider'], 422);
+            
+            return response()->json([
+                'message' => 'Email is required from Firebase provider',
+                'diagnostics' => [
+                    'request_received_keys' => array_keys($request->all()),
+                    'firebase_response_keys' => array_keys($firebaseUser),
+                    'extraction_attempts' => $extraction_log,
+                    'uid' => $uid
+                ]
+            ], 422);
         }
 
         // Find or Create User

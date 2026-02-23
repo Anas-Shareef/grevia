@@ -142,13 +142,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const email = result.user.email;
             const displayName = result.user.displayName;
 
-            // Send to backend to verify & create session
-            const response = await api.post('/auth/firebase', {
+            const payload = {
                 token,
                 email,
                 name: displayName,
+                firebase_email: email, // New diagnostic field
                 newsletter: true
-            });
+            };
+
+            console.log("SENDING TO BACKEND /auth/firebase:", payload);
+
+            // Send to backend to verify & create session
+            const response = await api.post('/auth/firebase', payload);
 
             localStorage.setItem('token', response.token);
             setUser(response.user);
