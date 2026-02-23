@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('marketing_consent')->default(false)->after('email');
-            $table->timestamp('unsubscribed_at')->nullable()->after('marketing_consent');
+            if (!Schema::hasColumn('users', 'marketing_consent')) {
+                $table->boolean('marketing_consent')->default(false)->after('email');
+            }
+            if (!Schema::hasColumn('users', 'unsubscribed_at')) {
+                $table->timestamp('unsubscribed_at')->nullable()->after('marketing_consent');
+            }
         });
     }
 

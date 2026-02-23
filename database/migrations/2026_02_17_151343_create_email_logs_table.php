@@ -11,23 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('email_logs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('campaign_id')->nullable()->constrained('email_campaigns')->cascadeOnDelete();
-            $table->foreignId('template_id')->nullable()->constrained('email_templates')->nullOnDelete();
-            $table->foreignId('event_id')->nullable()->constrained('marketing_events')->nullOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('email');
-            $table->enum('status', ['pending', 'sent', 'failed', 'opened', 'clicked'])->default('pending');
-            $table->text('error_message')->nullable();
-            $table->timestamp('sent_at')->nullable();
-            $table->timestamp('opened_at')->nullable();
-            $table->timestamp('clicked_at')->nullable();
-            $table->timestamps();
-            
-            $table->index(['campaign_id', 'status']);
-            $table->index(['email', 'campaign_id']);
-        });
+        if (!Schema::hasTable('email_logs')) {
+            Schema::create('email_logs', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('campaign_id')->nullable()->constrained('email_campaigns')->cascadeOnDelete();
+                $table->foreignId('template_id')->nullable()->constrained('email_templates')->nullOnDelete();
+                $table->foreignId('event_id')->nullable()->constrained('marketing_events')->nullOnDelete();
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                $table->string('email');
+                $table->enum('status', ['pending', 'sent', 'failed', 'opened', 'clicked'])->default('pending');
+                $table->text('error_message')->nullable();
+                $table->timestamp('sent_at')->nullable();
+                $table->timestamp('opened_at')->nullable();
+                $table->timestamp('clicked_at')->nullable();
+                $table->timestamps();
+                
+                $table->index(['campaign_id', 'status']);
+                $table->index(['email', 'campaign_id']);
+            });
+        }
     }
 
     /**

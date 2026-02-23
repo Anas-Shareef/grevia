@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('marketing_events', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('event_key')->unique();
-            $table->text('description')->nullable();
-            $table->foreignId('email_template_id')->nullable()->constrained('email_templates')->nullOnDelete();
-            $table->integer('delay_minutes')->default(0);
-            $table->boolean('status')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('marketing_events')) {
+            Schema::create('marketing_events', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('event_key')->unique();
+                $table->text('description')->nullable();
+                $table->foreignId('email_template_id')->nullable()->constrained('email_templates')->nullOnDelete();
+                $table->integer('delay_minutes')->default(0);
+                $table->boolean('status')->default(true);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
