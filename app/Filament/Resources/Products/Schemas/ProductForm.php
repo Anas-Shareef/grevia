@@ -95,6 +95,47 @@ class ProductForm
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['image_path'] ?? null),
                     ]),
+                Section::make('Product Variants')
+                    ->description('Manage weight/pack variants for this product. If variants exist, they will override the base price/stock on the frontend.')
+                    ->components([
+                        \Filament\Forms\Components\Repeater::make('variants')
+                            ->relationship()
+                            ->schema([
+                                TextInput::make('weight')
+                                    ->placeholder('e.g. 100g, 250g, 1kg')
+                                    ->required(),
+                                TextInput::make('pack_size')
+                                    ->label('Pack Size')
+                                    ->numeric()
+                                    ->default(1)
+                                    ->required(),
+                                TextInput::make('price')
+                                    ->numeric()
+                                    ->prefix('₹')
+                                    ->required(),
+                                TextInput::make('discount_price')
+                                    ->numeric()
+                                    ->prefix('₹')
+                                    ->label('Discount Price'),
+                                TextInput::make('stock_quantity')
+                                    ->numeric()
+                                    ->default(10)
+                                    ->required(),
+                                TextInput::make('sku')
+                                    ->label('SKU')
+                                    ->unique(\App\Models\ProductVariant::class, 'sku', ignoreRecord: true),
+                                Select::make('status')
+                                    ->options([
+                                        'active' => 'Active',
+                                        'inactive' => 'Inactive',
+                                    ])
+                                    ->default('active')
+                                    ->required(),
+                            ])
+                            ->columns(3)
+                            ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
+                            ->collapsible(),
+                    ]),
                 Section::make('Additional Data')
                     ->components([
                         TagsInput::make('ingredients')
