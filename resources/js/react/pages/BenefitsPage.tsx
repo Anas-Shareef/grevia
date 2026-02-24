@@ -10,7 +10,7 @@ const iconMap: Record<string, any> = {
   Leaf, Heart, Zap, Scale, Brain, Sparkles, Droplets, Shield
 };
 
-const STORAGE_URL = import.meta.env.VITE_STORAGE_URL || 'http://localhost:8000/storage';
+const STORAGE_URL = '/storage';
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -110,7 +110,9 @@ const BenefitsPage = () => {
                     >
                       <div className="aspect-square md:aspect-[4/3] lg:aspect-square rounded-3xl overflow-hidden shadow-2xl">
                         <img
-                          src={`${STORAGE_URL}/${section.image}`}
+                          src={section.image.startsWith('http') || section.image.startsWith('/storage')
+                            ? section.image
+                            : `${STORAGE_URL}/${section.image}`}
                           alt={section.title}
                           className="w-full h-full object-cover"
                         />
