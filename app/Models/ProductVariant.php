@@ -48,8 +48,8 @@ class ProductVariant extends Model
             return $this->hasMany(ProductImage::class, 'variant_id');
         }
         
-        // Fallback to a dummy relationship that won't crash (using 'id' as a safe existing column)
-        return $this->hasMany(ProductImage::class, 'id')->whereRaw('1=0');
+        // Fallback to a non-existent column that isn't the primary key
+        return $this->hasMany(ProductImage::class, 'variant_id_missing_in_db')->whereRaw('1=0');
     }
 
     public function product()

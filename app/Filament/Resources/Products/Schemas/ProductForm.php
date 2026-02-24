@@ -167,7 +167,8 @@ class ProductForm
                                     ->grid(2)
                                     ->collapsible()
                                     ->itemLabel(fn (array $state): ?string => $state['image_path'] ?? null)
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->hidden(fn () => !\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')),
                             ])
                             ->columns(3)
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
