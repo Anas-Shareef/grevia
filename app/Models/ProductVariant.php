@@ -48,8 +48,10 @@ class ProductVariant extends Model
             return $this->hasMany(ProductImage::class, 'variant_id');
         }
         
-        // Fallback to a non-existent column that isn't the primary key
-        return $this->hasMany(ProductImage::class, 'variant_id_missing_in_db')->whereRaw('1=0');
+        // Fallback: use an existing real column with an impossible value so MySQL
+        // doesn't complain about a missing column, but still returns no results.
+        return $this->hasMany(ProductImage::class, 'product_id')
+            ->where('product_id', -1);
     }
 
     public function product()
