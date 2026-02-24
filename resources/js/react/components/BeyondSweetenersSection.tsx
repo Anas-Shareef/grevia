@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { useProducts } from "@/hooks/useProducts";
 import { STORAGE_URL } from "@/lib/api";
 
@@ -29,12 +30,12 @@ const itemVariants = {
 };
 
 const BeyondSweetenersSection = () => {
-  const { data: response } = useProducts({ featured: '1' });
+  // Fetch featured products from the "other-products" category
+  const { data: response } = useProducts({ category: 'other-products', featured: '1' });
 
-  // Handle both array and paginated responses
   const allProducts = Array.isArray(response) ? response : response?.data || [];
 
-  // Hide the section completely if no featured products
+  // Hide the section completely if no featured products in this category
   if (!allProducts || allProducts.length === 0) return null;
 
   return (
@@ -130,6 +131,21 @@ const BeyondSweetenersSection = () => {
               </motion.div>
             );
           })}
+        </motion.div>
+
+        {/* All Products CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-center mt-12"
+        >
+          <Link to="/products/other-products">
+            <Button variant="default" size="lg">
+              All Products
+            </Button>
+          </Link>
         </motion.div>
       </div>
     </section>
