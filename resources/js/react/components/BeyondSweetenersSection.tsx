@@ -128,23 +128,22 @@ const BeyondSweetenersSection = () => {
                       {product.description}
                     </p>
 
-                    {/* Price */}
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-2xl font-black text-primary">
-                        ₹{typeof displayPrice === 'number'
-                          ? displayPrice.toFixed(0)
-                          : Number(displayPrice || 0).toFixed(0)}
-                      </span>
-                      {cheapestVariant && (
-                        <span className="text-xs text-muted-foreground font-medium bg-secondary px-2 py-1 rounded-full">
-                          {cheapestVariant.weight}
+                    {/* Price + Explore row */}
+                    <div className="flex items-center justify-between">
+                      <div className="inline-flex items-center text-primary font-bold text-sm group/btn border border-primary/30 px-4 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300">
+                        Explore Product
+                        <ArrowRight className="w-4 h-4 ml-1.5 group-hover/btn:translate-x-1 transition-transform" />
+                      </div>
+                      <div className="text-right">
+                        <span className="text-2xl font-black text-primary">
+                          ₹{typeof displayPrice === 'number'
+                            ? displayPrice.toFixed(0)
+                            : Number(displayPrice || 0).toFixed(0)}
                         </span>
-                      )}
-                    </div>
-
-                    <div className="inline-flex items-center text-primary font-bold text-sm group/btn border border-primary/30 px-4 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300">
-                      Explore Product
-                      <ArrowRight className="w-4 h-4 ml-1.5 group-hover/btn:translate-x-1 transition-transform" />
+                        {cheapestVariant && (
+                          <div className="text-xs text-muted-foreground font-medium">{cheapestVariant.weight}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -163,7 +162,7 @@ const BeyondSweetenersSection = () => {
         >
           <Link to="/products/other-products">
             <Button variant="default" size="lg" className="px-10 py-6 text-base font-bold rounded-full shadow-lg hover:shadow-primary/30 hover:scale-105 transition-all duration-300">
-              All Products
+              View All Products
             </Button>
           </Link>
         </motion.div>
