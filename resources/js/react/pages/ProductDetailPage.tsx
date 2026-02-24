@@ -352,8 +352,7 @@ const ProductDetailPage = () => {
                 <Button
                   variant="limeLg"
                   size="xl"
-                  className="flex-1"
-                  style={{ paddingTop: '5px', paddingBottom: '5px' }}
+                  className="flex-1 max-sm:h-auto max-sm:py-[5px]"
                   onClick={handleAddToCart}
                   disabled={!isInStock}
                 >
@@ -363,8 +362,7 @@ const ProductDetailPage = () => {
                 <Button
                   variant="outline"
                   size="xl"
-                  className="flex-1"
-                  style={{ paddingTop: '5px', paddingBottom: '5px' }}
+                  className="flex-1 max-sm:h-auto max-sm:py-[5px]"
                   onClick={() => {
                     handleAddToCart();
                     setIsCartOpen(true);
