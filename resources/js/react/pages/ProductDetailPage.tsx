@@ -152,9 +152,9 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Thumbnail Strip */}
-              {(product.gallery && product.gallery.length > 0) ? (
+              {((currentVariant?.images && currentVariant.images.length > 0) || (product.gallery && product.gallery.length > 0)) ? (
                 <div className="flex gap-4 overflow-x-auto pb-2">
-                  {product.gallery.map((img) => (
+                  {((currentVariant?.images && currentVariant.images.length > 0) ? currentVariant.images : product.gallery).map((img) => (
                     <button
                       key={img.id}
                       onClick={() => setSelectedImage(img.url)}

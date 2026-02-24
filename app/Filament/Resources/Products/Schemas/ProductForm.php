@@ -68,7 +68,12 @@ class ProductForm
                     ->collapsed()
                     ->components([
                         \Filament\Forms\Components\Repeater::make('gallery')
-                            ->relationship('gallery', fn ($query) => $query->whereNull('variant_id'))
+                            ->relationship('gallery', function ($query) {
+                                if (\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
+                                    return $query->whereNull('variant_id');
+                                }
+                                return $query;
+                            })
                             ->schema([
                                 FileUpload::make('image_path')
                                     ->label('Image')
@@ -138,7 +143,13 @@ class ProductForm
                                     ->default('active')
                                     ->required(),
                                 \Filament\Forms\Components\Repeater::make('images')
-                                    ->relationship('images')
+                                    ->relationship('images', function ($query) {
+                                        if (!\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
+                                            // Fallback to empty if column doesn't exist yet
+                                            return $query->whereRaw('1 = 0');
+                                        }
+                                        return $query;
+                                    })
                                     ->schema([
                                         FileUpload::make('image_path')
                                             ->label('Image')

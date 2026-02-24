@@ -155,7 +155,15 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        $product = Product::with(['category', 'gallery', 'mainImage', 'variants.images', 'reviews.user', 'reviews.images'])
+        $relationships = ['category', 'gallery', 'mainImage', 'reviews.user', 'reviews.images'];
+        
+        if (\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
+            $relationships[] = 'variants.images';
+        } else {
+            $relationships[] = 'variants';
+        }
+
+        $product = Product::with($relationships)
             ->where('slug', $slug)
             ->firstOrFail();
             
