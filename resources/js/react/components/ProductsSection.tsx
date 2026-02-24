@@ -28,7 +28,7 @@ const itemVariants = {
 };
 
 const ProductsSection = () => {
-  const { data: response } = useProducts({ featured: '1' });
+  const { data: response } = useProducts({ category: 'sweeteners', featured: '1' });
   const { addToCart } = useCart();
 
   // Handle both array response (old) and paginated response (new)

@@ -30,7 +30,7 @@ const itemVariants = {
 };
 
 const BeyondSweetenersSection = () => {
-  // Fetch featured products from the "other-products" category
+  // Fetch featured products from the "other-products" category only
   const { data: response } = useProducts({ category: 'other-products', featured: '1' });
 
   const allProducts = Array.isArray(response) ? response : response?.data || [];
