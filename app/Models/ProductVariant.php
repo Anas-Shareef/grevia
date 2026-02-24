@@ -43,7 +43,13 @@ class ProductVariant extends Model
 
     public function images()
     {
-        return $this->hasMany(ProductImage::class, 'variant_id');
+        // Use standard relationship if column exists
+        if (\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
+            return $this->hasMany(ProductImage::class, 'variant_id');
+        }
+        
+        // Fallback to a dummy relationship that won't crash (using 'id' as a safe existing column)
+        return $this->hasMany(ProductImage::class, 'id')->whereRaw('1=0');
     }
 
     public function product()

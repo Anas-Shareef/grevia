@@ -72,6 +72,7 @@ class ProductForm
                                 if (\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
                                     return $query->whereNull('variant_id');
                                 }
+                                // If column is missing, don't add the WHERE clause at all
                                 return $query;
                             })
                             ->schema([
@@ -143,13 +144,7 @@ class ProductForm
                                     ->default('active')
                                     ->required(),
                                 \Filament\Forms\Components\Repeater::make('images')
-                                    ->relationship('images', function ($query) {
-                                        if (!\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
-                                            // Fallback to empty if column doesn't exist yet
-                                            return $query->whereRaw('1 = 0');
-                                        }
-                                        return $query;
-                                    })
+                                    ->relationship('images')
                                     ->schema([
                                         FileUpload::make('image_path')
                                             ->label('Image')

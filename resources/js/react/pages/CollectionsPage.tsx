@@ -114,7 +114,7 @@ const CollectionsPage = () => {
                                 filters={filters}
                                 setFilter={setFilter}
                                 resetFilters={resetFilters}
-                                meta={response?.filters}
+                                meta={(response as any)?.filters}
                                 currentCategory={undefined}
                             />
                         </div>
