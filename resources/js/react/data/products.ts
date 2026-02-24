@@ -16,6 +16,12 @@ export interface ProductVariant {
   status: 'active' | 'inactive';
   image_path?: string;
   image_url?: string;
+  images?: {
+    id: number;
+    url: string;
+    is_main: boolean;
+    sort_order: number;
+  }[];
 }
 
 export interface Product {

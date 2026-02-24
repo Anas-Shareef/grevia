@@ -12,6 +12,7 @@ class ProductImage extends Model
 
     protected $fillable = [
         'product_id',
+        'variant_id',
         'image_path',
         'is_main',
         'sort_order',
@@ -21,6 +22,7 @@ class ProductImage extends Model
         'is_main' => 'boolean',
         'sort_order' => 'integer',
         'product_id' => 'integer',
+        'variant_id' => 'integer',
     ];
 
     protected $appends = ['url'];
@@ -28,6 +30,11 @@ class ProductImage extends Model
     public function getUrlAttribute()
     {
         return \Illuminate\Support\Facades\Storage::url($this->image_path);
+    }
+
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class);
     }
 
     public function product()

@@ -38,7 +38,15 @@ const ProductsSection = () => {
   const displayProducts = allProducts.slice(0, 6);
 
   const handleAddToCart = (product: Product) => {
-    addToCart(product);
+    let variantId = undefined;
+    if (product.variants && product.variants.length > 0) {
+      const cheapest = [...product.variants]
+        .filter(v => v.status === 'active')
+        .sort((a, b) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
+      variantId = cheapest?.id;
+    }
+
+    addToCart(product, 1, variantId);
     toast.success(`${product.name} added to cart!`, {
       duration: 2000,
     });
@@ -136,18 +144,38 @@ const ProductsSection = () => {
                   {product.description}
                 </p>
 
-                {/* Price & CTA */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-black text-foreground">
-                      ₹{product.price}
-                    </span>
+                {/* Price & Weight/CTA */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-2xl font-black text-foreground">
+                        ₹{(() => {
+                          if (product.variants && product.variants.length > 0) {
+                            const cheapest = [...product.variants]
+                              .filter(v => v.status === 'active')
+                              .sort((a, b) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
+                            return cheapest ? (cheapest.discount_price || cheapest.price) : product.price;
+                          }
+                          return product.originalPrice || product.price;
+                        })()}
+                      </span>
+                      {product.variants && product.variants.length > 0 && (
+                        <span className="text-xs font-bold text-lime uppercase tracking-wider">
+                          For {(() => {
+                            const cheapest = [...product.variants]
+                              .filter(v => v.status === 'active')
+                              .sort((a, b) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
+                            return cheapest ? `${cheapest.weight} (Pack of ${cheapest.pack_size})` : 'Each';
+                          })()}
+                        </span>
+                      )}
+                    </div>
+                    <Link to={`/product/${product.id}`}>
+                      <Button variant="outline" size="sm">
+                        View Details
+                      </Button>
+                    </Link>
                   </div>
-                  <Link to={`/product/${product.id}`}>
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                  </Link>
                 </div>
               </div>
             </motion.article>

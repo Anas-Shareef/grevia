@@ -43,13 +43,14 @@ class ProductForm
                         RichEditor::make('long_description')
                             ->columnSpanFull(),
                     ]),
-                Section::make('Pricing & Inventory')
+                Section::make('Pricing & Inventory (Default)')
+                    ->description('These values serve as defaults if no variants are specified.')
                     ->columns(3)
+                    ->collapsed()
                     ->components([
                         TextInput::make('price')
                             ->numeric()
-                            ->prefix('₹')
-                            ->required(),
+                            ->prefix('₹'),
                         TextInput::make('original_price')
                             ->numeric()
                             ->prefix('₹'),
@@ -62,10 +63,12 @@ class ProductForm
                             ->helperText('Show this product on the homepage')
                             ->default(false),
                     ]),
-                Section::make('Media')
+                Section::make('Global Media')
+                    ->description('Fallback images if variants have no specific media.')
+                    ->collapsed()
                     ->components([
                         \Filament\Forms\Components\Repeater::make('gallery')
-                            ->relationship()
+                            ->relationship('gallery', fn ($query) => $query->whereNull('variant_id'))
                             ->schema([
                                 FileUpload::make('image_path')
                                     ->label('Image')
@@ -134,11 +137,31 @@ class ProductForm
                                     ])
                                     ->default('active')
                                     ->required(),
-                                FileUpload::make('image_path')
-                                    ->label('Variant Image')
-                                    ->image()
-                                    ->disk('public')
-                                    ->directory('variants'),
+                                \Filament\Forms\Components\Repeater::make('images')
+                                    ->relationship('images')
+                                    ->schema([
+                                        FileUpload::make('image_path')
+                                            ->label('Image')
+                                            ->image()
+                                            ->disk('public')
+                                            ->directory('variants')
+                                            ->required()
+                                            ->columnSpanFull(),
+                                        \Filament\Schemas\Components\Group::make([
+                                            Toggle::make('is_main')
+                                                ->label('Main Image')
+                                                ->default(false)
+                                                ->inline(false),
+                                            TextInput::make('sort_order')
+                                                ->numeric()
+                                                ->default(0)
+                                                ->label('Sort Order'),
+                                        ]),
+                                    ])
+                                    ->grid(2)
+                                    ->collapsible()
+                                    ->itemLabel(fn (array $state): ?string => $state['image_path'] ?? null)
+                                    ->columnSpanFull(),
                             ])
                             ->columns(3)
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))

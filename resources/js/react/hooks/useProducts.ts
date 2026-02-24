@@ -51,7 +51,13 @@ const transformProduct = (data: any): Product => {
             ...v,
             price: Number(v.price),
             discount_price: v.discount_price ? Number(v.discount_price) : undefined,
-            image_url: v.image_path ? getImageUrl(v.image_path) : undefined
+            image_url: v.image_path ? getImageUrl(v.image_path) : undefined,
+            images: Array.isArray(v.images) ? v.images.map((img: any) => ({
+                id: img.id,
+                url: getImageUrl(img.image_path),
+                is_main: Boolean(img.is_main),
+                sort_order: Number(img.sort_order)
+            })) : []
         })) : [],
     };
 };
