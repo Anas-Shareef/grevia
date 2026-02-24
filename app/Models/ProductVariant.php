@@ -24,6 +24,22 @@ class ProductVariant extends Model
         'stock_quantity' => 'integer',
     ];
 
+    protected static function booted()
+    {
+        static::saving(function ($variant) {
+            if (empty($variant->sku)) {
+                $product = $variant->product ?: Product::find($variant->product_id);
+                $productName = $product ? $product->name : 'PROD';
+                $variant->sku = strtoupper(
+                    str($productName)->slug() . '-' . 
+                    str($variant->weight)->slug() . '-' . 
+                    $variant->pack_size . '-' . 
+                    rand(100, 999)
+                );
+            }
+        });
+    }
+
     public function product()
     {
         return $this->belongsTo(Product::class);

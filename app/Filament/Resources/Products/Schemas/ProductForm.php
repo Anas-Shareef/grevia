@@ -123,7 +123,9 @@ class ProductForm
                                     ->required(),
                                 TextInput::make('sku')
                                     ->label('SKU')
-                                    ->nullable()
+                                    ->required()
+                                    ->helperText('A unique SKU will be generated if left blank, but it is recommended to provide one.')
+                                    ->default(fn () => 'VAR-' . strtoupper(uniqid()))
                                     ->unique(\App\Models\ProductVariant::class, 'sku', ignoreRecord: true),
                                 Select::make('status')
                                     ->options([
