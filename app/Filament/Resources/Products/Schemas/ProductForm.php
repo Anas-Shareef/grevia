@@ -168,7 +168,8 @@ class ProductForm
                                     ->defaultItems(0)
                                     ->collapsible()
                                     ->itemLabel(fn (array $state): string => $state['is_main'] ? '⭐ Main Photo' : 'Photo')
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->hidden(fn () => !\Illuminate\Support\Facades\Schema::hasTable('variant_images')),
                             ])
                             ->columns(3)
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))

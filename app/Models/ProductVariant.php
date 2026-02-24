@@ -44,12 +44,18 @@ class ProductVariant extends Model
     /** Gallery images for this specific variant */
     public function variantImages()
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('variant_images')) {
+            // Table doesn't exist yet (migration not run) — return safe empty result
+            return $this->hasMany(VariantImage::class, 'variant_id')
+                ->where('id', -1); // impossible condition, returns nothing
+        }
+
         return $this->hasMany(VariantImage::class, 'variant_id')
             ->orderBy('is_main', 'desc')
             ->orderBy('sort_order');
     }
 
-    /** Alias used by some Filament relations — maps to variantImages */
+    /** Alias used by Filament repeater relationship */
     public function images()
     {
         return $this->variantImages();
