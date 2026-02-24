@@ -155,14 +155,10 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        $relations = ['category', 'gallery', 'mainImage', 'reviews.user', 'reviews.images'];
-        
-        // Only load variants if the table exists to prevent 500 errors during migration issues
-        if (\Schema::hasTable('product_variants')) {
-            $relations[] = 'variants';
-        }
-
-        $product = Product::with($relations)->where('slug', $slug)->firstOrFail();
+        $product = Product::with(['category', 'gallery', 'mainImage', 'variants', 'reviews.user', 'reviews.images'])
+            ->where('slug', $slug)
+            ->firstOrFail();
+            
         return response()->json($product);
     }
 }

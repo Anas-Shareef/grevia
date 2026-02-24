@@ -47,6 +47,11 @@ const transformProduct = (data: any): Product => {
         mainImage: data.mainImage
             ? { url: getImageUrl(data.mainImage.url || data.mainImage.image_path) }
             : (Array.isArray(data.gallery) && data.gallery.length > 0 ? { url: getImageUrl(data.gallery[0].url || data.gallery[0].image_path) } : undefined),
+        variants: Array.isArray(data.variants) ? data.variants.map((v: any) => ({
+            ...v,
+            price: Number(v.price),
+            discount_price: v.discount_price ? Number(v.discount_price) : undefined
+        })) : [],
     };
 };
 
