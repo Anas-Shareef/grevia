@@ -177,8 +177,8 @@ const ProductDetailPage = () => {
                         key={img.id}
                         onClick={() => setSelectedImage(img.url)}
                         className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img.url
-                            ? 'border-lime shadow-md opacity-100'
-                            : 'border-transparent opacity-60 hover:opacity-90 hover:border-lime/50'
+                          ? 'border-lime shadow-md opacity-100'
+                          : 'border-transparent opacity-60 hover:opacity-90 hover:border-lime/50'
                           }`}
                       >
                         <img src={img.url} alt="" className="w-full h-full object-cover" />
@@ -353,6 +353,7 @@ const ProductDetailPage = () => {
                   variant="limeLg"
                   size="xl"
                   className="flex-1"
+                  style={{ paddingTop: '5px', paddingBottom: '5px' }}
                   onClick={handleAddToCart}
                   disabled={!isInStock}
                 >
@@ -363,6 +364,7 @@ const ProductDetailPage = () => {
                   variant="outline"
                   size="xl"
                   className="flex-1"
+                  style={{ paddingTop: '5px', paddingBottom: '5px' }}
                   onClick={() => {
                     handleAddToCart();
                     setIsCartOpen(true);
