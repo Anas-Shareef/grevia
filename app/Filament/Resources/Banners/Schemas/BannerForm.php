@@ -25,6 +25,7 @@ class BannerForm
                             ->label('Top Badge Text')
                             ->placeholder('e.g. 100% Natural Sweeteners')
                             ->helperText('The small green badge shown above the headline.')
+                            ->hidden(fn () => !\Illuminate\Support\Facades\Schema::hasColumn('banners', 'badge_text'))
                             ->columnSpanFull(),
 
                         Textarea::make('title')
