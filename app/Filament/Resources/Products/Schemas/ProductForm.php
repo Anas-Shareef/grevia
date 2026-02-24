@@ -134,6 +134,11 @@ class ProductForm
                                     ])
                                     ->default('active')
                                     ->required(),
+                                FileUpload::make('image_path')
+                                    ->label('Variant Image')
+                                    ->image()
+                                    ->disk('public')
+                                    ->directory('variants'),
                             ])
                             ->columns(3)
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))

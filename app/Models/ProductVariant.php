@@ -15,6 +15,7 @@ class ProductVariant extends Model
         'stock_quantity',
         'sku',
         'status',
+        'image_path',
     ];
 
     protected $casts = [

@@ -50,7 +50,8 @@ const transformProduct = (data: any): Product => {
         variants: Array.isArray(data.variants) ? data.variants.map((v: any) => ({
             ...v,
             price: Number(v.price),
-            discount_price: v.discount_price ? Number(v.discount_price) : undefined
+            discount_price: v.discount_price ? Number(v.discount_price) : undefined,
+            image_url: v.image_path ? getImageUrl(v.image_path) : undefined
         })) : [],
     };
 };

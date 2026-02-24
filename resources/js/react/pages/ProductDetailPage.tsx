@@ -35,9 +35,31 @@ const ProductDetailPage = () => {
       if (cheapest) {
         setSelectedWeight(cheapest.weight);
         setSelectedPackSize(cheapest.pack_size);
+
+        // Use variant image if it exists, otherwise use product main image
+        if (cheapest.image_url) {
+          setSelectedImage(cheapest.image_url);
+        } else if (product.mainImage?.url) {
+          setSelectedImage(product.mainImage.url);
+        }
       }
+    } else if (product?.mainImage?.url) {
+      setSelectedImage(product.mainImage.url);
     }
   }, [product]);
+
+  // Handle image switching when variant changes
+  useEffect(() => {
+    if (product?.variants && selectedWeight && selectedPackSize) {
+      const variant = product.variants.find(
+        v => v.weight === selectedWeight && v.pack_size === selectedPackSize
+      );
+
+      if (variant?.image_url) {
+        setSelectedImage(variant.image_url);
+      }
+    }
+  }, [selectedWeight, selectedPackSize, product]);
 
   const currentVariant = product?.variants?.find(v =>
     v.weight === selectedWeight && v.pack_size === selectedPackSize
