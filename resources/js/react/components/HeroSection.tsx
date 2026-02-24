@@ -48,7 +48,7 @@ const HeroSection = () => {
   useEffect(() => {
     api.get('/content/hero-banner')
       .then(res => {
-        if (res.data) setBanner(res.data);
+        if (res) setBanner(res);
       })
       .catch(err => console.error("Failed to fetch hero banner", err));
   }, []);
