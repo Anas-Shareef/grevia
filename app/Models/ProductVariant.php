@@ -45,9 +45,10 @@ class ProductVariant extends Model
     public function variantImages()
     {
         if (!\Illuminate\Support\Facades\Schema::hasTable('variant_images')) {
-            // Table doesn't exist yet (migration not run) — return safe empty result
-            return $this->hasMany(VariantImage::class, 'variant_id')
-                ->where('id', -1); // impossible condition, returns nothing
+            // variant_images table doesn't exist yet — return empty results from
+            // an existing table so MySQL doesn't throw a "table not found" error.
+            return $this->hasMany(ProductImage::class, 'product_id')
+                ->where('product_id', -1);
         }
 
         return $this->hasMany(VariantImage::class, 'variant_id')
