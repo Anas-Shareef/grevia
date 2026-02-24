@@ -101,6 +101,73 @@ Route::get('/setup-variant-images', function () {
     }
 });
 
+Route::get('/setup-banners', function () {
+    try {
+        $db = \Illuminate\Support\Facades\DB::class;
+        $schema = \Illuminate\Support\Facades\Schema::class;
+
+        // Step 1: Add missing columns
+        $columns = [
+            'badge_text'            => "VARCHAR(255) NULL",
+            'description'           => "TEXT NULL",
+            'primary_button_text'   => "VARCHAR(255) NULL",
+            'primary_button_link'   => "VARCHAR(255) NULL",
+            'secondary_button_text' => "VARCHAR(255) NULL",
+            'secondary_button_link' => "VARCHAR(255) NULL",
+            'features'              => "JSON NULL",
+        ];
+
+        $added = [];
+        foreach ($columns as $col => $definition) {
+            if (!$schema::hasColumn('banners', $col)) {
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE `banners` ADD COLUMN `{$col}` {$definition}");
+                $added[] = $col;
+            }
+        }
+
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+        // Step 2: Show current banner state
+        $banners = \Illuminate\Support\Facades\DB::table('banners')->get();
+
+        $html = '<h2 style="color:green;font-family:sans-serif">✅ Setup Done</h2>';
+
+        if (count($added)) {
+            $html .= '<p><strong>Added columns:</strong> ' . implode(', ', $added) . '</p>';
+        } else {
+            $html .= '<p>All columns already existed.</p>';
+        }
+
+        $html .= '<h3 style="font-family:sans-serif">Banners in Database (' . $banners->count() . ' total):</h3>';
+
+        foreach ($banners as $b) {
+            $html .= '<div style="border:1px solid #ccc;padding:12px;margin:8px 0;font-family:monospace">';
+            $html .= '<b>ID:</b> ' . $b->id . ' | ';
+            $html .= '<b>Type:</b> ' . ($b->type ?? 'NULL') . ' | ';
+            $html .= '<b>Status:</b> ' . ($b->status ? 'Active ✅' : 'Inactive ❌') . ' | ';
+            $html .= '<b>Title:</b> ' . htmlspecialchars(substr($b->title ?? 'NULL', 0, 60)) . '<br>';
+            $html .= '<b>Image:</b> ' . ($b->image ?? 'NULL') . '<br>';
+            $html .= '</div>';
+        }
+
+        if ($banners->count() === 0) {
+            $html .= '<p style="color:red"><strong>⚠️ No banners found in database!</strong> Go to <a href="/admin/banners/create">Admin → Create Banner</a> and add one with Type = "Hero Banner" and Status = Active.</p>';
+        } else {
+            $heroActive = $banners->where('type', 'hero')->where('status', 1)->first();
+            if (!$heroActive) {
+                $html .= '<p style="color:orange"><strong>⚠️ No active Hero banner found!</strong> Make sure your banner has Type = "Hero Banner" and Status is ON.</p>';
+            } else {
+                $html .= '<p style="color:green"><strong>✅ Active hero banner found (ID: ' . $heroActive->id . '). It should appear on the homepage.</strong></p>';
+            }
+        }
+
+        return $html;
+
+    } catch (\Exception $e) {
+        return '<h2 style="color:red">❌ Error</h2><pre>' . $e->getMessage() . '</pre>';
+    }
+});
+
 
 Route::get('/debug-categories', function () {
     return [
