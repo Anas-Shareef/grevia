@@ -14,6 +14,8 @@ export interface ProductVariant {
   stock_quantity: number;
   sku: string;
   status: 'active' | 'inactive';
+  image_path?: string;
+  image_url?: string;
 }
 
 export interface Product {
