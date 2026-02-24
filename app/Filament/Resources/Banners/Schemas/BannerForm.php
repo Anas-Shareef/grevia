@@ -3,13 +3,13 @@
 namespace App\Filament\Resources\Banners\Schemas;
 
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Textarea;
 
 class BannerForm
 {
@@ -17,58 +17,106 @@ class BannerForm
     {
         return $schema
             ->components([
-                TextInput::make('title')
-                    ->label('Heading (Main Title)')
-                    ->helperText('Use <br> for line breaks. Wrap highlighted text in <span class="text-gradient-forest">...</span> for green gradient.')
-                    ->required(),
-                Textarea::make('description')
-                    ->rows(3),
-                FileUpload::make('image')
-                    ->image()
-                    ->disk('public')
-                    ->directory('banners')
-                    ->required(),
-                
-                // Button 1
-                TextInput::make('primary_button_text'),
-                TextInput::make('primary_button_link'),
+                Section::make('Content')
+                    ->description('Text shown on the banner.')
+                    ->columns(2)
+                    ->components([
+                        TextInput::make('badge_text')
+                            ->label('Top Badge Text')
+                            ->placeholder('e.g. 100% Natural Sweeteners')
+                            ->helperText('The small green badge shown above the headline.')
+                            ->columnSpanFull(),
 
-                // Button 2
-                TextInput::make('secondary_button_text'),
-                TextInput::make('secondary_button_link'),
+                        Textarea::make('title')
+                            ->label('Headline')
+                            ->helperText('Use <br> for line breaks. Wrap a word in <span class="text-gradient-forest">...</span> to make it green.')
+                            ->rows(3)
+                            ->required()
+                            ->columnSpanFull(),
 
-                // Features
-                Repeater::make('features')
-                    ->schema([
-                        TextInput::make('text')->required(),
-                        Select::make('icon')
-                            ->options([
-                                'Sparkles' => 'Sparkles',
-                                'Award' => 'Award',
-                                'Heart' => 'Heart',
+                        Textarea::make('description')
+                            ->label('Sub-text')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Image')
+                    ->description('The hero product photo shown on the right side.')
+                    ->components([
+                        FileUpload::make('image')
+                            ->label('Banner Image')
+                            ->image()
+                            ->disk('public')
+                            ->directory('banners')
+                            ->imagePreviewHeight('200')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Buttons')
+                    ->description('The two action buttons below the headline.')
+                    ->columns(2)
+                    ->components([
+                        TextInput::make('primary_button_text')
+                            ->label('Button 1 Text')
+                            ->placeholder('Shop Collection'),
+                        TextInput::make('primary_button_link')
+                            ->label('Button 1 Link')
+                            ->placeholder('/collections/all'),
+                        TextInput::make('secondary_button_text')
+                            ->label('Button 2 Text')
+                            ->placeholder('Learn More'),
+                        TextInput::make('secondary_button_link')
+                            ->label('Button 2 Link')
+                            ->placeholder('/benefits'),
+                    ]),
+
+                Section::make('Floating Badges')
+                    ->description('The small floating labels on the product image (e.g. Zero Glycemic, Keto Friendly).')
+                    ->components([
+                        Repeater::make('features')
+                            ->schema([
+                                TextInput::make('text')
+                                    ->label('Badge Text')
+                                    ->required(),
+                                Select::make('icon')
+                                    ->label('Icon')
+                                    ->options([
+                                        'Sparkles' => '✨ Sparkles',
+                                        'Award'    => '🏅 Award',
+                                        'Heart'    => '🤍 Heart',
+                                    ])
+                                    ->required(),
                             ])
-                            ->required(),
-                    ])
-                    ->columns(2),
+                            ->columns(2)
+                            ->addActionLabel('Add Badge')
+                            ->defaultItems(0)
+                            ->maxItems(3)
+                            ->helperText('Maximum 3 badges. Positions: top-left, right, bottom-left.'),
+                    ]),
 
-                // Legacy Link (keep if needed, or hide)
-                TextInput::make('link')
-                    ->url()
-                    ->label('General Link (Fallback)'),
-
-                Select::make('type')
-                    ->options([
-                        'hero' => 'Hero Banner',
-                        'category' => 'Category Banner',
-                        'campaign' => 'Campaign Banner',
-                    ])
-                    ->required()
-                    ->native(false),
-                Toggle::make('status')
-                    ->default(true),
-                TextInput::make('order')
-                    ->numeric()
-                    ->default(0),
+                Section::make('Settings')
+                    ->columns(3)
+                    ->collapsed()
+                    ->components([
+                        Select::make('type')
+                            ->options([
+                                'hero'     => 'Hero Banner',
+                                'category' => 'Category Banner',
+                                'campaign' => 'Campaign Banner',
+                            ])
+                            ->required()
+                            ->native(false)
+                            ->default('hero'),
+                        TextInput::make('order')
+                            ->numeric()
+                            ->default(0)
+                            ->label('Display Order'),
+                        Toggle::make('status')
+                            ->label('Active')
+                            ->default(true)
+                            ->inline(false),
+                    ]),
             ]);
     }
 }

@@ -8,6 +8,7 @@ class Banner extends Model
 {
     protected $fillable = [
         'title',
+        'badge_text',
         'description',
         'image',
         'link',

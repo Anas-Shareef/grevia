@@ -32,6 +32,7 @@ const FloatingBadge = ({
 
 interface BannerData {
   title: string;
+  badge_text?: string;
   description?: string;
   image_url?: string;
   primary_button_text?: string;
@@ -98,7 +99,7 @@ const HeroSection = () => {
               className="inline-flex items-center gap-2 bg-lime/15 rounded-squircle px-4 py-2 mb-6"
             >
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-primary">100% Natural Sweeteners</span>
+              <span className="text-sm font-semibold text-primary">{banner?.badge_text || '100% Natural Sweeteners'}</span>
             </motion.div>
 
             <h1
