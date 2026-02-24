@@ -7,7 +7,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -18,14 +17,13 @@ class BannerForm
         return $schema
             ->components([
                 Section::make('Content')
-                    ->description('Text shown on the banner.')
+                    ->description('Text shown on the homepage banner.')
                     ->columns(2)
                     ->components([
                         TextInput::make('badge_text')
                             ->label('Top Badge Text')
                             ->placeholder('e.g. 100% Natural Sweeteners')
-                            ->helperText('The small green badge shown above the headline.')
-                            ->hidden(fn () => !\Illuminate\Support\Facades\Schema::hasColumn('banners', 'badge_text'))
+                            ->helperText('The small green label above the headline.')
                             ->columnSpanFull(),
 
                         Textarea::make('title')
@@ -42,7 +40,7 @@ class BannerForm
                     ]),
 
                 Section::make('Image')
-                    ->description('The hero product photo shown on the right side.')
+                    ->description('The product photo shown on the right side of the banner.')
                     ->components([
                         FileUpload::make('image')
                             ->label('Banner Image')
@@ -73,7 +71,7 @@ class BannerForm
                     ]),
 
                 Section::make('Floating Badges')
-                    ->description('The small floating labels on the product image (e.g. Zero Glycemic, Keto Friendly).')
+                    ->description('Small floating labels on the product image (max 3).')
                     ->components([
                         Repeater::make('features')
                             ->schema([
@@ -92,31 +90,7 @@ class BannerForm
                             ->columns(2)
                             ->addActionLabel('Add Badge')
                             ->defaultItems(0)
-                            ->maxItems(3)
-                            ->helperText('Maximum 3 badges. Positions: top-left, right, bottom-left.'),
-                    ]),
-
-                Section::make('Settings')
-                    ->columns(3)
-                    ->collapsed()
-                    ->components([
-                        Select::make('type')
-                            ->options([
-                                'hero'     => 'Hero Banner',
-                                'category' => 'Category Banner',
-                                'campaign' => 'Campaign Banner',
-                            ])
-                            ->required()
-                            ->native(false)
-                            ->default('hero'),
-                        TextInput::make('order')
-                            ->numeric()
-                            ->default(0)
-                            ->label('Display Order'),
-                        Toggle::make('status')
-                            ->label('Active')
-                            ->default(true)
-                            ->inline(false),
+                            ->maxItems(3),
                     ]),
             ]);
     }
