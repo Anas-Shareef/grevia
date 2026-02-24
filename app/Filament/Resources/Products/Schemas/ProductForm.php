@@ -64,45 +64,17 @@ class ProductForm
                             ->default(false),
                     ]),
                 Section::make('Global Media')
-                    ->description('Fallback images if variants have no specific media.')
+                    ->description('Fallback image shown if a variant has no specific photo.')
                     ->collapsed()
                     ->components([
-                        \Filament\Forms\Components\Repeater::make('gallery')
-                            ->relationship('gallery', function ($query) {
-                                if (\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
-                                    return $query->whereNull('variant_id');
-                                }
-                                // If column is missing, don't add the WHERE clause at all
-                                return $query;
-                            })
-                            ->schema([
-                                FileUpload::make('image_path')
-                                    ->label('Image')
-                                    ->image()
-                                    ->disk('public')
-                                    ->directory('products')
-                                    ->required()
-                                    ->columnSpanFull(),
-                                \Filament\Schemas\Components\Group::make([
-                                    Toggle::make('is_main')
-                                        ->label('Main Image')
-                                        ->default(false)
-                                        ->inline(false),
-                                    TextInput::make('sort_order')
-                                        ->numeric()
-                                        ->default(0)
-                                        ->label('Sort Order'),
-                                ]),
-                            ])
-                            ->grid([
-                                'default' => 1,
-                                'md' => 2,
-                                'xl' => 3,
-                            ])
-                            ->defaultItems(0)
-                            ->reorderableWithButtons()
-                            ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['image_path'] ?? null),
+                        FileUpload::make('image')
+                            ->label('Product Image')
+                            ->helperText('This image is shown when no variant-specific photo is available.')
+                            ->image()
+                            ->disk('public')
+                            ->directory('products')
+                            ->imagePreviewHeight('200')
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Product Variants')
                     ->description('Manage weight/pack variants for this product. If variants exist, they will override the base price/stock on the frontend.')
