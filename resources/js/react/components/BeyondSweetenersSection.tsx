@@ -3,14 +3,6 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/hooks/useProducts";
-import { STORAGE_URL } from "@/lib/api";
-
-const getImg = (path: string | null | undefined) => {
-  if (!path) return null;
-  if (path.startsWith('http')) return path;
-  const base = STORAGE_URL.endsWith('/') ? STORAGE_URL.slice(0, -1) : STORAGE_URL;
-  return path.startsWith('/') ? `${base}${path}` : `${base}/${path}`;
-};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -30,21 +22,20 @@ const itemVariants = {
 };
 
 const BeyondSweetenersSection = () => {
-  // Fetch featured products from the "other-products" category only
+  // Only show featured products from the "other-products" category
   const { data: response } = useProducts({ category: 'other-products', featured: '1' });
 
   const allProducts = Array.isArray(response) ? response : response?.data || [];
 
-  // Hide the section completely if no featured products in this category
+  // Hide section completely when no products
   if (!allProducts || allProducts.length === 0) return null;
 
   return (
     <section
       id="beyond-sweeteners"
-      className="py-24 md:py-32 bg-[#F9FAFB] relative overflow-hidden"
+      className="py-24 md:py-32 bg-gradient-to-b from-[#F0F7F0] to-white relative overflow-hidden"
       aria-labelledby="beyond-sweeteners-heading"
     >
-      {/* Background elements */}
       <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-lime/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-1/4 h-1/3 bg-primary/5 rounded-full blur-3xl" />
 
@@ -57,7 +48,7 @@ const BeyondSweetenersSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
         >
-          <span className="inline-block text-sm font-bold text-lime uppercase tracking-widest mb-4">
+          <span className="inline-block text-sm font-extrabold text-lime uppercase tracking-[0.2em] mb-4 bg-lime/10 px-4 py-1.5 rounded-full">
             Explore More
           </span>
           <h2
@@ -66,11 +57,10 @@ const BeyondSweetenersSection = () => {
           >
             Beyond
             <br />
-            <span className="text-primary">Sweeteners</span>
+            <span className="text-primary italic">Sweeteners</span>
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Crafted foods made with the same care, purity, and health-first philosophy as Grevia sweeteners.
-            Thoughtfully prepared bakery items and traditional foods, aligned with our clean-label and quality-driven standards.
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
+            Crafted with the same care, purity, and health-first philosophy — from bakery to traditional foods.
           </p>
         </motion.div>
 
@@ -83,48 +73,78 @@ const BeyondSweetenersSection = () => {
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
         >
           {allProducts.map((product) => {
-            const imageUrl = product.image
-              ? getImg(product.image)
-              : product.variants?.[0]?.image_url || null;
+            // product.image is already a full processed URL from useProducts transformProduct
+            const imageUrl = product.image || product.mainImage?.url || '';
+
+            // Price logic
+            const cheapestVariant = product.variants && product.variants.length > 0
+              ? [...product.variants]
+                .filter((v: any) => v.status === 'active')
+                .sort((a: any, b: any) =>
+                  Number(a.discount_price || a.price) - Number(b.discount_price || b.price)
+                )[0]
+              : null;
+
+            const displayPrice = cheapestVariant
+              ? cheapestVariant.discount_price || cheapestVariant.price
+              : product.price;
 
             return (
               <motion.div
                 key={product.id}
                 variants={itemVariants}
-                className="group relative bg-card rounded-squircle-xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-500 border border-border/50 hover:border-lime/30"
+                className="group bg-card rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-border/40 hover:border-primary/30 hover:-translate-y-1"
               >
                 <Link to={`/product/${product.slug || product.id}`}>
                   {/* Image */}
-                  <div className="relative aspect-[4/3] overflow-hidden bg-secondary/30">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-secondary/20">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary/40 text-4xl font-black">{product.name[0]}</span>
+                        <span className="text-primary/30 text-5xl font-black">{product.name[0]}</span>
                       </div>
                     )}
                     {product.badge && (
-                      <div className="absolute top-4 left-4 bg-lime text-foreground text-xs font-bold px-3 py-1.5 rounded-squircle">
+                      <div className="absolute top-3 left-3 bg-lime text-foreground text-xs font-bold px-3 py-1 rounded-full shadow">
                         {product.badge}
                       </div>
                     )}
                   </div>
 
                   {/* Content */}
-                  <div className="p-8 text-center bg-card flex flex-col items-center">
-                    <h3 className="text-2xl font-black text-foreground mb-3">
+                  <div className="p-6 text-center">
+                    <h3 className="text-xl font-black text-foreground mb-2 group-hover:text-primary transition-colors leading-snug">
                       {product.name}
                     </h3>
-                    <p className="text-muted-foreground mb-6 line-clamp-2 max-w-sm mx-auto">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {product.description}
                     </p>
-                    <div className="inline-flex items-center text-primary font-bold group/btn">
+
+                    {/* Price */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-2xl font-black text-primary">
+                        ₹{typeof displayPrice === 'number'
+                          ? displayPrice.toFixed(0)
+                          : Number(displayPrice || 0).toFixed(0)}
+                      </span>
+                      {cheapestVariant && (
+                        <span className="text-xs text-muted-foreground font-medium bg-secondary px-2 py-1 rounded-full">
+                          {cheapestVariant.weight}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="inline-flex items-center text-primary font-bold text-sm group/btn border border-primary/30 px-4 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300">
                       Explore Product
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-4 h-4 ml-1.5 group-hover/btn:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </Link>
@@ -139,10 +159,10 @@ const BeyondSweetenersSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-12"
+          className="text-center mt-14"
         >
           <Link to="/products/other-products">
-            <Button variant="default" size="lg">
+            <Button variant="default" size="lg" className="px-10 py-6 text-base font-bold rounded-full shadow-lg hover:shadow-primary/30 hover:scale-105 transition-all duration-300">
               All Products
             </Button>
           </Link>
