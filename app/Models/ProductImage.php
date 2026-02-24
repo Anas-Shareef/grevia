@@ -10,6 +10,20 @@ class ProductImage extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($image) {
+            if (!$image->product_id && $image->variant_id) {
+                $variant = ProductVariant::find($image->variant_id);
+                if ($variant) {
+                    $image->product_id = $variant->product_id;
+                }
+            }
+        });
+    }
+
     protected $fillable = [
         'product_id',
         'variant_id',
