@@ -17,26 +17,40 @@ class EditBanner extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            // Show setup button only if badge_text column is missing
-            Action::make('setup_badge_text')
-                ->label('⚙️ Fix: Add Badge Text Field')
+            // Show setup button if any required column is missing
+            Action::make('setup_banner_columns')
+                ->label('⚙️ Fix: Set Up Banner Fields')
                 ->color('warning')
                 ->icon('heroicon-o-wrench')
-                ->visible(fn () => !Schema::hasColumn('banners', 'badge_text'))
+                ->visible(fn () => !Schema::hasColumn('banners', 'description'))
                 ->requiresConfirmation()
-                ->modalHeading('Add Badge Text to Banners?')
-                ->modalDescription('This will add a "Badge Text" field to the banners table so you can edit the green label above the headline.')
+                ->modalHeading('Set Up Banner Fields?')
+                ->modalDescription('This adds all required fields to your banners table: description, image, badge, buttons, and floating badges.')
                 ->modalSubmitActionLabel('Yes, Fix Now')
                 ->action(function () {
                     try {
-                        if (!Schema::hasColumn('banners', 'badge_text')) {
-                            DB::statement("ALTER TABLE `banners` ADD COLUMN `badge_text` VARCHAR(255) NULL AFTER `title`");
+                        // Add each column only if missing
+                        $columns = [
+                            'badge_text'             => "VARCHAR(255) NULL AFTER `title`",
+                            'description'            => "TEXT NULL AFTER `badge_text`",
+                            'primary_button_text'    => "VARCHAR(255) NULL",
+                            'primary_button_link'    => "VARCHAR(255) NULL",
+                            'secondary_button_text'  => "VARCHAR(255) NULL",
+                            'secondary_button_link'  => "VARCHAR(255) NULL",
+                            'features'               => "JSON NULL",
+                        ];
+
+                        foreach ($columns as $column => $definition) {
+                            if (!Schema::hasColumn('banners', $column)) {
+                                DB::statement("ALTER TABLE `banners` ADD COLUMN `{$column}` {$definition}");
+                            }
                         }
 
                         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 
                         Notification::make()
-                            ->title('✅ Done! Reload this page to use the Badge Text field.')
+                            ->title('✅ Done! All banner fields are set up.')
+                            ->body('Reload this page and save your banner — changes will now appear on the homepage.')
                             ->success()
                             ->persistent()
                             ->send();
