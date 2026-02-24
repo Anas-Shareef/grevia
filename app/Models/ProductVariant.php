@@ -41,17 +41,18 @@ class ProductVariant extends Model
         });
     }
 
+    /** Gallery images for this specific variant */
+    public function variantImages()
+    {
+        return $this->hasMany(VariantImage::class, 'variant_id')
+            ->orderBy('is_main', 'desc')
+            ->orderBy('sort_order');
+    }
+
+    /** Alias used by some Filament relations — maps to variantImages */
     public function images()
     {
-        // Use standard relationship if column exists
-        if (\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
-            return $this->hasMany(ProductImage::class, 'variant_id');
-        }
-        
-        // Fallback: use an existing real column with an impossible value so MySQL
-        // doesn't complain about a missing column, but still returns no results.
-        return $this->hasMany(ProductImage::class, 'product_id')
-            ->where('product_id', -1);
+        return $this->variantImages();
     }
 
     public function product()

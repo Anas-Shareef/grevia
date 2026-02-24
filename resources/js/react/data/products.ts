@@ -15,8 +15,8 @@ export interface ProductVariant {
   sku: string;
   status: 'active' | 'inactive';
   image_path?: string;
-  image_url?: string;
-  images?: {
+  image_url?: string;     // main image URL (computed from gallery or image_path)
+  gallery?: {             // full ordered gallery for this variant
     id: number;
     url: string;
     is_main: boolean;

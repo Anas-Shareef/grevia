@@ -156,9 +156,10 @@ class ProductController extends Controller
     public function show($slug)
     {
         $relationships = ['category', 'gallery', 'mainImage', 'reviews.user', 'reviews.images'];
-        
-        if (\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')) {
-            $relationships[] = 'variants.images';
+
+        // Use new dedicated variant_images table if it exists, otherwise just load variants
+        if (\Illuminate\Support\Facades\Schema::hasTable('variant_images')) {
+            $relationships[] = 'variants.variantImages';
         } else {
             $relationships[] = 'variants';
         }
@@ -166,7 +167,7 @@ class ProductController extends Controller
         $product = Product::with($relationships)
             ->where('slug', $slug)
             ->firstOrFail();
-            
+
         return response()->json($product);
     }
 }

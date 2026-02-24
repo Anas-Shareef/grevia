@@ -143,13 +143,31 @@ class ProductForm
                                     ])
                                     ->default('active')
                                     ->required(),
-                                FileUpload::make('image_path')
-                                    ->label('Variant Photo')
-                                    ->helperText('Upload a photo specific to this weight/size. This photo will show when a customer selects this variant.')
-                                    ->image()
-                                    ->disk('public')
-                                    ->directory('variants')
-                                    ->imagePreviewHeight('150')
+                                \Filament\Forms\Components\Repeater::make('variantImages')
+                                    ->relationship('variantImages')
+                                    ->schema([
+                                        FileUpload::make('image_path')
+                                            ->label('Photo')
+                                            ->image()
+                                            ->disk('public')
+                                            ->directory('variants')
+                                            ->required()
+                                            ->columnSpanFull(),
+                                        Toggle::make('is_main')
+                                            ->label('Main Photo')
+                                            ->helperText('The main photo is shown as the big image when this variant is selected.')
+                                            ->default(false)
+                                            ->inline(false),
+                                        TextInput::make('sort_order')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->label('Order'),
+                                    ])
+                                    ->columns(2)
+                                    ->addActionLabel('Add Photo')
+                                    ->defaultItems(0)
+                                    ->collapsible()
+                                    ->itemLabel(fn (array $state): string => $state['is_main'] ? '⭐ Main Photo' : 'Photo')
                                     ->columnSpanFull(),
                             ])
                             ->columns(3)

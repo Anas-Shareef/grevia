@@ -55,8 +55,15 @@ const ProductDetailPage = () => {
         v => v.weight === selectedWeight && v.pack_size === selectedPackSize
       );
 
-      if (variant?.image_url) {
-        setSelectedImage(variant.image_url);
+      if (variant) {
+        // If this variant has a gallery, show the main photo
+        const mainPhoto = variant.gallery?.find(img => img.is_main) || variant.gallery?.[0];
+        if (mainPhoto) {
+          setSelectedImage(mainPhoto.url);
+        } else if (variant.image_url) {
+          // Fallback to single image_path
+          setSelectedImage(variant.image_url);
+        }
       }
     }
   }, [selectedWeight, selectedPackSize, product]);
@@ -151,27 +158,38 @@ const ProductDetailPage = () => {
                 />
               </div>
 
-              {/* Thumbnail Strip */}
-              {((currentVariant?.images && currentVariant.images.length > 0) || (product.gallery && product.gallery.length > 0)) ? (
-                <div className="flex gap-4 overflow-x-auto pb-2">
-                  {((currentVariant?.images && currentVariant.images.length > 0) ? currentVariant.images : product.gallery).map((img) => (
-                    <button
-                      key={img.id}
-                      onClick={() => setSelectedImage(img.url)}
-                      className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${(selectedImage === img.url || (!selectedImage && img.is_main))
-                        ? "border-lime shadow-md opacity-100"
-                        : "border-transparent opacity-70 hover:opacity-100"
-                        }`}
-                    >
-                      <img
-                        src={img.url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              ) : null}
+              {/* Thumbnail Strip — shows variant gallery or product gallery */}
+              {(() => {
+                const variantGallery = currentVariant?.gallery && currentVariant.gallery.length > 0
+                  ? currentVariant.gallery
+                  : null;
+                const productGallery = product.gallery && product.gallery.length > 0
+                  ? product.gallery
+                  : null;
+                const thumbs = variantGallery || productGallery;
+
+                if (!thumbs) return null;
+
+                return (
+                  <div className="flex gap-3 overflow-x-auto pb-2 mt-4">
+                    {thumbs.map((img) => (
+                      <button
+                        key={img.id}
+                        onClick={() => setSelectedImage(img.url)}
+                        className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img.url
+                            ? 'border-lime shadow-md opacity-100'
+                            : 'border-transparent opacity-60 hover:opacity-90 hover:border-lime/50'
+                          }`}
+                      >
+                        <img src={img.url} alt="" className="w-full h-full object-cover" />
+                        {img.is_main && (
+                          <span className="absolute bottom-0 left-0 right-0 text-[9px] text-center bg-lime/80 text-white py-0.5">Main</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
 
               {/* Wishlist Button - Positioned on image */}
               <div className="absolute top-4 right-4 z-10">

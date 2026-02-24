@@ -47,18 +47,36 @@ const transformProduct = (data: any): Product => {
         mainImage: data.mainImage
             ? { url: getImageUrl(data.mainImage.url || data.mainImage.image_path) }
             : (Array.isArray(data.gallery) && data.gallery.length > 0 ? { url: getImageUrl(data.gallery[0].url || data.gallery[0].image_path) } : undefined),
-        variants: Array.isArray(data.variants) ? data.variants.map((v: any) => ({
-            ...v,
-            price: Number(v.price),
-            discount_price: v.discount_price ? Number(v.discount_price) : undefined,
-            image_url: v.image_path ? getImageUrl(v.image_path) : undefined,
-            images: Array.isArray(v.images) ? v.images.map((img: any) => ({
-                id: img.id,
-                url: getImageUrl(img.image_path),
-                is_main: Boolean(img.is_main),
-                sort_order: Number(img.sort_order)
-            })) : []
-        })) : [],
+        variants: Array.isArray(data.variants) ? data.variants.map((v: any) => {
+            // Support both new variantImages and legacy images
+            const rawImages = Array.isArray(v.variant_images) ? v.variant_images
+                : Array.isArray(v.images) ? v.images : [];
+
+            const gallery = rawImages
+                .map((img: any) => ({
+                    id: img.id,
+                    url: getImageUrl(img.url || img.image_path),
+                    is_main: Boolean(img.is_main),
+                    sort_order: Number(img.sort_order ?? 0)
+                }))
+                .sort((a: any, b: any) => {
+                    // Main photo first, then by sort_order
+                    if (b.is_main !== a.is_main) return b.is_main ? 1 : -1;
+                    return a.sort_order - b.sort_order;
+                });
+
+            const mainImage = gallery.find((img: any) => img.is_main) || gallery[0];
+
+            return {
+                ...v,
+                price: Number(v.price),
+                discount_price: v.discount_price ? Number(v.discount_price) : undefined,
+                // Single main image URL for backwards compat (ProductsSection, CollectionsPage etc.)
+                image_url: mainImage?.url || (v.image_path ? getImageUrl(v.image_path) : undefined),
+                // Full ordered gallery for ProductDetailPage
+                gallery,
+            };
+        }) : [],
     };
 };
 
