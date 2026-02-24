@@ -56,6 +56,52 @@ Route::get('/fix-storage', function () {
     }
 });
 
+Route::get('/setup-variant-images', function () {
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('variant_images')) {
+            return '<h2 style="color:green">✅ variant_images table already exists! You are ready to go.</h2>
+                    <p>Go to <a href="/admin/products/6/edit">Admin → Edit Product</a> to upload variant photos.</p>';
+        }
+
+        \Illuminate\Support\Facades\DB::statement('
+            CREATE TABLE IF NOT EXISTS `variant_images` (
+                `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `variant_id` BIGINT UNSIGNED NOT NULL,
+                `product_id` BIGINT UNSIGNED NOT NULL,
+                `image_path` VARCHAR(255) NOT NULL,
+                `is_main` TINYINT(1) NOT NULL DEFAULT 0,
+                `sort_order` INT UNSIGNED NOT NULL DEFAULT 0,
+                `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+                `created_at` TIMESTAMP NULL DEFAULT NULL,
+                `updated_at` TIMESTAMP NULL DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                INDEX `variant_images_variant_id_is_main_index` (`variant_id`, `is_main`),
+                CONSTRAINT `variant_images_variant_id_foreign`
+                    FOREIGN KEY (`variant_id`) REFERENCES `product_variants`(`id`) ON DELETE CASCADE,
+                CONSTRAINT `variant_images_product_id_foreign`
+                    FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ');
+
+        // Mark migration as run so artisan doesn't try to run it again
+        \Illuminate\Support\Facades\DB::table('migrations')->insertOrIgnore([
+            'migration' => '2026_02_24_050000_create_variant_images_table',
+            'batch'     => \Illuminate\Support\Facades\DB::table('migrations')->max('batch') + 1,
+        ]);
+
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+        return '<h2 style="color:green">✅ Success! variant_images table created.</h2>
+                <p>The cache has been cleared. Go to <a href="/admin/products/6/edit">Admin → Edit Product 6</a>.</p>
+                <p>You will now see an <strong>"Add Photo"</strong> button inside each weight variant.</p>
+                <p style="color:red"><strong>Important:</strong> Delete this route from web.php after running it once.</p>';
+
+    } catch (\Exception $e) {
+        return '<h2 style="color:red">❌ Error</h2><pre>' . $e->getMessage() . '</pre>';
+    }
+});
+
+
 Route::get('/debug-categories', function () {
     return [
         'categories' => \App\Models\Category::all(['id', 'name', 'slug', 'parent_id']),
