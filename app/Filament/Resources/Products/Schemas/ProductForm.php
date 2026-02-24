@@ -146,6 +146,11 @@ class ProductForm
                                 \Filament\Forms\Components\Repeater::make('images')
                                     ->relationship('images')
                                     ->schema([
+                                        \Filament\Forms\Components\Hidden::make('product_id')
+                                            ->default(function ($get) {
+                                                // Try to get product_id from the variant repeater state
+                                                return $get('../../product_id') ?? $get('../../../id');
+                                            }),
                                         FileUpload::make('image_path')
                                             ->label('Image')
                                             ->image()

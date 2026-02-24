@@ -16,7 +16,8 @@ class ProductImage extends Model
 
         static::creating(function ($image) {
             if (!$image->product_id && $image->variant_id) {
-                $variant = ProductVariant::find($image->variant_id);
+                // Try to get from relationship first (might be pre-loaded)
+                $variant = $image->variant ?: ProductVariant::find($image->variant_id);
                 if ($variant) {
                     $image->product_id = $variant->product_id;
                 }
