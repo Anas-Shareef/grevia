@@ -143,37 +143,14 @@ class ProductForm
                                     ])
                                     ->default('active')
                                     ->required(),
-                                \Filament\Forms\Components\Repeater::make('images')
-                                    ->relationship('images')
-                                    ->schema([
-                                        \Filament\Forms\Components\Hidden::make('product_id')
-                                            ->default(function ($get) {
-                                                // Try to get product_id from the variant repeater state
-                                                return $get('../../product_id') ?? $get('../../../id');
-                                            }),
-                                        FileUpload::make('image_path')
-                                            ->label('Image')
-                                            ->image()
-                                            ->disk('public')
-                                            ->directory('variants')
-                                            ->required()
-                                            ->columnSpanFull(),
-                                        \Filament\Schemas\Components\Group::make([
-                                            Toggle::make('is_main')
-                                                ->label('Main Image')
-                                                ->default(false)
-                                                ->inline(false),
-                                            TextInput::make('sort_order')
-                                                ->numeric()
-                                                ->default(0)
-                                                ->label('Sort Order'),
-                                        ]),
-                                    ])
-                                    ->grid(2)
-                                    ->collapsible()
-                                    ->itemLabel(fn (array $state): ?string => $state['image_path'] ?? null)
-                                    ->columnSpanFull()
-                                    ->hidden(fn () => !\Illuminate\Support\Facades\Schema::hasColumn('product_images', 'variant_id')),
+                                FileUpload::make('image_path')
+                                    ->label('Variant Photo')
+                                    ->helperText('Upload a photo specific to this weight/size. This photo will show when a customer selects this variant.')
+                                    ->image()
+                                    ->disk('public')
+                                    ->directory('variants')
+                                    ->imagePreviewHeight('150')
+                                    ->columnSpanFull(),
                             ])
                             ->columns(3)
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
