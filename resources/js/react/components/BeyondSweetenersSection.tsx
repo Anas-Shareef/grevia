@@ -1,14 +1,18 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
+import WishlistButton from "@/components/WishlistButton";
+import { Product } from "@/data/products";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.2 },
+    transition: { staggerChildren: 0.15 },
   },
 };
 
@@ -22,22 +26,32 @@ const itemVariants = {
 };
 
 const BeyondSweetenersSection = () => {
-  // Only show featured products from the "other-products" category
   const { data: response } = useProducts({ category: 'other-products', featured: '1' });
+  const { addToCart } = useCart();
 
   const allProducts = Array.isArray(response) ? response : response?.data || [];
 
-  // Hide section completely when no products
   if (!allProducts || allProducts.length === 0) return null;
+
+  const handleAddToCart = (product: Product) => {
+    let variantId = undefined;
+    if (product.variants && product.variants.length > 0) {
+      const cheapest = [...product.variants]
+        .filter((v: any) => v.status === 'active')
+        .sort((a: any, b: any) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
+      variantId = cheapest?.id;
+    }
+    addToCart(product, 1, variantId);
+    toast.success(`${product.name} added to cart!`, { duration: 2000 });
+  };
 
   return (
     <section
       id="beyond-sweeteners"
-      className="py-24 md:py-32 bg-gradient-to-b from-[#F0F7F0] to-white relative overflow-hidden"
+      className="py-24 md:py-32 relative overflow-hidden"
       aria-labelledby="beyond-sweeteners-heading"
     >
-      <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-lime/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-1/4 h-1/3 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 right-0 w-1/2 h-1/2 bg-primary/5 rounded-full blur-3xl -translate-y-1/2" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Section Header */}
@@ -48,7 +62,7 @@ const BeyondSweetenersSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
         >
-          <span className="inline-block text-sm font-extrabold text-lime uppercase tracking-[0.2em] mb-4 bg-lime/10 px-4 py-1.5 rounded-full">
+          <span className="inline-block text-sm font-bold text-lime uppercase tracking-widest mb-4">
             Explore More
           </span>
           <h2
@@ -57,111 +71,116 @@ const BeyondSweetenersSection = () => {
           >
             Beyond
             <br />
-            <span className="text-primary italic">Sweeteners</span>
+            <span className="text-primary">Sweeteners</span>
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
+          <p className="text-lg text-muted-foreground">
             Crafted with the same care, purity, and health-first philosophy — from bakery to traditional foods.
           </p>
         </motion.div>
 
-        {/* Products Grid */}
+        {/* Products Grid — same layout as Featured Products */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {allProducts.map((product) => {
-            // product.image is already a full processed URL from useProducts transformProduct
-            const imageUrl = product.image || product.mainImage?.url || '';
-
-            // Price logic
-            const cheapestVariant = product.variants && product.variants.length > 0
-              ? [...product.variants]
-                .filter((v: any) => v.status === 'active')
-                .sort((a: any, b: any) =>
-                  Number(a.discount_price || a.price) - Number(b.discount_price || b.price)
-                )[0]
-              : null;
-
-            const displayPrice = cheapestVariant
-              ? cheapestVariant.discount_price || cheapestVariant.price
-              : product.price;
-
-            return (
-              <motion.div
-                key={product.id}
-                variants={itemVariants}
-                className="group bg-card rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-border/40 hover:border-primary/30 hover:-translate-y-1"
-              >
-                <Link to={`/product/${product.slug || product.id}`}>
-                  {/* Image */}
-                  <div className="relative aspect-[4/3] overflow-hidden bg-secondary/20">
-                    {imageUrl ? (
-                      <img
-                        src={imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary/30 text-5xl font-black">{product.name[0]}</span>
-                      </div>
-                    )}
-                    {product.badge && (
-                      <div className="absolute top-3 left-3 bg-lime text-foreground text-xs font-bold px-3 py-1 rounded-full shadow">
-                        {product.badge}
-                      </div>
-                    )}
+          {allProducts.map((product) => (
+            <motion.article
+              key={product.id}
+              variants={itemVariants}
+              className="group bg-card rounded-squircle-xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-500 border border-border/50 hover:border-lime/30"
+            >
+              {/* Image Container */}
+              <div className="relative aspect-square overflow-hidden bg-secondary/30">
+                {product.badge && (
+                  <div className="absolute top-4 left-4 z-10 bg-lime text-foreground text-xs font-bold px-3 py-1.5 rounded-squircle">
+                    {product.badge}
                   </div>
-
-                  {/* Content */}
-                  <div className="p-6 text-center">
-                    <h3 className="text-xl font-black text-foreground mb-2 group-hover:text-primary transition-colors leading-snug">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-
-                    {/* Price + Explore row */}
-                    <div className="flex items-center justify-between">
-                      <div className="inline-flex items-center text-primary font-bold text-sm group/btn border border-primary/30 px-4 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300">
-                        Explore Product
-                        <ArrowRight className="w-4 h-4 ml-1.5 group-hover/btn:translate-x-1 transition-transform" />
-                      </div>
-                      <div className="text-right">
-                        <span className="text-2xl font-black text-primary">
-                          ₹{typeof displayPrice === 'number'
-                            ? displayPrice.toFixed(0)
-                            : Number(displayPrice || 0).toFixed(0)}
-                        </span>
-                        {cheapestVariant && (
-                          <div className="text-xs text-muted-foreground font-medium">{cheapestVariant.weight}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                )}
+                {/* Wishlist Button */}
+                <div className="absolute top-4 right-4 z-10">
+                  <WishlistButton product={product} size="sm" />
+                </div>
+                <Link to={`/product/${product.id}`}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
                 </Link>
-              </motion.div>
-            );
-          })}
+                {/* Quick Add Overlay */}
+                <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+                  <Button
+                    variant="lime"
+                    size="lg"
+                    className="translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Add to Cart
+                  </Button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <Link to={`/product/${product.id}`}>
+                  <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+                    {product.name}
+                  </h3>
+                </Link>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                  {product.description}
+                </p>
+
+                {/* Price & CTA */}
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-2xl font-black text-foreground">
+                      ₹{(() => {
+                        if (product.variants && product.variants.length > 0) {
+                          const cheapest = [...product.variants]
+                            .filter((v: any) => v.status === 'active')
+                            .sort((a: any, b: any) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
+                          return cheapest ? (cheapest.discount_price || cheapest.price) : product.price;
+                        }
+                        return product.originalPrice || product.price;
+                      })()}
+                    </span>
+                    {product.variants && product.variants.length > 0 && (
+                      <span className="text-xs font-bold text-lime uppercase tracking-wider">
+                        {(() => {
+                          const cheapest = [...product.variants]
+                            .filter((v: any) => v.status === 'active')
+                            .sort((a: any, b: any) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
+                          return cheapest ? `${cheapest.weight} (Pack of ${cheapest.pack_size})` : '';
+                        })()}
+                      </span>
+                    )}
+                  </div>
+                  <Link to={`/product/${product.id}`}>
+                    <Button variant="outline" size="sm">
+                      View Details
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </motion.article>
+          ))}
         </motion.div>
 
-        {/* All Products CTA */}
+        {/* View All Products CTA */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-14"
+          className="text-center mt-12"
         >
           <Link to="/products/other-products">
-            <Button variant="default" size="lg" className="px-10 py-6 text-base font-bold rounded-full shadow-lg hover:shadow-primary/30 hover:scale-105 transition-all duration-300">
+            <Button variant="default" size="lg">
               View All Products
             </Button>
           </Link>
