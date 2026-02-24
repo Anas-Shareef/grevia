@@ -123,6 +123,7 @@ class ProductForm
                                     ->required(),
                                 TextInput::make('sku')
                                     ->label('SKU')
+                                    ->nullable()
                                     ->unique(\App\Models\ProductVariant::class, 'sku', ignoreRecord: true),
                                 Select::make('status')
                                     ->options([
