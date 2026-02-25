@@ -29,9 +29,9 @@ class SendSingleEmail implements ShouldQueue
     public function handle(): void
     {
         // Extract recipient data
-        $email = $recipient->email ?? $recipient['email'] ?? null;
-        $name = $recipient->name ?? $recipient['name'] ?? 'Customer';
-        $userId = $recipient->id ?? $recipient['id'] ?? null;
+        $email = $this->recipient->email ?? $this->recipient['email'] ?? null;
+        $name  = $this->recipient->name  ?? $this->recipient['name']  ?? 'Customer';
+        $userId = $this->recipient->id   ?? $this->recipient['id']    ?? null;
 
         if (!$email) {
             throw new \Exception('Recipient email is missing');

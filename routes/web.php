@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 // Serve React SPA for all non-API/Admin routes
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '^(?!api|admin|storage|invoices|test-email).*$');
+})->where('any', '^(?!api|admin|storage|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns).*$');
 
 Route::get('/test-email', function () {
     try {
@@ -201,3 +201,40 @@ Route::get('/unsubscribe', [\App\Http\Controllers\UnsubscribeController::class, 
     ->name('unsubscribe');
 Route::post('/resubscribe', [\App\Http\Controllers\UnsubscribeController::class, 'resubscribe'])
     ->name('resubscribe');
+
+// One-click setup: runs email marketing migrations on the server
+Route::get('/setup-email-campaigns', function () {
+    $results = [];
+    $migrations = [
+        '2026_02_17_151340_create_email_templates_table',
+        '2026_02_17_151342_create_email_campaigns_table',
+        '2026_02_17_151343_create_email_logs_table',
+    ];
+
+    foreach ($migrations as $migration) {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--path' => "database/migrations/{$migration}.php",
+                '--force' => true,
+            ]);
+            $results[] = "✅ {$migration}";
+        } catch (\Exception $e) {
+            $results[] = "⚠️ {$migration}: " . $e->getMessage();
+        }
+    }
+
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+    $tables = [];
+    foreach (['email_templates', 'email_campaigns', 'email_logs'] as $table) {
+        $tables[$table] = \Illuminate\Support\Facades\Schema::hasTable($table) ? '✅ exists' : '❌ missing';
+    }
+
+    return response('<pre style="font-family:monospace;padding:20px">'
+        . '<h2>📧 Email Campaign Setup</h2>'
+        . implode("\n", $results)
+        . "\n\n<strong>Tables:</strong>\n"
+        . implode("\n", array_map(fn($k, $v) => "$k: $v", array_keys($tables), $tables))
+        . "\n\n✅ Done! Go to <a href=\"/admin/email-campaigns\">/admin/email-campaigns</a> to create your first campaign."
+        . '</pre>');
+});
