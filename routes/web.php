@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 // Serve React SPA for all non-API/Admin routes
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '^(?!api|admin|storage|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns).*$');
+})->where('any', '^(?!api|admin|storage|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend).*$');
 
 Route::get('/test-email', function () {
     try {
@@ -244,4 +244,44 @@ Route::prefix('admin/export')->group(function () {
     Route::get('/users',            [\App\Http\Controllers\Admin\AdminExportController::class, 'users'])->name('admin.export.users');
     Route::get('/products',         [\App\Http\Controllers\Admin\AdminExportController::class, 'products'])->name('admin.export.products');
     Route::get('/contact-messages', [\App\Http\Controllers\Admin\AdminExportController::class, 'contactMessages'])->name('admin.export.contact-messages');
+});
+
+// One-click sync: push all existing users to Moosend mailing list
+Route::get('/sync-moosend', function () {
+    $moosend = new \App\Services\MoosendService();
+    $users   = \App\Models\User::select('id', 'name', 'email')->get();
+
+    $success = 0;
+    $failed  = 0;
+    $log     = [];
+
+    foreach ($users as $user) {
+        $ok = $moosend->subscribe(
+            email: $user->email,
+            name:  $user->name,
+            tags:  ['existing', 'customer']
+        );
+
+        if ($ok) {
+            $success++;
+            $log[] = "✅ {$user->name} ({$user->email})";
+        } else {
+            $failed++;
+            $log[] = "❌ {$user->name} ({$user->email}) - failed";
+        }
+
+        // Small delay to avoid rate limiting
+        usleep(100000); // 100ms
+    }
+
+    $html = '<pre style="font-family:monospace;padding:20px;line-height:1.7">';
+    $html .= '<h2>📧 Moosend Sync Complete</h2>';
+    $html .= "<strong>Total:</strong> {$users->count()} | ";
+    $html .= "<strong style='color:green'>✅ Success: {$success}</strong> | ";
+    $html .= "<strong style='color:red'>❌ Failed: {$failed}</strong>\n\n";
+    $html .= implode("\n", $log);
+    $html .= '\n\n<a href="/admin/email-campaigns">→ Go to Email Campaigns</a>';
+    $html .= '</pre>';
+
+    return response($html);
 });
