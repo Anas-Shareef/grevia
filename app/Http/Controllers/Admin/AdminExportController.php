@@ -16,7 +16,7 @@ class AdminExportController extends Controller
     public function users(Request $request)
     {
         $users = User::query()
-            ->select('id', 'name', 'email', 'phone', 'created_at', 'is_blocked')
+            ->select('id', 'name', 'email', 'created_at', 'is_blocked')
             ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
                 ->orWhere('email', 'like', "%{$request->search}%"))
             ->orderBy('created_at', 'desc')
@@ -37,14 +37,13 @@ class AdminExportController extends Controller
             fputs($output, "\xEF\xBB\xBF");
 
             // Header row
-            fputcsv($output, ['ID', 'Name', 'Email', 'Phone', 'Status', 'Registered At']);
+            fputcsv($output, ['ID', 'Name', 'Email', 'Status', 'Registered At']);
 
             foreach ($users as $user) {
                 fputcsv($output, [
                     $user->id,
                     $user->name,
                     $user->email,
-                    $user->phone ?? '',
                     $user->is_blocked ? 'Blocked' : 'Active',
                     $user->created_at?->format('d M Y H:i'),
                 ]);
