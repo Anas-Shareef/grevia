@@ -21,29 +21,36 @@ class AuthController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // Handle Newsletter Subscription
+        // Handle Newsletter Subscription (local DB)
         if ($request->boolean('newsletter')) {
             \App\Models\Subscriber::updateOrCreate(
                 ['email' => $request->email],
                 [
                     'is_subscribed' => true,
-                    'source' => 'register',
-                    'user_id' => $user->id,
-                    'name' => $request->name,
+                    'source'        => 'register',
+                    'user_id'       => $user->id,
+                    'name'          => $request->name,
                 ]
             );
         }
+
+        // Auto-subscribe to Moosend for welcome email automation
+        (new \App\Services\MoosendService())->subscribe(
+            email: $user->email,
+            name:  $user->name,
+            tags:  ['registered', 'customer']
+        );
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user'  => $user,
         ], 201);
     }
 

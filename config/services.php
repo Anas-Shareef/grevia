@@ -31,4 +31,9 @@ return [
         ],
     ],
 
+    'moosend' => [
+        'api_key' => env('MOOSEND_API_KEY', ''),
+        'list_id' => env('MOOSEND_LIST_ID', ''),
+    ],
+
 ];
