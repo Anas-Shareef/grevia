@@ -1,4 +1,4 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -14,7 +14,7 @@ const CartDrawer = () => {
   const handleMoveToWishlist = (item: typeof items[0]) => {
     if (!isInWishlist(item.product.id)) {
       addToWishlist(item.product);
-      removeFromCart(item.product.id);
+      removeFromCart(item.product.id, item.variantId); // ✅ pass variantId
       toast.success(`${item.product.name} moved to wishlist!`);
     } else {
       toast.info(`${item.product.name} is already in wishlist`);
@@ -30,6 +30,10 @@ const CartDrawer = () => {
             <ShoppingBag className="w-5 h-5" />
             Cart ({getCartCount()})
           </SheetTitle>
+          {/* Fix aria-describedby warning */}
+          <SheetDescription className="sr-only">
+            Your shopping cart items
+          </SheetDescription>
         </SheetHeader>
 
         {items.length === 0 ? (
@@ -46,85 +50,102 @@ const CartDrawer = () => {
             {/* Cart Items */}
             <div className="flex-1 overflow-y-auto">
               <AnimatePresence mode="popLayout">
-                {items.map((item) => (
-                  <motion.div
-                    key={item.product.id}
-                    layout
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex gap-4 p-4 border-b border-border/50 hover:bg-secondary/20 transition-colors"
-                  >
-                    <Link
-                      to={`/product/${item.product.id}`}
-                      onClick={() => setIsCartOpen(false)}
-                      className="flex-shrink-0"
+                {items.map((item) => {
+                  // ✅ Unique key includes variantId so same product with different variants works
+                  const itemKey = `${item.product.id}_${item.variantId ?? 'no-variant'}`;
+
+                  // ✅ Price: prefer variant price, fallback to product price
+                  const variant = item.product.variants?.find((v: any) => v.id == item.variantId);
+                  const unitPrice = variant
+                    ? Number(variant.discount_price || variant.price)
+                    : Number(item.product.price || 0);
+
+                  return (
+                    <motion.div
+                      key={itemKey}
+                      layout
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex gap-4 p-4 border-b border-border/50 hover:bg-secondary/20 transition-colors"
                     >
-                      <img
-                        src={item.product.image}
-                        alt={item.product.name}
-                        className="w-20 h-20 object-cover rounded-lg"
-                      />
-                    </Link>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <Link
-                          to={`/product/${item.product.id}`}
-                          onClick={() => setIsCartOpen(false)}
-                          className="font-semibold text-foreground hover:text-lime transition-colors line-clamp-2 text-sm"
-                        >
-                          {item.product.name}
-                        </Link>
-                        <button
-                          onClick={() => removeFromCart(item.product.id)}
-                          className="p-1 text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
-                          aria-label="Remove item"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                      {/* Price */}
-                      <p className="text-sm font-bold text-lime mt-1">
-                        ₹{item.product.price} × {item.quantity} = ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
-                      </p>
-
-                      <div className="flex items-center justify-between mt-3">
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                            className="w-7 h-7 rounded-full bg-secondary border border-border flex items-center justify-center hover:bg-lime hover:border-lime hover:text-foreground transition-colors"
-                            aria-label="Decrease quantity"
+                      <Link
+                        to={`/product/${item.product.id}`}
+                        onClick={() => setIsCartOpen(false)}
+                        className="flex-shrink-0"
+                      >
+                        <img
+                          src={item.product.image}
+                          alt={item.product.name}
+                          className="w-20 h-20 object-cover rounded-lg"
+                        />
+                      </Link>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <Link
+                            to={`/product/${item.product.id}`}
+                            onClick={() => setIsCartOpen(false)}
+                            className="font-semibold text-foreground hover:text-lime transition-colors line-clamp-2 text-sm"
                           >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="w-6 text-center font-semibold text-sm">{item.quantity}</span>
+                            {item.product.name}
+                            {item.weight && (
+                              <span className="block text-xs text-muted-foreground font-normal mt-0.5">
+                                {item.weight}
+                              </span>
+                            )}
+                          </Link>
+                          {/* ✅ Pass variantId so the filter in CartContext matches correctly */}
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                            className="w-7 h-7 rounded-full bg-secondary border border-border flex items-center justify-center hover:bg-lime hover:border-lime hover:text-foreground transition-colors"
-                            aria-label="Increase quantity"
+                            onClick={() => removeFromCart(item.product.id, item.variantId)}
+                            className="p-1 text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
+                            aria-label="Remove item"
                           >
-                            <Plus className="w-3 h-3" />
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
 
-                        {/* Move to Wishlist */}
-                        <button
-                          onClick={() => handleMoveToWishlist(item)}
-                          className={`flex items-center gap-1 text-xs font-semibold transition-colors ${isInWishlist(item.product.id)
+                        {/* Price */}
+                        <p className="text-sm font-bold text-lime mt-1">
+                          ₹{unitPrice} × {item.quantity} = ₹{(unitPrice * item.quantity).toLocaleString('en-IN')}
+                        </p>
+
+                        <div className="flex items-center justify-between mt-3">
+                          {/* Quantity Controls — ✅ pass variantId */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.variantId)}
+                              className="w-7 h-7 rounded-full bg-secondary border border-border flex items-center justify-center hover:bg-lime hover:border-lime hover:text-foreground transition-colors"
+                              aria-label="Decrease quantity"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="w-6 text-center font-semibold text-sm">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.variantId)}
+                              className="w-7 h-7 rounded-full bg-secondary border border-border flex items-center justify-center hover:bg-lime hover:border-lime hover:text-foreground transition-colors"
+                              aria-label="Increase quantity"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+
+                          {/* Move to Wishlist */}
+                          <button
+                            onClick={() => handleMoveToWishlist(item)}
+                            className={`flex items-center gap-1 text-xs font-semibold transition-colors ${isInWishlist(item.product.id)
                               ? "text-red-500"
                               : "text-muted-foreground hover:text-red-500"
-                            }`}
-                        >
-                          <Heart className={`w-4 h-4 ${isInWishlist(item.product.id) ? "fill-current" : ""}`} />
-                          Save
-                        </button>
+                              }`}
+                          >
+                            <Heart className={`w-4 h-4 ${isInWishlist(item.product.id) ? "fill-current" : ""}`} />
+                            Save
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
 

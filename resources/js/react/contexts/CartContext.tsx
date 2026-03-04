@@ -159,7 +159,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Update cart (both state and storage/server)
   const updateCart = useCallback(async (newItems: CartItem[]) => {
-    console.log('[CartContext] updateCart called, user:', user?.email, 'items:', newItems.length);
     setItems(newItems);
     saveToLocalStorage(newItems);
 
@@ -198,9 +197,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [items, updateCart]);
 
   const removeFromCart = useCallback(async (productId: string, variantId?: string | number) => {
-    const newItems = items.filter(item =>
-      !(item.product.id === productId && item.variantId == variantId)
-    );
+    const newItems = items.filter(item => {
+      if (item.product.id !== productId) return true;          // keep other products
+      if (variantId === undefined) return false;               // remove ALL variants of this product if no variantId given
+      return item.variantId != variantId;                      // keep variants that don't match
+    });
     await updateCart(newItems);
   }, [items, updateCart]);
 
@@ -210,11 +211,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    const newItems = items.map(item =>
-      (item.product.id === productId && item.variantId == variantId)
-        ? { ...item, quantity }
-        : item
-    );
+    const newItems = items.map(item => {
+      if (item.product.id !== productId) return item;
+      if (variantId !== undefined && item.variantId != variantId) return item;
+      return { ...item, quantity };
+    });
     await updateCart(newItems);
   }, [items, updateCart, removeFromCart]);
 
