@@ -3,12 +3,12 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -50,6 +50,12 @@ class UsersTable
                 DeleteAction::make(),
             ])
             ->toolbarActions([
+                Action::make('export_excel')
+                    ->label('Export Excel')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->url(fn () => route('admin.export.users'))
+                    ->openUrlInNewTab(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

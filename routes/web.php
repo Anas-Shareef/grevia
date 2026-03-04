@@ -238,3 +238,10 @@ Route::get('/setup-email-campaigns', function () {
         . "\n\n✅ Done! Go to <a href=\"/admin/email-campaigns\">/admin/email-campaigns</a> to create your first campaign."
         . '</pre>');
 });
+
+// Admin Excel/CSV Export Routes (no auth guard needed - admin middleware handles it via session)
+Route::prefix('admin/export')->group(function () {
+    Route::get('/users',            [\App\Http\Controllers\Admin\AdminExportController::class, 'users'])->name('admin.export.users');
+    Route::get('/products',         [\App\Http\Controllers\Admin\AdminExportController::class, 'products'])->name('admin.export.products');
+    Route::get('/contact-messages', [\App\Http\Controllers\Admin\AdminExportController::class, 'contactMessages'])->name('admin.export.contact-messages');
+});

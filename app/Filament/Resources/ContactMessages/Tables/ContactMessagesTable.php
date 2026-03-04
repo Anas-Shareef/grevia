@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ContactMessages\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
@@ -65,11 +65,16 @@ class ContactMessagesTable
                             );
                     })
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
-                // ReplyAction inserted later
             ])
-            ->bulkActions([
+            ->toolbarActions([
+                Action::make('export_excel')
+                    ->label('Export Excel')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->url(fn () => route('admin.export.contact-messages'))
+                    ->openUrlInNewTab(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
