@@ -16,6 +16,7 @@ class Category extends Model
         'image',
         'parent_id',
         'status',
+        'show_in_filter',
         'order',
     ];
 

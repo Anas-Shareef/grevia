@@ -32,43 +32,20 @@ class ProductController extends Controller
         if ($request->filled('category')) {
             $categorySlug = $request->category;
             
-            // Special handling for "other-products" - show bakery and pickles
-            if ($categorySlug === 'other-products') {
-                $query->whereHas('category', function($q) {
-                    $q->whereIn('slug', ['bakery', 'pickles']);
-                });
-            } 
-            // Check if it's a subcategory (stevia, monkfruit)
-            elseif (in_array($categorySlug, ['stevia', 'monkfruit'])) {
-                 // Try to match by Category Slug OR Subcategory text field (hybrid approach)
-                 $query->where(function($q) use ($categorySlug) {
-                    $q->whereHas('category', fn($c) => $c->where('slug', $categorySlug))
-                      ->orWhere('subcategory', $categorySlug);
-                 });
-            } 
-            else {
-                // Robust Category Filtering: Include Children
-                // 1. Find the category by slug (Exact match)
-                $cat = \App\Models\Category::where('slug', $categorySlug)->first();
+            // Find the category by slug
+            $cat = \App\Models\Category::where('slug', $categorySlug)->first();
+            
+            if ($cat) {
+                // Get this category ID AND all its children IDs
+                $childIds = \App\Models\Category::where('parent_id', $cat->id)->pluck('id')->toArray();
+                $allIds = array_merge([$cat->id], $childIds);
                 
-                // 2. Fallback: Fuzzy match (e.g. 'sweeteners' finds 'premium-sweeteners')
-                if (!$cat) {
-                    $cat = \App\Models\Category::where('slug', 'like', "%{$categorySlug}%")->first();
-                }
-
-                if ($cat) {
-                    // Get this category ID and all its children IDs
-                    $ids = \App\Models\Category::where('id', $cat->id)
-                        ->orWhere('parent_id', $cat->id)
-                        ->pluck('id');
-                    
-                    $query->whereIn('category_id', $ids);
-                } else {
-                    // Fallback to strict slug match if not found (or id)
-                     $query->whereHas('category', function($q) use ($categorySlug) {
-                        $q->where('slug', $categorySlug)->orWhere('id', $categorySlug);
-                    });
-                }
+                $query->whereIn('category_id', $allIds);
+            } else {
+                // Fallback: mostly for 'search' strings if the frontend still sends weird text
+                $query->whereHas('category', function($q) use ($categorySlug) {
+                    $q->where('slug', 'like', "%{$categorySlug}%");
+                });
             }
         }
 
@@ -147,8 +124,14 @@ class ProductController extends Controller
                     'min' => (float)$minPrice,
                     'max' => (float)$maxPrice,
                 ],
-                'categories' => \App\Models\Category::select('id', 'name', 'slug')->get(),
-                // 'tags' => ... // TODO: extract tags
+                'categories' => \App\Models\Category::where('show_in_filter', true)
+                    ->whereNull('parent_id')
+                    ->with(['children' => function($q) {
+                        $q->where('show_in_filter', true)->select('id', 'name', 'slug', 'parent_id')->orderBy('order');
+                    }])
+                    ->orderBy('order')
+                    ->select('id', 'name', 'slug')
+                    ->get(),
             ]
         ]);
     }

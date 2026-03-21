@@ -13,7 +13,7 @@ type FilterSidebarProps = {
     resetFilters: () => void;
     meta: {
         price: { min: number; max: number };
-        categories: { id: number; slug: string; name: string }[];
+        categories: { id: number; slug: string; name: string; children?: { id: number; slug: string; name: string }[] }[];
     } | undefined;
     className?: string;
     currentCategory?: string; // Current category from route
@@ -40,34 +40,38 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: Omit<Filte
         setFilter("max_price", value[1]);
     }
 
-    // Show category filter on collections page, sweeteners page, and other-products page
-    const showCategoryFilter = !currentCategory || currentCategory === 'sweeteners' || currentCategory === 'other-products';
+    // Show category filter if there are options
+    const showCategoryFilter = true;
 
-    // Get filter options based on context
+    // Get filter options based on dynamic backend data
     const getFilterOptions = () => {
-        if (!currentCategory) {
-            // On /collections/all - show all main categories
+        const cats = meta?.categories || [];
+
+        // 1. On ALL products page
+        if (!currentCategory || currentCategory === 'all') {
             return [
                 { value: "", label: "All Products" },
-                { value: "sweeteners", label: "All Sweeteners" },
-                { value: "bakery", label: "Bakery Items" },
-                { value: "pickles", label: "Pickles & Preserves" },
-            ];
-        } else if (currentCategory === 'sweeteners') {
-            // On /products/sweeteners - show sweetener subcategories
-            return [
-                { value: "", label: "All Sweeteners" },
-                { value: "stevia", label: "Stevia Sweeteners" },
-                { value: "monkfruit", label: "Monkfruit Sweeteners" },
-            ];
-        } else if (currentCategory === 'other-products') {
-            // On /products/other-products - show other product categories
-            return [
-                { value: "", label: "All Other Products" },
-                { value: "bakery", label: "Bakery Items" },
-                { value: "pickles", label: "Pickles & Preserves" },
+                ...cats.map(c => ({ value: c.slug, label: c.name }))
             ];
         }
+
+        // 2. See if the current URL is a parent category or a child category
+        let parentCat = cats.find(c => c.slug === currentCategory);
+
+        if (!parentCat) {
+            // Check if it's a child category
+            parentCat = cats.find(c => c.children?.some(child => child.slug === currentCategory));
+        }
+
+        // 3. If we found a matching parent tree, show "All [Parent]" and its children
+        if (parentCat) {
+            return [
+                { value: parentCat.slug, label: `All ${parentCat.name}` },
+                ...(parentCat.children || []).map(child => ({ value: child.slug, label: child.name }))
+            ];
+        }
+
+        // Fallback default
         return [];
     };
 

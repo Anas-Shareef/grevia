@@ -39,6 +39,10 @@ class CategoryForm
                 Toggle::make('status')
                     ->label('Active')
                     ->default(true),
+                Toggle::make('show_in_filter')
+                    ->label('Show in Filter')
+                    ->helperText('Enable this to show the category in the shop dropdown filters.')
+                    ->default(true),
                 TextInput::make('order')
                     ->required()
                     ->numeric()
