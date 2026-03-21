@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 // Serve React SPA for all non-API/Admin routes
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '^(?!api|admin|storage|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend).*$');
+})->where('any', '^(?!api|admin|storage|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|fix-db).*$');
 
 Route::get('/test-email', function () {
     try {
@@ -174,6 +174,21 @@ Route::get('/debug-categories', function () {
         'categories' => \App\Models\Category::all(['id', 'name', 'slug', 'parent_id']),
         'products' => \App\Models\Product::all(['id', 'name', 'slug', 'category_id', 'subcategory', 'in_stock'])
     ];
+});
+
+Route::get('/fix-db', function () {
+    try {
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('categories', 'show_in_filter')) {
+            \Illuminate\Support\Facades\Schema::table('categories', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->boolean('show_in_filter')->default(true)->after('status');
+            });
+            \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+            return "Database Fixed! The show_in_filter column has been added to categories table.";
+        }
+        return "Database is already up to date!";
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
 });
 
 // Order Export Routes
