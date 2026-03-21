@@ -21,9 +21,8 @@ class CategoryForm
                 TextInput::make('name')
                     ->required()
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn (string $operation, $state, $set) => $operation === 'create' ? $set('slug', str($state)->slug()) : null),
+                    ->afterStateUpdated(fn (string $operation, $state, $set) => $set('slug', str($state)->slug())),
                 TextInput::make('slug')
-                    ->disabledOn('edit')
                     ->required()
                     ->unique(Category::class, 'slug', ignoreRecord: true),
                 Textarea::make('description')

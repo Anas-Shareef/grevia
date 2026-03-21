@@ -25,9 +25,8 @@ class ProductForm
                         TextInput::make('name')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, $set) => $operation === 'create' ? $set('slug', str($state)->slug()) : null),
+                            ->afterStateUpdated(fn (string $operation, $state, $set) => $set('slug', str($state)->slug())),
                         TextInput::make('slug')
-                            ->disabledOn('edit')
                             ->required()
                             ->unique(Product::class, 'slug', ignoreRecord: true),
                         Select::make('category_id')
@@ -63,17 +62,47 @@ class ProductForm
                             ->helperText('Show this product on the homepage')
                             ->default(false),
                     ]),
-                Section::make('Global Media')
-                    ->description('Fallback image shown if a variant has no specific photo.')
+                Section::make('Global Media (Fallback)')
+                    ->description('Fallback image shown only if the product has no gallery photos.')
                     ->collapsed()
                     ->components([
                         FileUpload::make('image')
-                            ->label('Product Image')
-                            ->helperText('This image is shown when no variant-specific photo is available.')
+                            ->label('Fallback Image')
+                            ->helperText('This image is only shown when the Product Gallery is empty.')
                             ->image()
                             ->disk('public')
                             ->directory('products')
                             ->imagePreviewHeight('200')
+                            ->columnSpanFull(),
+                    ]),
+                Section::make('Product Gallery')
+                    ->description('Manage main and additional photos for this product.')
+                    ->components([
+                        \Filament\Forms\Components\Repeater::make('gallery')
+                            ->relationship('gallery')
+                            ->schema([
+                                FileUpload::make('image_path')
+                                    ->label('Photo')
+                                    ->image()
+                                    ->disk('public')
+                                    ->directory('products/gallery')
+                                    ->required()
+                                    ->columnSpanFull(),
+                                Toggle::make('is_main')
+                                    ->label('Main Photo')
+                                    ->helperText('This photo will be the primary one shown on the store.')
+                                    ->default(false)
+                                    ->inline(false),
+                                TextInput::make('sort_order')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->label('Display Order'),
+                            ])
+                            ->columns(2)
+                            ->addActionLabel('Add Gallery Photo')
+                            ->defaultItems(0)
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): string => $state['is_main'] ? '⭐ Main Photo' : 'Gallery Photo')
                             ->columnSpanFull(),
                     ]),
                 Section::make('Product Variants')
