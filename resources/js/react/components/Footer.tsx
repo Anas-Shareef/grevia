@@ -16,7 +16,7 @@ const Footer = () => {
   // useQuery to fetch footer content
   const { data: footerData } = useQuery<any[]>({
     queryKey: ['footer-content'],
-    queryFn: api.get('/content/footer') as unknown as () => Promise<any[]>,
+    queryFn: () => api.get('/content/footer'),
   });
 
   const handleSubscribe = async () => {
