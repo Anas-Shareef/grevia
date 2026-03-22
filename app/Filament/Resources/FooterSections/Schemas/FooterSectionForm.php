@@ -41,9 +41,8 @@ class FooterSectionForm
                     ->schema([
                         TextInput::make('label')->required(),
                         TextInput::make('url')
-                            ->url()
                             ->required()
-                            ->prefix('https://'),
+                            ->helperText('Enter a full URL (https://) or a relative path (e.g. /products)'),
                     ])
                     ->visible(fn ($get) => $get('type') === 'links')
                     ->columnSpanFull(),

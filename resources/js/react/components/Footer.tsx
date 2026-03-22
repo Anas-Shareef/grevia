@@ -2,6 +2,7 @@ import { Instagram, Twitter, Facebook, Mail } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import greviaLogo from "@/assets/grevia-logo.png";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -123,16 +124,33 @@ const Footer = () => {
               <div key={colIdx}>
                 <h3 className="font-bold text-lg mb-4">{section.section_name}</h3>
                 <ul className="space-y-3">
-                  {(section.content?.links || []).map((link: any, linkIdx: number) => (
-                    <li key={linkIdx}>
-                      <a
-                        href={link.url}
-                        className="text-primary-foreground/70 hover:text-lime transition-colors"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
+                  {(section.content?.links || []).map((link: any, linkIdx: number) => {
+                    const isExternal = link.url.startsWith('http');
+                    if (isExternal) {
+                      return (
+                        <li key={linkIdx}>
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary-foreground/70 hover:text-lime transition-colors"
+                          >
+                            {link.label}
+                          </a>
+                        </li>
+                      );
+                    }
+                    return (
+                      <li key={linkIdx}>
+                        <Link
+                          to={link.url}
+                          className="text-primary-foreground/70 hover:text-lime transition-colors"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))
