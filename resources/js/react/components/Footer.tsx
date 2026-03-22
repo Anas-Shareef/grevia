@@ -39,36 +39,28 @@ const Footer = () => {
     }
   };
 
-  // Helper to parse sections by name/type
-  const getSection = (name: string) => {
-    return footerData?.find(s => s.section_name.toLowerCase() === name.toLowerCase())?.content;
+  // Safe wrapper for all data items
+  const activeSections = footerData || [];
+
+  // Group sections by type
+  const textSections = activeSections.filter(s => s.type === 'text');
+  const linksSections = activeSections.filter(s => s.type === 'links');
+  const socialSection = activeSections.find(s => s.type === 'social');
+  
+  // Fallbacks if backend is completely empty
+  const defaultAbout = {
+    section_name: 'About Us',
+    content: { text: "Experience the pure taste of nature with our premium organic sweeteners." }
   };
-
-  const aboutContent = getSection('About Us') || {
-    text: "Experience the pure taste of nature with our premium organic sweeteners. Zero calories, zero guilt, endless flavor."
-  };
-
-  const shopLinks = getSection('Shop')?.links || [
-    { label: "All Products", url: "/products" },
-    { label: "Stevia", url: "#" },
-  ];
-
-  const companyLinks = getSection('Company')?.links || [
-    { label: "About Us", url: "#about" },
-  ];
-
-  const supportLinks = getSection('Support')?.links || [
-    { label: "Contact", url: "#" },
-  ];
-
-  const socialLinks = getSection('Social')?.socials || [
+  
+  const defaultSocials = [
     { platform: "Instagram", url: "#" },
     { platform: "Twitter", url: "#" },
     { platform: "Facebook", url: "#" },
   ];
 
   const getIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
+    switch (platform?.toLowerCase() || '') {
       case 'instagram': return Instagram;
       case 'twitter': return Twitter;
       case 'facebook': return Facebook;
@@ -89,8 +81,16 @@ const Footer = () => {
                 className="h-12 w-auto brightness-0 invert"
               />
             </a>
-            <div className="text-primary-foreground/70 max-w-sm mb-6 leading-relaxed">
-              {aboutContent.text ? <div dangerouslySetInnerHTML={{ __html: aboutContent.text }} /> : aboutContent}
+            <div className="text-primary-foreground/70 max-w-sm mb-6 leading-relaxed space-y-4">
+              {textSections.length > 0 ? (
+                textSections.map((section, idx) => (
+                  <div key={idx}>
+                    {section.content?.text ? <div dangerouslySetInnerHTML={{ __html: section.content.text }} /> : null}
+                  </div>
+                ))
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: defaultAbout.content.text }} />
+              )}
             </div>
             {/* Newsletter */}
             <div className="flex gap-2">
@@ -118,53 +118,47 @@ const Footer = () => {
           </div>
 
           {/* Links */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Shop</h3>
-            <ul className="space-y-3">
-              {shopLinks.map((link: any, idx: number) => (
-                <li key={idx}>
-                  <a
-                    href={link.url}
-                    className="text-primary-foreground/70 hover:text-lime transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-bold text-lg mb-4">Company</h3>
-            <ul className="space-y-3">
-              {companyLinks.map((link: any, idx: number) => (
-                <li key={idx}>
-                  <a
-                    href={link.url}
-                    className="text-primary-foreground/70 hover:text-lime transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-bold text-lg mb-4">Support</h3>
-            <ul className="space-y-3">
-              {supportLinks.map((link: any, idx: number) => (
-                <li key={idx}>
-                  <a
-                    href={link.url}
-                    className="text-primary-foreground/70 hover:text-lime transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {linksSections.length > 0 ? (
+            linksSections.map((section: any, colIdx: number) => (
+              <div key={colIdx}>
+                <h3 className="font-bold text-lg mb-4">{section.section_name}</h3>
+                <ul className="space-y-3">
+                  {(section.content?.links || []).map((link: any, linkIdx: number) => (
+                    <li key={linkIdx}>
+                      <a
+                        href={link.url}
+                        className="text-primary-foreground/70 hover:text-lime transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          ) : (
+            // Default Layout if empty
+            <>
+              <div>
+                <h3 className="font-bold text-lg mb-4">Shop</h3>
+                <ul className="space-y-3">
+                  <li><a href="/products" className="text-primary-foreground/70 hover:text-lime">All Products</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-4">Company</h3>
+                <ul className="space-y-3">
+                  <li><a href="#about" className="text-primary-foreground/70 hover:text-lime">About Us</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-4">Support</h3>
+                <ul className="space-y-3">
+                  <li><a href="/contact" className="text-primary-foreground/70 hover:text-lime">Contact</a></li>
+                </ul>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Bottom */}
@@ -173,7 +167,7 @@ const Footer = () => {
             © {currentYear} Grevia. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            {socialLinks.map((social: any, idx: number) => {
+            {(socialSection?.content?.socials || defaultSocials).map((social: any, idx: number) => {
               const Icon = getIcon(social.platform);
               return (
                 <a
