@@ -284,29 +284,30 @@ const ProductDetailPage = () => {
                       <div>
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">Concentration Strength</h3>
-                          <button className="text-[10px] font-black text-lime uppercase underline tracking-widest flex items-center gap-1 hover:text-white transition-colors">
-                            <Info className="w-3 h-3" /> Guide
+                          <button className="text-[10px] font-black text-[#97c459] uppercase underline tracking-widest flex items-center gap-1 hover:text-white transition-colors">
+                            <Info className="w-3 h-3" /> Strength Guide
                           </button>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                          {siblings.sort((a,b) => a.name.includes('1:10') ? -1 : 1).map(sib => {
-                            const isCurrent = sib.id === product.id;
-                            const isMild = sib.name.includes('1:10');
+                          {siblings.sort((a,b) => (a.ratio || '') === '1:10' ? -1 : 1).map((sib: Product) => {
+                            const isCurrent = sib.id === product.id || sib.slug === product.slug;
+                            const isMild = sib.ratio === '1:10';
                             return (
                               <Link
                                 key={sib.id}
                                 to={`/product/${sib.slug}`}
-                                className={`flex flex-col items-start p-4 rounded-2xl border-2 transition-all group ${
+                                className={`flex flex-col items-start p-5 rounded-[24px] border-2 transition-all duration-500 group relative overflow-hidden ${
                                   isCurrent 
-                                  ? "border-lime bg-lime/5" 
-                                  : "border-white/5 bg-white/2 hover:border-white/20"
+                                  ? "border-[#97c459] bg-[#97c459]/10" 
+                                  : "border-white/5 bg-white/[0.02] hover:border-white/20"
                                 }`}
                               >
-                                <span className={`text-base font-black ${isCurrent ? "text-white" : "text-white/40 group-hover:text-white"}`}>
-                                  {isMild ? "1:10 Ratio" : "1:50 Ratio"}
+                                {isCurrent && <div className="absolute top-0 right-0 w-12 h-12 bg-[#97c459]/20 blur-xl" />}
+                                <span className={`text-lg font-black ${isCurrent ? "text-white" : "text-white/30 group-hover:text-white"}`}>
+                                  {sib.ratio || (isMild ? "1:10" : "1:50")}
                                 </span>
-                                <span className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? "text-lime" : "text-white/20"}`}>
-                                  {isMild ? "Mild - Everyday use" : "Intense - Baking use"}
+                                <span className={`text-[9px] font-black uppercase tracking-widest mt-1 ${isCurrent ? "text-[#97c459]" : "text-white/10"}`}>
+                                  {isMild ? "Mild - Everyday" : "Intense - Baking"}
                                 </span>
                               </Link>
                             );
@@ -320,27 +321,26 @@ const ProductDetailPage = () => {
                   <div>
                     <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] mb-4">Select Pack Size</h3>
                     <div className="grid grid-cols-2 gap-3">
-                      {product.variants
-                        .filter(v => v.pack_size === 1) // Only show base units here or group by weight
+                      {(product.variants && product.variants.length > 0 ? product.variants : [{id: 'base', weight: product.size_label || '50g', price: product.price}])
                         .map(v => {
-                          const isSelected = selectedWeight === v.weight;
+                          const isSelected = selectedWeight === v.weight || product.size_label === v.weight;
                           return (
                             <button
                               key={v.id}
                               onClick={() => setSelectedWeight(v.weight)}
-                              className={`flex flex-col items-start p-4 rounded-2xl border-2 transition-all text-left ${
+                              className={`flex flex-col items-start p-5 rounded-[24px] border-2 transition-all duration-500 text-left relative overflow-hidden ${
                                 isSelected 
-                                ? "border-lime bg-lime/5" 
-                                : "border-white/5 bg-white/2 hover:border-white/20"
+                                ? "border-[#97c459] bg-[#97c459]/10" 
+                                : "border-white/5 bg-white/[0.02] hover:border-white/20"
                               }`}
                             >
-                              <div className="flex justify-between w-full mb-0.5">
-                                <span className={`text-base font-black ${isSelected ? "text-white" : "text-white/40"}`}>
+                              <div className="flex justify-between w-full mb-1">
+                                <span className={`text-lg font-black ${isSelected ? "text-white" : "text-white/30"}`}>
                                     {v.weight}
                                 </span>
-                                {isSelected && <Check className="w-4 h-4 text-lime" />}
+                                {isSelected && <Check className="w-5 h-5 text-[#97c459]" />}
                               </div>
-                              <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? "text-lime" : "text-white/20"}`}>
+                              <span className={`text-[9px] font-black uppercase tracking-widest ${isSelected ? "text-[#97c459]" : "text-white/10"}`}>
                                 ₹{v.discount_price || v.price} / unit
                               </span>
                             </button>
@@ -352,52 +352,56 @@ const ProductDetailPage = () => {
               )}
 
               {/* Price Row */}
-              <div className="flex items-center justify-between mb-8 pb-8 border-b border-white/5">
+              <div className="flex items-center justify-between mb-10 pb-10 border-b border-white/5">
                 <div className="flex flex-col">
-                    <div className="flex items-baseline gap-3">
-                        <span className="text-5xl font-black text-white tracking-tighter">
+                    <div className="flex items-baseline gap-4">
+                        <span className="text-6xl font-black text-white tracking-tighter">
                             ₹{displayPrice}
                         </span>
                         {displayOriginalPrice && displayOriginalPrice > (displayPrice || 0) && (
-                            <span className="text-xl text-white/20 line-through">
+                            <span className="text-2xl text-white/20 line-through font-bold">
                             ₹{displayOriginalPrice}
                             </span>
                         )}
                     </div>
-                    <p className="text-[10px] font-bold text-lime uppercase tracking-widest mt-2">Free Delivery Applied</p>
+                    <div className="flex items-center gap-2 mt-3">
+                        <span className="w-2 h-2 rounded-full bg-[#97c459] animate-pulse" />
+                        <p className="text-[10px] font-black text-[#97c459] uppercase tracking-[0.2em]">Ships within 24 hours</p>
+                    </div>
                 </div>
 
-                <div className="flex items-center p-2 bg-white/5 rounded-2xl border border-white/5">
+                <div className="flex items-center p-2 bg-white/[0.03] rounded-3xl border border-white/5">
                     <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/50 hover:text-white"
+                        className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/50 hover:text-white"
                     >
-                        <Minus className="w-4 h-4" />
+                        <Minus className="w-5 h-5" />
                     </button>
-                    <span className="w-12 text-center font-black text-xl text-white">{quantity}</span>
+                    <span className="w-14 text-center font-black text-2xl text-white">{quantity}</span>
                     <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/50 hover:text-white"
+                        className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/50 hover:text-white"
                     >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-5 h-5" />
                     </button>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <div className="flex flex-col sm:flex-row gap-5 mb-12">
                 <Button
                   variant="lime"
-                  className="flex-1 h-16 text-lg font-black rounded-2xl shadow-xl shadow-lime/20"
+                  className="flex-[2] h-20 text-xl font-black rounded-3xl shadow-2xl shadow-lime/10 group overflow-hidden relative"
                   onClick={handleAddToCart}
                   disabled={!isInStock}
                 >
-                  <ShoppingCart className="w-5 h-5 mr-3" />
-                  {isInStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  <ShoppingCart className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+                  {isInStock ? 'ADD TO BASKET' : 'OUT OF STOCK'}
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1 h-16 text-lg font-black rounded-2xl border-white/10 hover:bg-white/5"
+                  className="flex-1 h-20 text-lg font-black rounded-3xl border-white/10 hover:bg-white/5 hover:border-white/20 transition-all"
                   onClick={() => {
                     handleAddToCart();
                     setIsCartOpen(true);
@@ -407,55 +411,46 @@ const ProductDetailPage = () => {
                 </Button>
               </div>
 
-              {/* Trust Badges */}
-              <div className="grid grid-cols-3 gap-4 p-6 bg-white/2 border border-white/5 rounded-3xl mb-12">
-                  <div className="flex flex-col items-center text-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-lime/10 flex items-center justify-center text-lime">
-                        <Truck className="w-5 h-5" />
-                      </div>
-                      <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">Fast Shipping</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-lime/10 flex items-center justify-center text-lime">
-                        <ShieldCheck className="w-5 h-5" />
-                      </div>
-                      <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">100% Organic</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-lime/10 flex items-center justify-center text-lime">
-                        <RotateCcw className="w-5 h-5" />
-                      </div>
-                      <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">Easy Returns</span>
-                  </div>
-              </div>
-
-              {/* Educational Guide Box */}
-              <div className="bg-[#1a2e1d] border border-lime/20 rounded-[32px] p-8 mb-12 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-lime opacity-5 blur-[80px]" />
+              {/* Educational Guide Box (Dynamic Content) */}
+              <div className="bg-[#0f1a0f] border border-[#2d7a3a33] rounded-[40px] p-10 mb-12 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#97c459] opacity-[0.03] blur-[100px]" />
                   <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-full bg-lime flex items-center justify-center text-black">
-                            <Info className="w-4 h-4" />
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="w-10 h-10 rounded-2xl bg-[#97c459]/10 border border-[#97c459]/20 flex items-center justify-center text-[#97c459]">
+                            <Info className="w-5 h-5" />
                         </div>
-                        <h3 className="text-base font-black text-white uppercase tracking-wider">Understanding Ratios</h3>
+                        <div>
+                            <h3 className="text-lg font-black text-white uppercase tracking-widest">Strength Guide</h3>
+                            <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Educational Reference</p>
+                        </div>
                     </div>
-                    <div className="space-y-6">
-                        <div className="flex gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-                                <span className="text-lime font-black">1:10</span>
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-white mb-1">Standard Strength</h4>
-                                <p className="text-sm text-white/50 leading-relaxed italic">1g replaces 10g sugar. Ideal for tea, coffee & daily use.</p>
+                    
+                    <div className="space-y-8">
+                        <div className={`transition-all duration-700 ${product.ratio === '1:10' ? 'opacity-100 translate-x-0' : 'opacity-30 scale-95'}`}>
+                            <div className="flex gap-6">
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border-2 transition-colors ${product.ratio === '1:10' ? 'bg-[#97c459] border-[#97c459] text-black shadow-xl shadow-[#97c459]/20' : 'bg-white/5 border-white/10 text-white/20'}`}>
+                                    <span className="font-black text-lg">1:10</span>
+                                </div>
+                                <div>
+                                    <h4 className={`font-black uppercase tracking-widest mb-1 ${product.ratio === '1:10' ? 'text-white' : 'text-white/20'}`}>Mild Intensity</h4>
+                                    <p className={`text-sm leading-relaxed italic ${product.ratio === '1:10' ? 'text-white/60' : 'text-white/10'}`}>
+                                        Perfect for daily use. 1 gram replaces 10 grams of table sugar. No bitter aftertaste.
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-                                <span className="text-lime font-black">1:50</span>
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-white mb-1">Ultra Strength</h4>
-                                <p className="text-sm text-white/50 leading-relaxed italic">1g replaces 50g sugar. Primarily for baking & professional use.</p>
+
+                        <div className={`transition-all duration-700 ${product.ratio === '1:50' ? 'opacity-100 translate-x-0' : 'opacity-30 scale-95'}`}>
+                            <div className="flex gap-6">
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border-2 transition-colors ${product.ratio === '1:50' ? 'bg-[#97c459] border-[#97c459] text-black shadow-xl shadow-[#97c459]/20' : 'bg-white/5 border-white/10 text-white/20'}`}>
+                                    <span className="font-black text-lg">1:50</span>
+                                </div>
+                                <div>
+                                    <h4 className={`font-black uppercase tracking-widest mb-1 ${product.ratio === '1:50' ? 'text-white' : 'text-white/20'}`}>Professional Intensity</h4>
+                                    <p className={`text-sm leading-relaxed italic ${product.ratio === '1:50' ? 'text-white/60' : 'text-white/10'}`}>
+                                        Specially designed for baking & large scale use. 1 gram replaces 50 grams of sugar.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -463,20 +458,23 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Technical Specifications Grid */}
-              <div className="space-y-4 mb-12">
-                  <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] mb-4">Product Details</h3>
-                  <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-6 mb-16">
+                  <div className="flex items-center gap-3">
+                      <span className="h-[1px] w-6 bg-white/10" />
+                      <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em]">Pure Analytics</h3>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       {[
-                          { label: "Base", value: product.name.includes("Stevia") ? "Stevia Rebaudiana" : "Monk Fruit" },
-                          { label: "Form", value: product.name.includes("Drops") ? "Liquid" : "Powder" },
-                          { label: "GI Index", value: "Zero (0)" },
-                          { label: "Calories", value: "0 kcal" },
-                          { label: "Shelf Life", value: "24 Months" },
-                          { label: "Storage", value: "Cool & Dry" }
+                          { label: "Active Base", value: (product as any).type === 'stevia' ? "Stevia Extract" : "Monk Fruit" },
+                          { label: "Physical Form", value: (product as any).form === 'drops' ? "Liquid Essence" : "Fine Powder" },
+                          { label: "GI Index", value: "Absolute Zero (0)" },
+                          { label: "Net Weight", value: (product as any).size_label || "50 Grams" },
+                          { label: "Serving Size", value: "0.1g - 0.5g" },
+                          { label: "Ideal For", value: (product as any).use_case || "Beverages" }
                       ].map((spec, i) => (
-                          <div key={i} className="flex flex-col p-3 rounded-xl bg-white/2 border border-white/5">
-                              <span className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">{spec.label}</span>
-                              <span className="text-xs font-bold text-white/70">{spec.value}</span>
+                          <div key={i} className="flex flex-col p-5 rounded-[24px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors group">
+                              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-2 group-hover:text-[#97c459] transition-colors">{spec.label}</span>
+                              <span className="text-xs font-black text-white/80">{spec.value}</span>
                           </div>
                       ))}
                   </div>

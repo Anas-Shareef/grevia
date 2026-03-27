@@ -77,6 +77,11 @@ const transformProduct = (data: any): Product => {
                 gallery,
             };
         }) : [],
+        ratio: data.ratio,
+        form: data.form,
+        type: data.type,
+        size_label: data.size_label,
+        use_case: data.use_case,
     };
 };
 

@@ -81,43 +81,21 @@ class ProductController extends Controller
              }
         }
 
-        // 6. Specialized Sweetener Filters
-        // Type: Stevia / Monk Fruit
+        // 6. Specialized Sweetener Filters (Using New Dedicated Columns)
         if ($request->filled('type')) {
-            $type = $request->type;
-            $query->whereHas('category', function($q) use ($type) {
-                $q->where('slug', 'like', "%{$type}%")
-                  ->orWhereHas('parent', function($pq) use ($type) {
-                      $pq->where('slug', 'like', "%{$type}%")
-                        ->orWhereHas('parent', function($ppq) use ($type) {
-                            $ppq->where('slug', 'like', "%{$type}%");
-                        });
-                  });
-            });
+            $query->where('type', $request->type);
         }
 
-        // Form: Powder / Drops
         if ($request->filled('form')) {
-            $form = $request->form;
-            $query->whereHas('category', function($q) use ($form) {
-                $q->where('slug', 'like', "%{$form}%");
-            });
+            $query->where('form', $request->form);
         }
 
-        // Ratio: 1-10 / 1-50
         if ($request->filled('ratio')) {
-            $ratio = str_replace(':', '-', $request->ratio);
-            $query->whereHas('category', function($q) use ($ratio) {
-                $q->where('slug', 'like', "%{$ratio}%");
-            });
+            $query->where('ratio', $request->ratio);
         }
 
-        // Size: 50g / 100g
         if ($request->filled('size')) {
-            $size = $request->size;
-            $query->whereHas('variants', function($q) use ($size) {
-                $q->where('weight', 'like', "%{$size}%");
-            });
+            $query->where('size_label', 'like', "%{$request->size}%");
         }
 
         // 6. Sorting
@@ -171,20 +149,20 @@ class ProductController extends Controller
                     ->select('id', 'name', 'slug')
                     ->get(),
                 'types' => [
-                    ['label' => 'stevia', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%stevia%'))->count()],
-                    ['label' => 'monk-fruit', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%monk-fruit%'))->count()],
+                    ['label' => 'stevia', 'count' => Product::where('type', 'stevia')->count()],
+                    ['label' => 'monk-fruit', 'count' => Product::where('type', 'monk-fruit')->count()],
                 ],
                 'forms' => [
-                    ['label' => 'powder', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%powder%'))->count()],
-                    ['label' => 'drops', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%drops%'))->count()],
+                    ['label' => 'powder', 'count' => Product::where('form', 'powder')->count()],
+                    ['label' => 'drops', 'count' => Product::where('form', 'drops')->count()],
                 ],
                 'ratios' => [
-                    ['label' => '1:10', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%1-10%'))->count()],
-                    ['label' => '1:50', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%1-50%'))->count()],
+                    ['label' => '1:10', 'count' => Product::where('ratio', '1:10')->count()],
+                    ['label' => '1:50', 'count' => Product::where('ratio', '1:50')->count()],
                 ],
                 'sizes' => [
-                    ['label' => '50g', 'count' => \App\Models\ProductVariant::where('weight', 'like', '%50g%')->count()],
-                    ['label' => '100g', 'count' => \App\Models\ProductVariant::where('weight', 'like', '%100g%')->count()],
+                    ['label' => '50g', 'count' => Product::where('size_label', 'like', '%50g%')->count()],
+                    ['label' => '100g', 'count' => Product::where('size_label', 'like', '%100g%')->count()],
                 ],
             ]
         ]);

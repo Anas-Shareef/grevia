@@ -158,81 +158,103 @@ const CollectionsPage = () => {
                         </div>
                     </motion.div>
 
-                    {/* Page Header Hero */}
+                    {/* Page Header Hero - High Conversion */}
                     <motion.div
-                        key={pageTitle}
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6 }}
-                        className="relative rounded-[40px] overflow-hidden bg-[#121212] mb-12 min-h-[340px] flex items-center border border-white/5"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="relative rounded-[48px] overflow-hidden bg-[#0d1f0e] mb-12 min-h-[440px] flex items-center border border-[#2d7a3a33] group"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10" />
-                        <img 
-                            src="https://grevia.in/storage/collections_hero.jpg" 
-                            alt={pageTitle}
-                            className="absolute inset-0 w-full h-full object-cover opacity-60"
-                        />
-                        <div className="relative z-20 px-8 py-12 md:px-20 md:py-24 max-w-2xl">
-                            <div className="flex items-center gap-3 mb-6">
-                                <span className="h-[1px] w-8 bg-lime" />
-                                <span className="text-[11px] font-black text-lime uppercase tracking-[0.3em]">Pure Organic Sweeteners</span>
+                        {/* Background Decor */}
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2d7a3a] opacity-10 blur-[120px] -mr-32 -mt-32 transition-all duration-1000 group-hover:opacity-20" />
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-lime/5 blur-[80px]" />
+                        
+                        <div className="relative z-20 px-8 py-12 md:px-20 flex flex-col md:flex-row items-center justify-between w-full gap-12">
+                            <div className="max-w-2xl">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <span className="px-3 py-1 rounded-full bg-lime/10 border border-lime/20 text-[10px] font-black text-lime uppercase tracking-[0.2em]">
+                                        Natural Sweeteners
+                                    </span>
+                                </div>
+                                <h1 className="text-5xl md:text-7xl font-black mb-8 leading-[1] tracking-tighter text-white">
+                                    Sweetness <br />
+                                    <span className="text-[#97c459]">Without Sacrifice.</span>
+                                </h1>
+                                <p className="text-white/50 text-xl mb-10 leading-relaxed max-w-lg">
+                                    Zero-calorie, plant-based alternatives to sugar. Crafted for health, designed for taste.
+                                </p>
+                                <div className="flex flex-wrap gap-4">
+                                    <Button size="xl" variant="lime" className="font-black px-12 h-16 rounded-2xl shadow-2xl shadow-lime/20" onClick={() => {
+                                        const el = document.getElementById('products-grid');
+                                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }}>
+                                        SHOP ALL PRODUCTS
+                                    </Button>
+                                    <Button size="xl" variant="outline" className="font-black px-10 h-16 rounded-2xl border-white/10 hover:bg-white/5">
+                                        OUR STORY
+                                    </Button>
+                                </div>
                             </div>
-                            <h1 className="text-4xl md:text-6xl font-black mb-6 leading-[1.1] capitalize tracking-tighter">
-                                {pageTitle}
-                            </h1>
-                            <p className="text-white/60 text-lg mb-10 leading-relaxed font-medium">
-                                {pageDescription}
-                            </p>
-                            <Button size="xl" variant="lime" className="font-black px-10 rounded-2xl shadow-[0_10px_40px_-10px_rgba(163,230,53,0.3)] shadow-lime/20" onClick={() => {
-                                const el = document.getElementById('products-grid');
-                                el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }}>
-                                Discover All
-                            </Button>
+
+                            {/* Stats Badges */}
+                            <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
+                                <div className="bg-white/5 border border-white/10 backdrop-blur-md p-8 rounded-[32px] flex flex-col items-center justify-center text-center min-w-[160px] group/stat hover:border-lime/40 transition-all">
+                                    <span className="text-4xl font-black text-white mb-1 group-hover/stat:scale-110 transition-transform">0</span>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Calories</span>
+                                </div>
+                                <div className="bg-white/5 border border-white/10 backdrop-blur-md p-8 rounded-[32px] flex flex-col items-center justify-center text-center min-w-[160px] group/stat hover:border-lime/40 transition-all">
+                                    <span className="text-4xl font-black text-[#97c459] mb-1 group-hover/stat:scale-110 transition-transform">100%</span>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Natural</span>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
 
-                    {/* Sub-category Pills */}
-                    {subCats.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-12">
-                            {subCats.map(sc => (
-                                <Button
-                                    key={sc.slug}
-                                    asChild
-                                    variant={filters.category === sc.slug ? "lime" : "outline"}
-                                    className="rounded-full font-bold"
-                                >
-                                    <Link to={`/collections/${category}/${sc.slug}`}>{sc.name}</Link>
-                                </Button>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Top Level Category Cards - Only show on main collections page */}
+                    {/* Category Shortcut Cards */}
                     {!category && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-200">
                             {[
-                                { name: "Stevia Powder", slug: "stevia-powder", desc: "Pure sweetness in convenient powder form.", img: "https://grevia.in/storage/category_powder.jpg" },
-                                { name: "Stevia Drops", slug: "stevia-drops", desc: "Easy-to-use liquid drops for beverages.", img: "https://grevia.in/storage/category_drops.jpg" },
-                                { name: "Monk Fruit", slug: "monk-fruit", desc: "Natural monk fruit for premium baking.", img: "https://grevia.in/storage/category_monk.jpg" },
+                                { 
+                                    name: "Stevia Powder", 
+                                    icon: "🌿", 
+                                    slug: "stevia-powder", 
+                                    desc: "Perfect for tea, coffee & baking.", 
+                                    count: "6 Products" 
+                                },
+                                { 
+                                    name: "Stevia Drops", 
+                                    icon: "💧", 
+                                    slug: "stevia-drops", 
+                                    desc: "Convenient liquid drops on the go.", 
+                                    count: "2 Products" 
+                                },
+                                { 
+                                    name: "Monk Fruit", 
+                                    icon: "🍈", 
+                                    slug: "monk-fruit", 
+                                    desc: "Premium ancient calorie-free sweetness.", 
+                                    count: "2 Products" 
+                                },
                             ].map((cat, idx) => (
-                                <motion.div
+                                <Link 
                                     key={cat.name}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 + idx * 0.1 }}
-                                    className="group relative rounded-2xl overflow-hidden aspect-[4/5] bg-secondary/30 border border-border/50"
+                                    to={`/collections/${cat.slug}`}
+                                    className="group relative bg-[#1a2e1b] border border-[#2d7a3a22] hover:border-[#2d7a3a99] p-8 rounded-[32px] transition-all duration-500 hover:-translate-y-2 overflow-hidden"
                                 >
-                                    <img src={cat.img} alt={cat.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-                                    <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
-                                        <h3 className="text-2xl font-black text-white mb-2">{cat.name}</h3>
-                                        <p className="text-white/70 text-sm mb-6 line-clamp-2">{cat.desc}</p>
-                                        <Button asChild variant="lime" className="w-full font-bold">
-                                            <Link to={`/collections/${cat.slug}`}>Shop Now</Link>
-                                        </Button>
+                                    <div className="absolute top-0 right-0 p-6 text-[10px] font-black text-[#2d7a3a] uppercase tracking-widest">
+                                        {cat.count}
                                     </div>
-                                </motion.div>
+                                    <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-500 inline-block">
+                                        {cat.icon}
+                                    </div>
+                                    <h3 className="text-xl font-black text-white mb-3 flex items-center gap-2">
+                                        {cat.name}
+                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-lime text-base translate-x-2 group-hover:translate-x-0">→</span>
+                                    </h3>
+                                    <p className="text-white/40 text-sm leading-relaxed mb-6 italic">
+                                        {cat.desc}
+                                    </p>
+                                    <span className="text-[10px] font-black text-lime uppercase tracking-[0.2em] group-hover:underline">Explore Category</span>
+                                </Link>
                             ))}
                         </div>
                     )}

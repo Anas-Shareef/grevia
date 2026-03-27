@@ -54,6 +54,11 @@ export interface Product {
     url: string;
   };
   variants?: ProductVariant[];
+  ratio?: string;
+  form?: string;
+  type?: string;
+  size_label?: string;
+  use_case?: string;
 }
 
 export const products: Product[] = [

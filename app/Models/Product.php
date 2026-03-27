@@ -27,6 +27,12 @@ class Product extends Model
         'in_stock',
         'is_featured',
         'tags',
+        'ratio',
+        'form',
+        'type',
+        'size_label',
+        'sweetness_description',
+        'use_case',
     ];
 
     protected $casts = [

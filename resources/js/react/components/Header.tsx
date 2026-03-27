@@ -50,18 +50,19 @@ const Header = () => {
       megaMenu: true,
       sections: [
         {
-          title: "Stevia",
+          title: "Stevia Products",
           href: "/collections/stevia",
           items: [
-            { name: "Stevia Powder", href: "/collections/stevia-powder", subtitle: "1:10 & 1:50 Ratios" },
-            { name: "Stevia Drops", href: "/collections/stevia-drops", subtitle: "1:10 Concentrated" },
+            { name: "Stevia Powder 1:10", href: "/collections/stevia-powder-1-10", subtitle: "Everyday Sweetness" },
+            { name: "Stevia Powder 1:50", href: "/collections/stevia-powder-1-50", subtitle: "Concentrated Baking" },
+            { name: "Stevia Drops 1:10", href: "/collections/stevia-drops-1-10", subtitle: "Liquid Convenience" },
           ]
         },
         {
-          title: "Monk Fruit",
+          title: "Monk Fruit Products",
           href: "/collections/monk-fruit",
           items: [
-            { name: "Monk Fruit Powder", href: "/collections/monk-fruit-powder", subtitle: "1:10 Ratios" },
+            { name: "Monk Fruit Powder 1:10", href: "/collections/monk-fruit-powder-1-10", subtitle: "Premium Sand Like" },
           ]
         }
       ]
@@ -158,7 +159,7 @@ const Header = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute top-full left-0 mt-1 bg-card border border-border rounded-2xl shadow-xl overflow-hidden min-w-[600px] p-8 grid grid-cols-3 gap-8"
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-[#1a2e1b] border border-[#2d7a3a33] rounded-[32px] shadow-2xl overflow-hidden min-w-[850px] p-10 grid grid-cols-3 gap-10"
                     >
                       {item.sections?.map((section) => (
                         <div key={section.title}>
@@ -182,17 +183,26 @@ const Header = () => {
                         </div>
                       ))}
                       
-                      {/* Explanation Box */}
-                      <div className="bg-secondary/30 rounded-xl p-6 flex flex-col justify-center">
-                        <h4 className="font-bold text-primary mb-2 text-sm uppercase">Strength Guide</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                          <strong>1:10 Ratio:</strong> 1 gram replaces 10 grams of regular sugar. Ideal for everyday use.
-                        </p>
-                        <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-                          <strong>1:50 Ratio:</strong> High concentration for bulk use. Special strength for experts.
-                        </p>
-                        <Link to="/benefits" className="text-[10px] font-bold text-lime mt-4 uppercase hover:underline">
-                          Learn More About Ratios →
+                      {/* Strength Guide Box */}
+                      <div className="bg-[#173404] rounded-3xl p-8 flex flex-col justify-center border border-[#2d7a3a33] relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-lime/10 blur-[50px] group-hover:bg-lime/20 transition-all duration-700" />
+                        <h4 className="font-black text-white mb-4 text-xs uppercase tracking-[0.2em]">Strength Guide</h4>
+                        <div className="space-y-4">
+                          <div>
+                            <p className="text-[10px] font-black text-lime uppercase tracking-widest mb-1">1:10 Ratio</p>
+                            <p className="text-xs text-white/50 leading-relaxed italic">
+                              1g replaces 10g sugar. Ideal for tea, coffee & daily use.
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black text-lime uppercase tracking-widest mb-1">1:50 Ratio</p>
+                            <p className="text-xs text-white/50 leading-relaxed italic">
+                              Concentrated extracts for baking & large scale use.
+                            </p>
+                          </div>
+                        </div>
+                        <Link to="/benefits" className="text-[10px] font-black text-lime mt-6 uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2">
+                          Learn More About Ratios <span>→</span>
                         </Link>
                       </div>
                     </motion.div>
