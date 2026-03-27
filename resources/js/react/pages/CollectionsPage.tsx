@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { useProductFilters } from "@/hooks/useProductFilters";
 import { FilterSidebar } from "@/components/FilterSidebar";
 import { SortDropdown } from "@/components/SortDropdown";
 import { AvailabilityFilter } from "@/components/AvailabilityFilter";
+import { ProductCard } from "@/components/ProductCard";
+import { X } from "lucide-react";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -79,6 +81,24 @@ const CollectionsPage = () => {
     // Sub-category pills (e.g. 1:10, 1:50)
     const subCats = currentCatData?.children || [];
 
+    // ACTIVE FILTERS LOGIC
+    const activeFilters = useMemo(() => {
+        const list = [];
+        if (filters.type) list.push({ key: 'type', label: filters.type, value: filters.type });
+        if (filters.form) list.push({ key: 'form', label: filters.form, value: filters.form });
+        if (filters.ratio) list.push({ key: 'ratio', label: filters.ratio, value: filters.ratio });
+        if (filters.size) list.push({ key: 'size', label: filters.size, value: filters.size });
+        if (filters.category && filters.category !== category) {
+            const cat = findCategory(filters.category);
+            if (cat) list.push({ key: 'category', label: cat.name, value: filters.category });
+        }
+        return list;
+    }, [filters, category, categories]);
+
+    const handleRemoveFilter = (key: string) => {
+        setFilter(key as any, "");
+    };
+
     const handleAddToCart = (product: Product) => {
         let variantId = undefined;
         if (product.variants && product.variants.length > 0) {
@@ -107,24 +127,24 @@ const CollectionsPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-[#0a0a0a] text-white">
             <Header />
             <main className="pt-24 pb-16">
-                <div className="container mx-auto px-4 md:px-6">
+                <div className="container mx-auto px-4 md:px-8">
                     {/* Breadcrumbs */}
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-8"
                     >
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-white/30">
+                            <Link to="/" className="hover:text-lime transition-colors">Home</Link>
                             <span>/</span>
-                            <Link to="/collections" className="hover:text-primary transition-colors">Collections</Link>
+                            <Link to="/collections" className="hover:text-lime transition-colors">Collections</Link>
                             {category && (
                                 <>
                                     <span>/</span>
-                                    <Link to={`/collections/${category}`} className="hover:text-primary transition-colors capitalize">
+                                    <Link to={`/collections/${category}`} className="hover:text-lime transition-colors">
                                         {category.replace('-', ' ')}
                                     </Link>
                                 </>
@@ -132,7 +152,7 @@ const CollectionsPage = () => {
                             {subcategory && (
                                 <>
                                     <span>/</span>
-                                    <span className="text-foreground font-semibold capitalize">{subcategory.replace('-', ' ')}</span>
+                                    <span className="text-white border-b border-lime/50">{subcategory.replace('-', ' ')}</span>
                                 </>
                             )}
                         </div>
@@ -141,24 +161,33 @@ const CollectionsPage = () => {
                     {/* Page Header Hero */}
                     <motion.div
                         key={pageTitle}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.6 }}
-                        className="relative rounded-3xl overflow-hidden bg-primary mb-12 min-h-[300px] flex items-center"
+                        className="relative rounded-[40px] overflow-hidden bg-[#121212] mb-12 min-h-[340px] flex items-center border border-white/5"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/40 z-10" />
-                        <div className="relative z-20 px-8 py-12 md:px-16 md:py-20 text-white max-w-2xl">
-                            <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight capitalize">
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10" />
+                        <img 
+                            src="https://grevia.in/storage/collections_hero.jpg" 
+                            alt={pageTitle}
+                            className="absolute inset-0 w-full h-full object-cover opacity-60"
+                        />
+                        <div className="relative z-20 px-8 py-12 md:px-20 md:py-24 max-w-2xl">
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="h-[1px] w-8 bg-lime" />
+                                <span className="text-[11px] font-black text-lime uppercase tracking-[0.3em]">Pure Organic Sweeteners</span>
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-black mb-6 leading-[1.1] capitalize tracking-tighter">
                                 {pageTitle}
                             </h1>
-                            <p className="text-white/80 text-lg mb-8 leading-relaxed">
+                            <p className="text-white/60 text-lg mb-10 leading-relaxed font-medium">
                                 {pageDescription}
                             </p>
-                            <Button size="lg" variant="secondary" className="font-bold rounded-squircle" onClick={() => {
+                            <Button size="xl" variant="lime" className="font-black px-10 rounded-2xl shadow-[0_10px_40px_-10px_rgba(163,230,53,0.3)] shadow-lime/20" onClick={() => {
                                 const el = document.getElementById('products-grid');
-                                el?.scrollIntoView({ behavior: 'smooth' });
+                                el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }}>
-                                Shop {pageTitle}
+                                Discover All
                             </Button>
                         </div>
                     </motion.div>
@@ -221,92 +250,39 @@ const CollectionsPage = () => {
                         </div>
 
                         <div className="flex-1 px-4 lg:px-0">
-                            {/* Toolbar */}
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6">
-                                <p className="text-xs sm:text-sm text-muted-foreground">
-                                    Showing {products.length} products
-                                </p>
-                                <div className="flex gap-2 w-full sm:w-auto">
-                                    <AvailabilityFilter value={filters.in_stock || ""} onChange={(val) => setFilter("in_stock", val)} />
-                                    <SortDropdown value={filters.sort_by} onChange={(val) => setFilter("sort_by", val)} />
+                            {/* Active Filter Tags */}
+                            {activeFilters.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mb-6">
+                                    {activeFilters.map((f) => (
+                                        <button
+                                            key={`${f.key}-${f.value}`}
+                                            onClick={() => handleRemoveFilter(f.key)}
+                                            className="inline-flex items-center gap-2 bg-white/5 border border-white/10 hover:border-lime/30 px-3 py-1.5 rounded-full text-[11px] font-bold text-white/70 hover:text-white transition-all group"
+                                        >
+                                            <span className="capitalize">{f.label.replace('-', ' ')}</span>
+                                            <X className="w-3 h-3 text-white/30 group-hover:text-lime transition-colors" />
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={resetFilters}
+                                        className="text-[11px] font-bold text-lime hover:underline px-2 py-1.5"
+                                    >
+                                        Clear All
+                                    </button>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Products Grid */}
                             <motion.div
                                 variants={containerVariants}
                                 initial="hidden"
                                 animate="visible"
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6"
                             >
                                 {products.map((product: Product) => (
-                                    <motion.article
-                                        key={product.id}
-                                        variants={itemVariants}
-                                        className="group bg-card rounded-squircle-xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-500 border border-border/50 hover:border-lime/30"
-                                    >
-                                        <Link to={`/product/${product.id}`} className="block relative aspect-square overflow-hidden bg-secondary/30">
-                                            {product.badge && (
-                                                <div className="absolute top-4 left-4 z-10 bg-lime text-foreground text-xs font-bold px-3 py-1.5 rounded-squircle">
-                                                    {product.badge}
-                                                </div>
-                                            )}
-                                            <div className="absolute top-4 right-4 z-10">
-                                                <WishlistButton product={product} size="sm" />
-                                            </div>
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                loading="lazy"
-                                            />
-                                        </Link>
-
-                                        <div className="p-4 sm:p-6">
-                                            <Link to={`/product/${product.id}`}>
-                                                <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors truncate">
-                                                    {product.name}
-                                                </h3>
-                                            </Link>
-                                            <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[40px]">
-                                                {product.description}
-                                            </p>
-
-                                            <div className="flex items-center justify-between mt-auto">
-                                                <div className="flex flex-col">
-                                                    <span className="text-xl sm:text-2xl font-black text-foreground">
-                                                        ₹{(() => {
-                                                            if (product.variants && product.variants.length > 0) {
-                                                                const cheapest = [...product.variants]
-                                                                    .filter(v => v.status === 'active')
-                                                                    .sort((a, b) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
-                                                                return cheapest ? (cheapest.discount_price || cheapest.price) : product.price;
-                                                            }
-                                                            return product.price;
-                                                        })()}
-                                                    </span>
-                                                    {product.variants && product.variants.length > 0 && (
-                                                        <span className="text-[10px] sm:text-xs font-bold text-lime uppercase tracking-wider">
-                                                            For {(() => {
-                                                                const cheapest = [...product.variants]
-                                                                    .filter(v => v.status === 'active')
-                                                                    .sort((a, b) => Number(a.discount_price || a.price) - Number(b.discount_price || b.price))[0];
-                                                                return cheapest ? `${cheapest.weight} (Pack of ${cheapest.pack_size})` : 'Each';
-                                                            })()}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <Button
-                                                    variant="lime"
-                                                    size="sm"
-                                                    onClick={() => handleAddToCart(product)}
-                                                >
-                                                    <ShoppingCart className="w-4 h-4 mr-1" />
-                                                    Add
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </motion.article>
+                                    <motion.div key={product.id} variants={itemVariants}>
+                                        <ProductCard product={product} />
+                                    </motion.div>
                                 ))}
                             </motion.div>
 

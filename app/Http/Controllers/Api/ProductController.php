@@ -170,10 +170,22 @@ class ProductController extends Controller
                     ->orderBy('order')
                     ->select('id', 'name', 'slug')
                     ->get(),
-                'types' => ['stevia', 'monk-fruit'],
-                'forms' => ['powder', 'drops'],
-                'ratios' => ['1:10', '1:50'],
-                'sizes' => ['50g', '100g', '250g', '500g'],
+                'types' => [
+                    ['label' => 'stevia', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%stevia%'))->count()],
+                    ['label' => 'monk-fruit', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%monk-fruit%'))->count()],
+                ],
+                'forms' => [
+                    ['label' => 'powder', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%powder%'))->count()],
+                    ['label' => 'drops', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%drops%'))->count()],
+                ],
+                'ratios' => [
+                    ['label' => '1:10', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%1-10%'))->count()],
+                    ['label' => '1:50', 'count' => Product::whereHas('category', fn($q) => $q->where('slug', 'like', '%1-50%'))->count()],
+                ],
+                'sizes' => [
+                    ['label' => '50g', 'count' => \App\Models\ProductVariant::where('weight', 'like', '%50g%')->count()],
+                    ['label' => '100g', 'count' => \App\Models\ProductVariant::where('weight', 'like', '%100g%')->count()],
+                ],
             ]
         ]);
     }

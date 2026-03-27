@@ -1,8 +1,9 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, Star, ArrowLeft, Minus, Plus, Check } from "lucide-react";
+import { ShoppingCart, Star, ArrowLeft, Minus, Plus, Check, ShieldCheck, Truck, RotateCcw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
@@ -120,7 +121,7 @@ const ProductDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Header />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-6">
@@ -130,25 +131,25 @@ const ProductDetailPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+            <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/30 whitespace-nowrap overflow-x-auto no-scrollbar py-2">
+              <Link to="/" className="hover:text-lime transition-colors">Home</Link>
               <span>/</span>
-              <Link to="/collections" className="hover:text-primary transition-colors">Collections</Link>
+              <Link to="/collections" className="hover:text-lime transition-colors">Collections</Link>
               {product.category && (
                 <>
                   <span>/</span>
                   <Link 
                     to={`/collections/${typeof product.category === 'string' ? product.category : product.category.slug}`}
-                    className="hover:text-primary transition-colors"
+                    className="hover:text-lime transition-colors"
                   >
                     {typeof product.category === 'string' 
-                      ? product.category.charAt(0).toUpperCase() + product.category.slice(1) 
+                      ? product.category 
                       : product.category.name}
                   </Link>
                 </>
               )}
               <span>/</span>
-              <span className="text-foreground font-semibold truncate max-w-[200px]">{product.name}</span>
+              <span className="text-white border-b border-lime/50 pb-0.5">{product.name}</span>
             </div>
           </motion.div>
 
@@ -240,7 +241,7 @@ const ProductDetailPage = () => {
               )}
 
               {/* Title */}
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 leading-[1.1] tracking-tighter">
                 {product.name}
               </h1>
 
@@ -270,178 +271,247 @@ const ProductDetailPage = () => {
 
               {/* Variant Selectors */}
               {product.variants && product.variants.length > 0 && (
-                <div className="space-y-6 mb-6">
-                  {/* Strength Ratio Selector */}
+                <div className="space-y-8 mb-10">
+                  {/* Strength Ratio Selector - DUAL LABEL */}
                   {(() => {
                     const baseName = product.name.split('1:')[0].trim();
                     const siblings = (Array.isArray(allProducts) ? allProducts : allProducts?.data || [])
-                      .filter(p => p.name.startsWith(baseName) && p.id !== product.id);
+                      .filter(p => p.name.startsWith(baseName));
 
-                    if (siblings.length === 0 && !product.name.includes('1:')) return null;
+                    if (siblings.length < 2) return null;
 
                     return (
                       <div>
-                        <h3 className="text-sm font-bold text-foreground uppercase tracking-wide mb-3 flex items-center justify-between">
-                          <span>Strength Ratio</span>
-                          <span className="text-[10px] text-lime font-black underline cursor-help">WHAT IS THIS?</span>
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {/* Current Product Ratio */}
-                          <button className="px-4 py-2 rounded-squircle text-sm font-bold border-2 border-lime bg-lime/10 text-foreground">
-                            {product.name.includes('1:10') ? '1:10 Ratio' : product.name.includes('1:50') ? '1:50 Ratio' : 'Standard'}
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">Concentration Strength</h3>
+                          <button className="text-[10px] font-black text-lime uppercase underline tracking-widest flex items-center gap-1 hover:text-white transition-colors">
+                            <Info className="w-3 h-3" /> Guide
                           </button>
-                          
-                          {/* Sibling Ratios */}
-                          {siblings.map(sib => (
-                            <Link
-                              key={sib.id}
-                              to={`/product/${sib.slug}`}
-                              className="px-4 py-2 rounded-squircle text-sm font-bold border-2 border-border hover:border-lime/30 text-muted-foreground"
-                            >
-                              {sib.name.includes('1:10') ? '1:10 Ratio' : sib.name.includes('1:50') ? '1:50 Ratio' : 'Alternative'}
-                            </Link>
-                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          {siblings.sort((a,b) => a.name.includes('1:10') ? -1 : 1).map(sib => {
+                            const isCurrent = sib.id === product.id;
+                            const isMild = sib.name.includes('1:10');
+                            return (
+                              <Link
+                                key={sib.id}
+                                to={`/product/${sib.slug}`}
+                                className={`flex flex-col items-start p-4 rounded-2xl border-2 transition-all group ${
+                                  isCurrent 
+                                  ? "border-lime bg-lime/5" 
+                                  : "border-white/5 bg-white/2 hover:border-white/20"
+                                }`}
+                              >
+                                <span className={`text-base font-black ${isCurrent ? "text-white" : "text-white/40 group-hover:text-white"}`}>
+                                  {isMild ? "1:10 Ratio" : "1:50 Ratio"}
+                                </span>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? "text-lime" : "text-white/20"}`}>
+                                  {isMild ? "Mild - Everyday use" : "Intense - Baking use"}
+                                </span>
+                              </Link>
+                            );
+                          })}
                         </div>
                       </div>
                     );
                   })()}
 
-                  {/* Weight Selector */}
+                  {/* Weight Selector - DUAL LABEL */}
                   <div>
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wide mb-3">
-                      Select Size / Weight
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {Array.from(new Set(product.variants.map(v => v.weight))).map(weight => (
-                        <button
-                          key={weight}
-                          onClick={() => {
-                            setSelectedWeight(weight);
-                            // Auto-select first available pack size for this weight
-                            const firstPack = product.variants?.find(v => v.weight === weight);
-                            if (firstPack) setSelectedPackSize(firstPack.pack_size);
-                          }}
-                          className={`px-4 py-2 rounded-squircle text-sm font-bold transition-all border-2 ${selectedWeight === weight
-                            ? "border-primary bg-primary/5 text-primary"
-                            : "border-border hover:border-primary/30 text-muted-foreground"
-                            }`}
-                        >
-                          {weight}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Pack Size Selector */}
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wide mb-3">
-                      Pack Size
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
+                    <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] mb-4">Select Pack Size</h3>
+                    <div className="grid grid-cols-2 gap-3">
                       {product.variants
-                        .filter(v => v.weight === selectedWeight)
-                        .map(v => (
-                          <button
-                            key={v.id}
-                            onClick={() => setSelectedPackSize(v.pack_size)}
-                            className={`px-4 py-2 rounded-squircle text-sm font-bold transition-all border-2 ${selectedPackSize === v.pack_size
-                              ? "border-primary bg-primary/5 text-primary"
-                              : "border-border hover:border-primary/30 text-muted-foreground"
+                        .filter(v => v.pack_size === 1) // Only show base units here or group by weight
+                        .map(v => {
+                          const isSelected = selectedWeight === v.weight;
+                          return (
+                            <button
+                              key={v.id}
+                              onClick={() => setSelectedWeight(v.weight)}
+                              className={`flex flex-col items-start p-4 rounded-2xl border-2 transition-all text-left ${
+                                isSelected 
+                                ? "border-lime bg-lime/5" 
+                                : "border-white/5 bg-white/2 hover:border-white/20"
                               }`}
-                          >
-                            Pack of {v.pack_size}
-                          </button>
-                        ))}
+                            >
+                              <div className="flex justify-between w-full mb-0.5">
+                                <span className={`text-base font-black ${isSelected ? "text-white" : "text-white/40"}`}>
+                                    {v.weight}
+                                </span>
+                                {isSelected && <Check className="w-4 h-4 text-lime" />}
+                              </div>
+                              <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? "text-lime" : "text-white/20"}`}>
+                                ₹{v.discount_price || v.price} / unit
+                              </span>
+                            </button>
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Strength Guide Accordion */}
-              <div className="mt-8 mb-8">
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="ratio-guide" className="border-border/50">
-                    <AccordionTrigger className="text-sm font-bold uppercase tracking-wider py-4 hover:no-underline">
-                      What do these ratios mean?
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-muted-foreground space-y-4 pb-6">
-                      <p>Our sweeteners are highly concentrated extracts from Stevia and Monk Fruit. The ratio indicates the sweetness intensity compared to regular table sugar.</p>
-                      <ul className="space-y-3">
-                        <li className="flex gap-3">
-                          <span className="w-12 py-1 bg-lime/10 text-lime font-black text-center rounded-lg text-xs shrink-0">1:10</span>
-                          <span><strong>Standard Strength:</strong> 1 gram of Grevia replaces 10 grams of regular sugar. Perfect for tea, coffee, and everyday cooking.</span>
-                        </li>
-                        <li className="flex gap-3">
-                          <span className="w-12 py-1 bg-primary/10 text-primary font-black text-center rounded-lg text-xs shrink-0">1:50</span>
-                          <span><strong>Ultra Strength:</strong> 1 gram replaces 50 grams of sugar. Primarily used for bulk baking and industrial applications. Use sparingly!</span>
-                        </li>
-                      </ul>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-
-              {/* Price */}
-              <div className="mb-6">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-black text-foreground">
-                    ₹{displayPrice}
-                  </span>
-                  {displayOriginalPrice && displayOriginalPrice > (displayPrice || 0) && (
-                    <span className="text-xl text-muted-foreground line-through">
-                      ₹{displayOriginalPrice}
-                    </span>
-                  )}
+              {/* Price Row */}
+              <div className="flex items-center justify-between mb-8 pb-8 border-b border-white/5">
+                <div className="flex flex-col">
+                    <div className="flex items-baseline gap-3">
+                        <span className="text-5xl font-black text-white tracking-tighter">
+                            ₹{displayPrice}
+                        </span>
+                        {displayOriginalPrice && displayOriginalPrice > (displayPrice || 0) && (
+                            <span className="text-xl text-white/20 line-through">
+                            ₹{displayOriginalPrice}
+                            </span>
+                        )}
+                    </div>
+                    <p className="text-[10px] font-bold text-lime uppercase tracking-widest mt-2">Free Delivery Applied</p>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">Inclusive of all taxes</p>
-              </div>
 
-              {/* Quantity Selector */}
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-sm font-bold text-foreground">Quantity</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 rounded-squircle bg-secondary border border-border flex items-center justify-center hover:bg-secondary/80 transition-colors"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="w-12 text-center font-bold text-lg">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 rounded-squircle bg-secondary border border-border flex items-center justify-center hover:bg-secondary/80 transition-colors"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                <div className="flex items-center p-2 bg-white/5 rounded-2xl border border-white/5">
+                    <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/50 hover:text-white"
+                    >
+                        <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="w-12 text-center font-black text-xl text-white">{quantity}</span>
+                    <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/50 hover:text-white"
+                    >
+                        <Plus className="w-4 h-4" />
+                    </button>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 mb-10">
                 <Button
-                  variant="limeLg"
-                  size="xl"
-                  className="flex-1 max-sm:h-auto max-sm:py-[5px]"
+                  variant="lime"
+                  className="flex-1 h-16 text-lg font-black rounded-2xl shadow-xl shadow-lime/20"
                   onClick={handleAddToCart}
                   disabled={!isInStock}
                 >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  {isInStock ? 'Add to Cart' : 'Out of Stock'}
+                  <ShoppingCart className="w-5 h-5 mr-3" />
+                  {isInStock ? 'ADD TO CART' : 'OUT OF STOCK'}
                 </Button>
                 <Button
                   variant="outline"
-                  size="xl"
-                  className="flex-1 max-sm:h-auto max-sm:py-[5px]"
+                  className="flex-1 h-16 text-lg font-black rounded-2xl border-white/10 hover:bg-white/5"
                   onClick={() => {
                     handleAddToCart();
                     setIsCartOpen(true);
                   }}
                 >
-                  Buy Now
+                  BUY NOW
                 </Button>
               </div>
+
+              {/* Trust Badges */}
+              <div className="grid grid-cols-3 gap-4 p-6 bg-white/2 border border-white/5 rounded-3xl mb-12">
+                  <div className="flex flex-col items-center text-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-lime/10 flex items-center justify-center text-lime">
+                        <Truck className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">Fast Shipping</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-lime/10 flex items-center justify-center text-lime">
+                        <ShieldCheck className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">100% Organic</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-lime/10 flex items-center justify-center text-lime">
+                        <RotateCcw className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">Easy Returns</span>
+                  </div>
+              </div>
+
+              {/* Educational Guide Box */}
+              <div className="bg-[#1a2e1d] border border-lime/20 rounded-[32px] p-8 mb-12 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-lime opacity-5 blur-[80px]" />
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-full bg-lime flex items-center justify-center text-black">
+                            <Info className="w-4 h-4" />
+                        </div>
+                        <h3 className="text-base font-black text-white uppercase tracking-wider">Understanding Ratios</h3>
+                    </div>
+                    <div className="space-y-6">
+                        <div className="flex gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+                                <span className="text-lime font-black">1:10</span>
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-white mb-1">Standard Strength</h4>
+                                <p className="text-sm text-white/50 leading-relaxed italic">1g replaces 10g sugar. Ideal for tea, coffee & daily use.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+                                <span className="text-lime font-black">1:50</span>
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-white mb-1">Ultra Strength</h4>
+                                <p className="text-sm text-white/50 leading-relaxed italic">1g replaces 50g sugar. Primarily for baking & professional use.</p>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+              </div>
+
+              {/* Technical Specifications Grid */}
+              <div className="space-y-4 mb-12">
+                  <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] mb-4">Product Details</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                      {[
+                          { label: "Base", value: product.name.includes("Stevia") ? "Stevia Rebaudiana" : "Monk Fruit" },
+                          { label: "Form", value: product.name.includes("Drops") ? "Liquid" : "Powder" },
+                          { label: "GI Index", value: "Zero (0)" },
+                          { label: "Calories", value: "0 kcal" },
+                          { label: "Shelf Life", value: "24 Months" },
+                          { label: "Storage", value: "Cool & Dry" }
+                      ].map((spec, i) => (
+                          <div key={i} className="flex flex-col p-3 rounded-xl bg-white/2 border border-white/5">
+                              <span className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">{spec.label}</span>
+                              <span className="text-xs font-bold text-white/70">{spec.value}</span>
+                          </div>
+                      ))}
+                  </div>
+              </div>
+
+              {/* Description Tabs */}
+              <Tabs defaultValue="details" className="w-full">
+                  <TabsList className="w-full h-12 bg-white/2 border border-white/5 p-1 rounded-2xl mb-8">
+                      <TabsTrigger value="details" className="flex-1 rounded-xl font-bold uppercase text-[10px] tracking-widest data-[state=active]:bg-white/10 data-[state=active]:text-lime transition-all">Description</TabsTrigger>
+                      <TabsTrigger value="ingredients" className="flex-1 rounded-xl font-bold uppercase text-[10px] tracking-widest data-[state=active]:bg-white/10 data-[state=active]:text-lime transition-all">Ingredients</TabsTrigger>
+                      <TabsTrigger value="how-to-use" className="flex-1 rounded-xl font-bold uppercase text-[10px] tracking-widest data-[state=active]:bg-white/10 data-[state=active]:text-lime transition-all">How to Use</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="details" className="mt-0">
+                      <div className="text-white/60 text-base leading-relaxed prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: product.longDescription }} />
+                  </TabsContent>
+                  <TabsContent value="ingredients" className="mt-0">
+                        <div className="grid grid-cols-2 gap-3">
+                            {product.ingredients.map((ing, i) => (
+                                <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-white/2 border border-white/5">
+                                    <div className="w-2 h-2 rounded-full bg-lime shadow-[0_0_10px_rgba(163,230,53,0.5)]" />
+                                    <span className="text-sm font-bold text-white/70">{ing}</span>
+                                </div>
+                            ))}
+                        </div>
+                  </TabsContent>
+                  <TabsContent value="how-to-use" className="mt-0">
+                      <p className="text-white/60 leading-relaxed italic">
+                        {product.name.includes("1:50") 
+                          ? "This is a concentrated extract. Start with a tiny pinch (0.1g) as it is 50x sweeter than sugar. Ideal for baking and large batches of desserts."
+                          : "Use 1 gram of Grevia for every 10 grams of table sugar. Perfectly dissolves in hot and cold beverages alike."}
+                      </p>
+                  </TabsContent>
+              </Tabs>
+            </motion.div>
+          </div>
 
               {/* Wishlist Button with Label */}
               <div className="mt-4">

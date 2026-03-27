@@ -14,10 +14,10 @@ type FilterSidebarProps = {
     meta: {
         price: { min: number; max: number };
         categories: { id: number; slug: string; name: string; children?: { id: number; slug: string; name: string }[] }[];
-        types?: string[];
-        forms?: string[];
-        ratios?: string[];
-        sizes?: string[];
+        types?: { label: string; count: number }[];
+        forms?: { label: string; count: number }[];
+        ratios?: { label: string; count: number }[];
+        sizes?: { label: string; count: number }[];
     } | undefined;
     className?: string;
     currentCategory?: string; // Current category from route
@@ -100,23 +100,24 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                 </div>
             )}
 
-            <Accordion type="multiple" defaultValue={["type", "form", "ratio", "size"]} className="w-full">
+            <Accordion type="multiple" defaultValue={["type", "form", "ratio", "size"]} className="w-full border-none">
                 {/* Type Filter */}
                 {meta?.types && (
-                    <AccordionItem value="type" className="border-none">
-                        <AccordionTrigger className="hover:no-underline py-3 px-0 font-bold text-sm uppercase tracking-wider">Type</AccordionTrigger>
+                    <AccordionItem value="type" className="border-b border-white/5 mb-2">
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Type</AccordionTrigger>
                         <AccordionContent>
-                            <div className="space-y-2">
-                                {meta.types.map((type) => (
-                                    <div key={type} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`type-${type}`}
-                                            checked={filters.type === type}
-                                            onCheckedChange={() => setFilter("type", filters.type === type ? "" : type)}
-                                        />
-                                        <label htmlFor={`type-${type}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize cursor-pointer">
-                                            {type.replace('-', ' ')}
-                                        </label>
+                            <div className="space-y-3 pb-4">
+                                {meta.types.map((t) => (
+                                    <div key={t.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("type", filters.type === t.label ? "" : t.label)}>
+                                        <div className="flex items-center space-x-3">
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.type === t.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
+                                                {filters.type === t.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                            </div>
+                                            <span className={`text-sm font-bold transition-colors capitalize ${filters.type === t.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                                {t.label.replace('-', ' ')}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{t.count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -126,20 +127,21 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
 
                 {/* Form Filter */}
                 {meta?.forms && (
-                    <AccordionItem value="form" className="border-none">
-                        <AccordionTrigger className="hover:no-underline py-3 px-0 font-bold text-sm uppercase tracking-wider">Form</AccordionTrigger>
+                    <AccordionItem value="form" className="border-b border-white/5 mb-2">
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Form</AccordionTrigger>
                         <AccordionContent>
-                            <div className="space-y-2">
-                                {meta.forms.map((form) => (
-                                    <div key={form} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`form-${form}`}
-                                            checked={filters.form === form}
-                                            onCheckedChange={() => setFilter("form", filters.form === form ? "" : form)}
-                                        />
-                                        <label htmlFor={`form-${form}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize cursor-pointer">
-                                            {form}
-                                        </label>
+                            <div className="space-y-3 pb-4">
+                                {meta.forms.map((f) => (
+                                    <div key={f.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("form", filters.form === f.label ? "" : f.label)}>
+                                        <div className="flex items-center space-x-3">
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.form === f.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
+                                                {filters.form === f.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                            </div>
+                                            <span className={`text-sm font-bold transition-colors capitalize ${filters.form === f.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                                {f.label}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{f.count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -149,20 +151,21 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
 
                 {/* Ratio Filter */}
                 {meta?.ratios && (
-                    <AccordionItem value="ratio" className="border-none">
-                        <AccordionTrigger className="hover:no-underline py-3 px-0 font-bold text-sm uppercase tracking-wider">Strength / Ratio</AccordionTrigger>
+                    <AccordionItem value="ratio" className="border-b border-white/5 mb-2">
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Strength Ratio</AccordionTrigger>
                         <AccordionContent>
-                            <div className="space-y-2">
-                                {meta.ratios.map((ratio) => (
-                                    <div key={ratio} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`ratio-${ratio}`}
-                                            checked={filters.ratio === ratio}
-                                            onCheckedChange={() => setFilter("ratio", filters.ratio === ratio ? "" : ratio)}
-                                        />
-                                        <label htmlFor={`ratio-${ratio}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
-                                            {ratio} Strength
-                                        </label>
+                            <div className="space-y-3 pb-4">
+                                {meta.ratios.map((r) => (
+                                    <div key={r.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("ratio", filters.ratio === r.label ? "" : r.label)}>
+                                        <div className="flex items-center space-x-3">
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.ratio === r.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
+                                                {filters.ratio === r.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                            </div>
+                                            <span className={`text-sm font-bold transition-colors ${filters.ratio === r.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                                {r.label}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{r.count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -172,20 +175,21 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
 
                 {/* Size Filter */}
                 {meta?.sizes && (
-                    <AccordionItem value="size" className="border-none">
-                        <AccordionTrigger className="hover:no-underline py-3 px-0 font-bold text-sm uppercase tracking-wider">Size / Weight</AccordionTrigger>
+                    <AccordionItem value="size" className="border-b border-white/5">
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Size</AccordionTrigger>
                         <AccordionContent>
-                            <div className="space-y-2">
-                                {meta.sizes.map((size) => (
-                                    <div key={size} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`size-${size}`}
-                                            checked={filters.size === size}
-                                            onCheckedChange={() => setFilter("size", filters.size === size ? "" : size)}
-                                        />
-                                        <label htmlFor={`size-${size}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
-                                            {size}
-                                        </label>
+                            <div className="space-y-3 pb-4">
+                                {meta.sizes.map((s) => (
+                                    <div key={s.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("size", filters.size === s.label ? "" : s.label)}>
+                                        <div className="flex items-center space-x-3">
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.size === s.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
+                                                {filters.size === s.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                            </div>
+                                            <span className={`text-sm font-bold transition-colors ${filters.size === s.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                                {s.label}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{s.count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -201,13 +205,16 @@ export const FilterSidebar = (props: FilterSidebarProps) => {
     return (
         <>
             {/* Desktop Sidebar */}
-            <div className={`hidden lg:block w-64 flex-shrink-0 ${props.className}`}>
-                <div className="sticky top-24 bg-card border rounded-xl p-6 shadow-sm">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-lg font-bold">Filters</h2>
-                        <Button variant="ghost" size="sm" onClick={props.resetFilters} className="h-auto p-0 text-muted-foreground hover:text-primary">
-                            Reset
-                        </Button>
+            <div className={`hidden lg:block w-72 flex-shrink-0 ${props.className}`}>
+                <div className="sticky top-28 bg-[#121212] border border-white/5 rounded-[32px] p-8 shadow-2xl">
+                    <div className="flex justify-between items-center mb-10 pb-4 border-b border-white/5">
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-lime rounded-full" />
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white">Filters</h2>
+                        </div>
+                        <button onClick={props.resetFilters} className="text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-lime transition-colors">
+                            Clear
+                        </button>
                     </div>
                     <FilterContent {...props} />
                 </div>
