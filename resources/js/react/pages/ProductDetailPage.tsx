@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingCart, Star, ArrowLeft, Minus, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
@@ -129,15 +130,26 @@ const ProductDetailPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <Link
-              to={`/products/${product.category}`}
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to {typeof product.category === 'string'
-                ? product.category.charAt(0).toUpperCase() + product.category.slice(1)
-                : product.category.name}
-            </Link>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+              <span>/</span>
+              <Link to="/collections" className="hover:text-primary transition-colors">Collections</Link>
+              {product.category && (
+                <>
+                  <span>/</span>
+                  <Link 
+                    to={`/collections/${typeof product.category === 'string' ? product.category : product.category.slug}`}
+                    className="hover:text-primary transition-colors"
+                  >
+                    {typeof product.category === 'string' 
+                      ? product.category.charAt(0).toUpperCase() + product.category.slice(1) 
+                      : product.category.name}
+                  </Link>
+                </>
+              )}
+              <span>/</span>
+              <span className="text-foreground font-semibold truncate max-w-[200px]">{product.name}</span>
+            </div>
           </motion.div>
 
           {/* Product Details */}
@@ -259,10 +271,45 @@ const ProductDetailPage = () => {
               {/* Variant Selectors */}
               {product.variants && product.variants.length > 0 && (
                 <div className="space-y-6 mb-6">
+                  {/* Strength Ratio Selector */}
+                  {(() => {
+                    const baseName = product.name.split('1:')[0].trim();
+                    const siblings = (Array.isArray(allProducts) ? allProducts : allProducts?.data || [])
+                      .filter(p => p.name.startsWith(baseName) && p.id !== product.id);
+
+                    if (siblings.length === 0 && !product.name.includes('1:')) return null;
+
+                    return (
+                      <div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-wide mb-3 flex items-center justify-between">
+                          <span>Strength Ratio</span>
+                          <span className="text-[10px] text-lime font-black underline cursor-help">WHAT IS THIS?</span>
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {/* Current Product Ratio */}
+                          <button className="px-4 py-2 rounded-squircle text-sm font-bold border-2 border-lime bg-lime/10 text-foreground">
+                            {product.name.includes('1:10') ? '1:10 Ratio' : product.name.includes('1:50') ? '1:50 Ratio' : 'Standard'}
+                          </button>
+                          
+                          {/* Sibling Ratios */}
+                          {siblings.map(sib => (
+                            <Link
+                              key={sib.id}
+                              to={`/product/${sib.slug}`}
+                              className="px-4 py-2 rounded-squircle text-sm font-bold border-2 border-border hover:border-lime/30 text-muted-foreground"
+                            >
+                              {sib.name.includes('1:10') ? '1:10 Ratio' : sib.name.includes('1:50') ? '1:50 Ratio' : 'Alternative'}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   {/* Weight Selector */}
                   <div>
                     <h3 className="text-sm font-bold text-foreground uppercase tracking-wide mb-3">
-                      Select Weight
+                      Select Size / Weight
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {Array.from(new Set(product.variants.map(v => v.weight))).map(weight => (
@@ -275,8 +322,8 @@ const ProductDetailPage = () => {
                             if (firstPack) setSelectedPackSize(firstPack.pack_size);
                           }}
                           className={`px-4 py-2 rounded-squircle text-sm font-bold transition-all border-2 ${selectedWeight === weight
-                            ? "border-lime bg-lime/10 text-foreground"
-                            : "border-border hover:border-lime/30 text-muted-foreground"
+                            ? "border-primary bg-primary/5 text-primary"
+                            : "border-border hover:border-primary/30 text-muted-foreground"
                             }`}
                         >
                           {weight}
@@ -298,8 +345,8 @@ const ProductDetailPage = () => {
                             key={v.id}
                             onClick={() => setSelectedPackSize(v.pack_size)}
                             className={`px-4 py-2 rounded-squircle text-sm font-bold transition-all border-2 ${selectedPackSize === v.pack_size
-                              ? "border-lime bg-lime/10 text-foreground"
-                              : "border-border hover:border-lime/30 text-muted-foreground"
+                              ? "border-primary bg-primary/5 text-primary"
+                              : "border-border hover:border-primary/30 text-muted-foreground"
                               }`}
                           >
                             Pack of {v.pack_size}
@@ -309,6 +356,30 @@ const ProductDetailPage = () => {
                   </div>
                 </div>
               )}
+
+              {/* Strength Guide Accordion */}
+              <div className="mt-8 mb-8">
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="ratio-guide" className="border-border/50">
+                    <AccordionTrigger className="text-sm font-bold uppercase tracking-wider py-4 hover:no-underline">
+                      What do these ratios mean?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground space-y-4 pb-6">
+                      <p>Our sweeteners are highly concentrated extracts from Stevia and Monk Fruit. The ratio indicates the sweetness intensity compared to regular table sugar.</p>
+                      <ul className="space-y-3">
+                        <li className="flex gap-3">
+                          <span className="w-12 py-1 bg-lime/10 text-lime font-black text-center rounded-lg text-xs shrink-0">1:10</span>
+                          <span><strong>Standard Strength:</strong> 1 gram of Grevia replaces 10 grams of regular sugar. Perfect for tea, coffee, and everyday cooking.</span>
+                        </li>
+                        <li className="flex gap-3">
+                          <span className="w-12 py-1 bg-primary/10 text-primary font-black text-center rounded-lg text-xs shrink-0">1:50</span>
+                          <span><strong>Ultra Strength:</strong> 1 gram replaces 50 grams of sugar. Primarily used for bulk baking and industrial applications. Use sparingly!</span>
+                        </li>
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
 
               {/* Price */}
               <div className="mb-6">

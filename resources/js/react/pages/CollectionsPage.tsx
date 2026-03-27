@@ -1,11 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
-import { useProducts } from "@/hooks/useProducts";
+import { useProducts, useCategories } from "@/hooks/useProducts";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import WishlistButton from "@/components/WishlistButton";
@@ -34,19 +35,49 @@ const itemVariants = {
 };
 
 const CollectionsPage = () => {
+    const { category, subcategory } = useParams<{ category: string; subcategory?: string }>();
     const { addToCart } = useCart();
     const { filters, setFilter, resetFilters } = useProductFilters();
+    const { data: categories } = useCategories();
 
-    // Pass filters to useProducts hook (need to update hook first? actually useProducts hook just calls api.get('/products') so we need to update it to accept params)
-    // Assuming useProducts is updated or we update it now. 
-    // Wait, I haven't updated useProducts hook yet. I need to update it to accept query params.
-    // I will assume useProducts accepts params.
+    // Sync route param with filters
+    useEffect(() => {
+        if (subcategory) {
+            setFilter("category", subcategory);
+        } else if (category) {
+            setFilter("category", category);
+        } else if (filters.category === "" && !category && !subcategory) {
+            // Default to all or something?
+            // For now leave as is
+        }
+    }, [category, subcategory, setFilter, filters.category]);
 
     const { data: response, isLoading } = useProducts(filters);
 
     // Handle both array response (old) and paginated response (new) to be safe during transition
     const products = Array.isArray(response) ? response : response?.data || [];
-    const meta = !Array.isArray(response) ? response?.filters : undefined; // Backend returns 'filters' in meta? No, 'filters' is sibling to 'data' and 'meta'
+    const meta = !Array.isArray(response) ? response?.filters : undefined;
+
+    // Find current category data
+    const findCategory = (slug?: string) => {
+        if (!slug) return null;
+        // Search in top level
+        let cat = categories?.find(c => c.slug === slug);
+        if (cat) return cat;
+        // Search in children
+        for (const top of (categories || [])) {
+            const child = top.children?.find(c => c.slug === slug);
+            if (child) return child;
+        }
+        return null;
+    };
+
+    const currentCatData = findCategory(subcategory || category || filters.category);
+    const pageTitle = currentCatData?.name || "Our Collection";
+    const pageDescription = currentCatData?.description || "Experience the pure taste of nature with our premium organic sweeteners. Zero calories, zero guilt, endless flavor.";
+
+    // Sub-category pills (e.g. 1:10, 1:50)
+    const subCats = currentCatData?.children || [];
 
     const handleAddToCart = (product: Product) => {
         let variantId = undefined;
@@ -80,34 +111,104 @@ const CollectionsPage = () => {
             <Header />
             <main className="pt-24 pb-16">
                 <div className="container mx-auto px-4 md:px-6">
-                    {/* Breadcrumb */}
+                    {/* Breadcrumbs */}
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-8"
                     >
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Link to="/" className="hover:text-primary transition-colors">
-                                Home
-                            </Link>
+                            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                             <span>/</span>
-                            <span className="text-foreground">All Collections</span>
+                            <Link to="/collections" className="hover:text-primary transition-colors">Collections</Link>
+                            {category && (
+                                <>
+                                    <span>/</span>
+                                    <Link to={`/collections/${category}`} className="hover:text-primary transition-colors capitalize">
+                                        {category.replace('-', ' ')}
+                                    </Link>
+                                </>
+                            )}
+                            {subcategory && (
+                                <>
+                                    <span>/</span>
+                                    <span className="text-foreground font-semibold capitalize">{subcategory.replace('-', ' ')}</span>
+                                </>
+                            )}
                         </div>
                     </motion.div>
 
-                    {/* Page Header */}
+                    {/* Page Header Hero */}
                     <motion.div
+                        key={pageTitle}
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="text-center max-w-3xl mx-auto mb-8 md:mb-12 px-4"
+                        className="relative rounded-3xl overflow-hidden bg-primary mb-12 min-h-[300px] flex items-center"
                     >
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground leading-tight mb-4">
-                            Our Collection
-                        </h1>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/40 z-10" />
+                        <div className="relative z-20 px-8 py-12 md:px-16 md:py-20 text-white max-w-2xl">
+                            <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight capitalize">
+                                {pageTitle}
+                            </h1>
+                            <p className="text-white/80 text-lg mb-8 leading-relaxed">
+                                {pageDescription}
+                            </p>
+                            <Button size="lg" variant="secondary" className="font-bold rounded-squircle" onClick={() => {
+                                const el = document.getElementById('products-grid');
+                                el?.scrollIntoView({ behavior: 'smooth' });
+                            }}>
+                                Shop {pageTitle}
+                            </Button>
+                        </div>
                     </motion.div>
 
-                    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                    {/* Sub-category Pills */}
+                    {subCats.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-12">
+                            {subCats.map(sc => (
+                                <Button
+                                    key={sc.slug}
+                                    asChild
+                                    variant={filters.category === sc.slug ? "lime" : "outline"}
+                                    className="rounded-full font-bold"
+                                >
+                                    <Link to={`/collections/${category}/${sc.slug}`}>{sc.name}</Link>
+                                </Button>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Top Level Category Cards - Only show on main collections page */}
+                    {!category && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                            {[
+                                { name: "Stevia Powder", slug: "stevia-powder", desc: "Pure sweetness in convenient powder form.", img: "https://grevia.in/storage/category_powder.jpg" },
+                                { name: "Stevia Drops", slug: "stevia-drops", desc: "Easy-to-use liquid drops for beverages.", img: "https://grevia.in/storage/category_drops.jpg" },
+                                { name: "Monk Fruit", slug: "monk-fruit", desc: "Natural monk fruit for premium baking.", img: "https://grevia.in/storage/category_monk.jpg" },
+                            ].map((cat, idx) => (
+                                <motion.div
+                                    key={cat.name}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2 + idx * 0.1 }}
+                                    className="group relative rounded-2xl overflow-hidden aspect-[4/5] bg-secondary/30 border border-border/50"
+                                >
+                                    <img src={cat.img} alt={cat.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+                                    <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
+                                        <h3 className="text-2xl font-black text-white mb-2">{cat.name}</h3>
+                                        <p className="text-white/70 text-sm mb-6 line-clamp-2">{cat.desc}</p>
+                                        <Button asChild variant="lime" className="w-full font-bold">
+                                            <Link to={`/collections/${cat.slug}`}>Shop Now</Link>
+                                        </Button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div id="products-grid" className="flex flex-col lg:flex-row gap-6 lg:gap-8">
                         {/* Sidebar - Hidden on mobile */}
                         <div className="hidden lg:block">
                             <FilterSidebar

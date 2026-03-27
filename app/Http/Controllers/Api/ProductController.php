@@ -74,12 +74,50 @@ class ProductController extends Controller
         }
 
         // 5. Tags (JSON column 'ingredients' or 'tags'?)
-        // Assuming 'tags' column exists as JSON, if not we will migrate.
         if ($request->filled('tags')) {
              $tags = is_array($request->tags) ? $request->tags : explode(',', $request->tags);
              foreach ($tags as $tag) {
                  $query->whereJsonContains('tags', $tag);
              }
+        }
+
+        // 6. Specialized Sweetener Filters
+        // Type: Stevia / Monk Fruit
+        if ($request->filled('type')) {
+            $type = $request->type;
+            $query->whereHas('category', function($q) use ($type) {
+                $q->where('slug', 'like', "%{$type}%")
+                  ->orWhereHas('parent', function($pq) use ($type) {
+                      $pq->where('slug', 'like', "%{$type}%")
+                        ->orWhereHas('parent', function($ppq) use ($type) {
+                            $ppq->where('slug', 'like', "%{$type}%");
+                        });
+                  });
+            });
+        }
+
+        // Form: Powder / Drops
+        if ($request->filled('form')) {
+            $form = $request->form;
+            $query->whereHas('category', function($q) use ($form) {
+                $q->where('slug', 'like', "%{$form}%");
+            });
+        }
+
+        // Ratio: 1-10 / 1-50
+        if ($request->filled('ratio')) {
+            $ratio = str_replace(':', '-', $request->ratio);
+            $query->whereHas('category', function($q) use ($ratio) {
+                $q->where('slug', 'like', "%{$ratio}%");
+            });
+        }
+
+        // Size: 50g / 100g
+        if ($request->filled('size')) {
+            $size = $request->size;
+            $query->whereHas('variants', function($q) use ($size) {
+                $q->where('weight', 'like', "%{$size}%");
+            });
         }
 
         // 6. Sorting
@@ -132,6 +170,10 @@ class ProductController extends Controller
                     ->orderBy('order')
                     ->select('id', 'name', 'slug')
                     ->get(),
+                'types' => ['stevia', 'monk-fruit'],
+                'forms' => ['powder', 'drops'],
+                'ratios' => ['1:10', '1:50'],
+                'sizes' => ['50g', '100g', '250g', '500g'],
             ]
         ]);
     }

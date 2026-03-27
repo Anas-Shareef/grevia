@@ -13,10 +13,18 @@ interface DropdownItem {
   href: string;
 }
 
+interface MegaMenuSection {
+  title: string;
+  href: string;
+  items: { name: string; href: string; subtitle?: string }[];
+}
+
 interface NavItem {
   name: string;
   href?: string;
   dropdown?: DropdownItem[];
+  megaMenu?: boolean;
+  sections?: MegaMenuSection[];
 }
 
 const Header = () => {
@@ -36,7 +44,28 @@ const Header = () => {
   const navItems: NavItem[] = [
     { name: "Home", href: "/" },
     { name: "Benefits", href: "/benefits" },
-    { name: "Sweeteners", href: "/products/sweeteners" },
+    { 
+      name: "Natural Sweeteners", 
+      href: "/collections/natural-sweeteners",
+      megaMenu: true,
+      sections: [
+        {
+          title: "Stevia",
+          href: "/collections/stevia",
+          items: [
+            { name: "Stevia Powder", href: "/collections/stevia-powder", subtitle: "1:10 & 1:50 Ratios" },
+            { name: "Stevia Drops", href: "/collections/stevia-drops", subtitle: "1:10 Concentrated" },
+          ]
+        },
+        {
+          title: "Monk Fruit",
+          href: "/collections/monk-fruit",
+          items: [
+            { name: "Monk Fruit Powder", href: "/collections/monk-fruit-powder", subtitle: "1:10 Ratios" },
+          ]
+        }
+      ]
+    },
     { name: "Other Products", href: "/products/other-products" },
     { name: "Contact Us", href: "/contact" },
   ];
@@ -71,12 +100,20 @@ const Header = () => {
               <div
                 key={item.name}
                 className="relative"
-                onMouseEnter={() => item.dropdown && setActiveDropdown(item.name)}
+                onMouseEnter={() => (item.dropdown || item.megaMenu) && setActiveDropdown(item.name)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 {item.dropdown ? (
                   <button
                     className="flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors py-2"
+                  >
+                    {item.name}
+                    <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
+                  </button>
+                ) : item.megaMenu ? (
+                  <button
+                    className="flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setActiveDropdown(activeDropdown === item.name ? null : item.name)}
                   >
                     {item.name}
                     <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
@@ -109,6 +146,55 @@ const Header = () => {
                           {dropdownItem.name}
                         </Link>
                       ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Mega Menu */}
+                <AnimatePresence>
+                  {item.megaMenu && activeDropdown === item.name && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-1 bg-card border border-border rounded-2xl shadow-xl overflow-hidden min-w-[600px] p-8 grid grid-cols-3 gap-8"
+                    >
+                      {item.sections?.map((section) => (
+                        <div key={section.title}>
+                          <Link to={section.href} className="block font-bold text-foreground hover:text-primary transition-colors mb-4 uppercase tracking-wider text-xs">
+                            {section.title}
+                          </Link>
+                          <div className="space-y-4">
+                            {section.items.map((subItem) => (
+                              <Link key={subItem.name} to={subItem.href} className="group block">
+                                <p className="text-sm font-semibold text-foreground group-hover:text-lime transition-colors">
+                                  {subItem.name}
+                                </p>
+                                {subItem.subtitle && (
+                                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                                    {subItem.subtitle}
+                                  </p>
+                                )}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {/* Explanation Box */}
+                      <div className="bg-secondary/30 rounded-xl p-6 flex flex-col justify-center">
+                        <h4 className="font-bold text-primary mb-2 text-sm uppercase">Strength Guide</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          <strong>1:10 Ratio:</strong> 1 gram replaces 10 grams of regular sugar. Ideal for everyday use.
+                        </p>
+                        <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+                          <strong>1:50 Ratio:</strong> High concentration for bulk use. Special strength for experts.
+                        </p>
+                        <Link to="/benefits" className="text-[10px] font-bold text-lime mt-4 uppercase hover:underline">
+                          Learn More About Ratios →
+                        </Link>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -307,7 +393,7 @@ const Header = () => {
 
                 {navItems.map((item) => (
                   <div key={item.name}>
-                    {item.dropdown ? (
+                    {item.dropdown || item.megaMenu ? (
                       <>
                         <button
                           onClick={() => setMobileDropdown(mobileDropdown === item.name ? null : item.name)}
@@ -324,7 +410,7 @@ const Header = () => {
                               exit={{ opacity: 0, height: 0 }}
                               className="pl-4 overflow-hidden"
                             >
-                              {item.dropdown.map((dropdownItem) => (
+                              {item.dropdown?.map((dropdownItem) => (
                                 <Link
                                   key={dropdownItem.name}
                                   to={dropdownItem.href}
@@ -336,6 +422,33 @@ const Header = () => {
                                 >
                                   {dropdownItem.name}
                                 </Link>
+                              ))}
+
+                              {item.sections?.map((section) => (
+                                <div key={section.title} className="py-2">
+                                  <Link 
+                                    to={section.href}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="block text-sm font-bold text-foreground uppercase tracking-widest px-2 mb-2"
+                                  >
+                                    {section.title}
+                                  </Link>
+                                  <div className="space-y-1 ml-2 border-l border-border/50">
+                                    {section.items.map((subItem) => (
+                                      <Link
+                                        key={subItem.name}
+                                        to={subItem.href}
+                                        onClick={() => {
+                                          setIsMenuOpen(false);
+                                          setMobileDropdown(null);
+                                        }}
+                                        className="block text-sm text-muted-foreground hover:text-lime py-1 px-4"
+                                      >
+                                        {subItem.name}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
                               ))}
                             </motion.div>
                           )}

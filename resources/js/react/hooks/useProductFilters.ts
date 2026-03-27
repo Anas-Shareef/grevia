@@ -12,6 +12,10 @@ export type FilterState = {
     page: string;
     in_stock: string;
     featured?: string;
+    type?: string;
+    form?: string;
+    ratio?: string;
+    size?: string;
 };
 
 export const useProductFilters = () => {
@@ -28,6 +32,10 @@ export const useProductFilters = () => {
             sort_by: searchParams.get("sort_by") || "newest",
             page: searchParams.get("page") || "1",
             in_stock: searchParams.get("in_stock") || "",
+            type: searchParams.get("type") || "",
+            form: searchParams.get("form") || "",
+            ratio: searchParams.get("ratio") || "",
+            size: searchParams.get("size") || "",
         };
     }, [searchParams]);
 

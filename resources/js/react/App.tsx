@@ -62,7 +62,10 @@ const App = () => (
                   <Route path="wishlist" element={<WishlistPage isDashboard={true} />} />
                 </Route>
 
-                <Route path="/collections/all" element={<CollectionsPage />} />
+                <Route path="/collections" element={<CollectionsPage />} />
+                <Route path="/collections/:category" element={<CollectionsPage />} />
+                <Route path="/collections/:category/:subcategory" element={<CollectionsPage />} />
+                <Route path="/collections/all" element={<Navigate to="/collections" replace />} />
                 <Route path="/benefits" element={<BenefitsPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
