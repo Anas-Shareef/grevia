@@ -510,8 +510,6 @@ const ProductDetailPage = () => {
                       </p>
                   </TabsContent>
               </Tabs>
-            </motion.div>
-          </div>
 
               {/* Wishlist Button with Label */}
               <div className="mt-4">
