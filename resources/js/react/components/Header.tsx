@@ -34,39 +34,39 @@ const Header = () => {
     <Link
       to={href}
       onClick={() => setMegaMenuOpen(false)}
-      className="inline-block px-3 py-1 rounded-lg text-xs font-medium border transition-all duration-150 hover:scale-105"
+      className="inline-block px-3 py-1.5 rounded-full text-[10px] font-black border uppercase tracking-widest transition-all duration-150 hover:scale-105"
       style={{
-        background: 'var(--pill-inactive-bg)',
-        borderColor: 'var(--pill-inactive-border)',
-        color: 'var(--text-secondary)',
+        background: 'var(--bg-card)',
+        borderColor: 'var(--border)',
+        color: 'var(--text-primary)',
       }}
       onMouseEnter={e => {
         const el = e.currentTarget as HTMLAnchorElement;
-        el.style.background = 'var(--pill-active-bg)';
-        el.style.borderColor = 'var(--pill-active-border)';
-        el.style.color = 'var(--text-green)';
+        el.style.background = 'var(--bg-mint)';
+        el.style.borderColor = 'var(--primary)';
+        el.style.color = 'var(--primary)';
       }}
       onMouseLeave={e => {
         const el = e.currentTarget as HTMLAnchorElement;
-        el.style.background = 'var(--pill-inactive-bg)';
-        el.style.borderColor = 'var(--pill-inactive-border)';
-        el.style.color = 'var(--text-secondary)';
+        el.style.background = 'var(--bg-card)';
+        el.style.borderColor = 'var(--border)';
+        el.style.color = 'var(--text-primary)';
       }}
     >
       {label}
     </Link>
   );
 
-  const navLinkClass = "text-sm font-semibold transition-colors py-2";
-  const navLinkStyle = { color: 'var(--text-secondary)' };
+  const navLinkClass = "text-xs font-black uppercase tracking-widest transition-colors py-2";
+  const navLinkStyle = { color: 'var(--text-primary)' };
 
   return (
     <motion.header
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b"
-      style={{ background: 'rgba(13,31,14,0.95)', borderColor: 'var(--border-card)' }}
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b shadow-soft"
+      style={{ background: 'rgba(255,255,255,0.85)', borderColor: 'rgba(6, 78, 59, 0.05)' }}
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
@@ -76,20 +76,20 @@ const Header = () => {
             <img
               src={greviaLogo}
               alt="Grevia - Premium Natural Sweeteners"
-              className="h-10 md:h-12 w-auto group-hover:scale-105 transition-transform"
+              className="h-9 md:h-11 w-auto group-hover:scale-105 transition-transform brightness-90 contrast-125"
             />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
+          <nav className="hidden lg:flex items-center gap-8" aria-label="Main navigation">
             <Link to="/" className={navLinkClass} style={navLinkStyle}
-              onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-green)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-primary)')}>
               Home
             </Link>
             <Link to="/benefits" className={navLinkClass} style={navLinkStyle}
-              onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-green)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-primary)')}>
               Benefits
             </Link>
 

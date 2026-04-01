@@ -23,7 +23,7 @@ interface Review {
     user?: { name: string };
 }
 
-const ReviewsSection = ({ productId }: { productId: number }) => {
+const ReviewsSection = ({ productId }: { productId: number | string }) => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -90,7 +90,7 @@ const ReviewsSection = ({ productId }: { productId: number }) => {
         : 0;
 
     return (
-        <section className="py-16 md:py-24 bg-secondary/20">
+        <section className="py-16 md:py-24 bg-page">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="flex flex-col md:flex-row gap-12 items-start">
 
@@ -98,11 +98,11 @@ const ReviewsSection = ({ productId }: { productId: number }) => {
                     <div className="w-full md:w-1/3 sticky top-24">
                         <h2 className="text-3xl font-black text-foreground mb-6">Customer Reviews</h2>
 
-                        <div className="bg-card border border-border rounded-squircle-xl p-6 mb-8">
+                        <div className="bg-white border border-border rounded-2xl p-6 mb-8 shadow-soft">
                             <div className="flex items-end gap-4 mb-4">
                                 <span className="text-5xl font-black text-foreground">{averageRating}</span>
                                 <div className="mb-2">
-                                    <div className="flex text-lime mb-1">
+                                    <div className="flex text-primary mb-1">
                                         {[...Array(5)].map((_, i) => (
                                             <Star key={i} className={`w-5 h-5 ${i < Math.round(Number(averageRating)) ? "fill-current" : "text-muted-foreground/30"}`} />
                                         ))}
@@ -111,7 +111,7 @@ const ReviewsSection = ({ productId }: { productId: number }) => {
                                 </div>
                             </div>
 
-                            <Button variant="limeLg" size="xl" className="w-full" onClick={() => setIsFormOpen(!isFormOpen)}>
+                            <Button variant="default" size="xl" className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl" onClick={() => setIsFormOpen(!isFormOpen)}>
                                 {isFormOpen ? "Cancel Review" : "Write a Review"}
                             </Button>
                         </div>

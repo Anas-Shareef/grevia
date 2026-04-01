@@ -64,13 +64,9 @@ const BenefitsSection = () => {
   return (
     <section
       id="benefits"
-      className="py-24 md:py-32 relative overflow-hidden"
+      className="py-24 md:py-32 relative bg-page overflow-hidden"
       aria-labelledby="benefits-heading"
     >
-      {/* Background elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-lime/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-3xl" />
-
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Section Header */}
         <motion.div
@@ -80,18 +76,22 @@ const BenefitsSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
         >
-          <span className="inline-block text-sm font-bold text-lime uppercase tracking-widest mb-4">
+          <motion.span 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            className="inline-block text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 bg-secondary px-4 py-2 rounded-full"
+          >
             Why Choose Us
-          </span>
+          </motion.span>
           <h2
             id="benefits-heading"
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-tight mb-6"
+            className="text-4xl md:text-5xl lg:text-7xl font-black text-primary leading-[1] mb-6 tracking-tighter"
           >
             The Sweet Truth
             <br />
-            <span className="text-primary">About Health</span>
+            <span className="text-accent-green">About Health</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-text-muted max-w-2xl mx-auto font-medium">
             Our natural sweeteners deliver pure, clean sweetness backed by science and nature.
           </p>
         </motion.div>
@@ -108,15 +108,15 @@ const BenefitsSection = () => {
             <motion.article
               key={benefit.title}
               variants={itemVariants}
-              className="group bg-card rounded-squircle-lg p-8 shadow-soft hover:shadow-card transition-all duration-300 border border-border/50 hover:border-lime/30"
+              className="group bg-white rounded-[32px] p-10 shadow-card hover:shadow-glow transition-all duration-500 border border-border/40 hover:border-accent-green/20"
             >
-              <div className="w-14 h-14 bg-lime/15 rounded-squircle flex items-center justify-center mb-6 group-hover:bg-lime/25 group-hover:scale-110 transition-all duration-300">
-                <benefit.icon className="w-7 h-7 text-primary" />
+              <div className="w-14 h-14 bg-secondary rounded-2xl flex items-center justify-center mb-10 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-soft">
+                <benefit.icon className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">
+              <h3 className="text-2xl font-black text-primary mb-4 tracking-tighter">
                 {benefit.title}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-text-muted leading-relaxed font-medium">
                 {benefit.description}
               </p>
             </motion.article>

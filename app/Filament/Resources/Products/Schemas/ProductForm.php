@@ -19,6 +19,9 @@ class ProductForm
     {
         return $schema
             ->components([
+                \Filament\Forms\Components\Split::make([
+                    \Filament\Forms\Components\Grid::make(1)
+                        ->schema([
                 Section::make('General Information')
                     ->columns(2)
                     ->components([
@@ -49,12 +52,14 @@ class ProductForm
                     ->components([
                         TextInput::make('price')
                             ->numeric()
-                            ->prefix('₹'),
+                            ->prefix('₹')
+                            ->live(onBlur: true),
                         TextInput::make('original_price')
                             ->numeric()
                             ->prefix('₹'),
                         TextInput::make('badge')
-                            ->placeholder('e.g. Best Seller, New'),
+                            ->placeholder('e.g. Best Seller, New')
+                            ->live(onBlur: true),
                         Toggle::make('in_stock')
                             ->default(true),
                         Toggle::make('is_featured')
@@ -206,18 +211,23 @@ class ProductForm
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Section::make('Additional Data')
-                    ->components([
-                        TagsInput::make('ingredients')
-                            ->label('Ingredients')
-                            ->placeholder('Add ingredient...')
-                            ->suggestions([
-                                'Organic Stevia Leaf Extract',
-                                'Monk Fruit Extract',
-                                'Erythritol',
-                                'Natural Fiber',
-                            ]),
-                    ]),
+                        ]),
+                    \Filament\Forms\Components\Section::make('Live Preview & Tools')
+                        ->grow(false)
+                        ->components([
+                            \Filament\Forms\Components\Placeholder::make('preview_card')
+                                ->label('Store View')
+                                ->content(fn ($get) => view('filament.products.preview-card', [
+                                    'getState' => fn () => $get(['name', 'price', 'badge']),
+                                    'getRecord' => fn () => $schema->getModelInstance(),
+                                ])),
+                            \Filament\Forms\Components\Placeholder::make('meta_info')
+                                ->label('Metadata')
+                                ->content(fn ($record) => $record ? "Created: " . $record->created_at->format('M d, Y') : "New Product"),
+                        ]),
+                ])
+                ->from('md')
+                ->columnSpanFull(),
             ]);
     }
 }

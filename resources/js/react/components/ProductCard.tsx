@@ -43,15 +43,15 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     };
 
     return (
-        <div className="group relative flex flex-col bg-[#121212] rounded-[32px] p-2 border border-white/5 hover:border-lime/20 transition-all duration-500 shadow-xl overflow-hidden">
-            {/* Image Container - Light Background */}
+        <div className="group relative flex flex-col bg-white rounded-[32px] p-3 border border-border/40 shadow-soft hover:shadow-card transition-all duration-500 overflow-hidden">
+            {/* Image Container - Light Natural Background */}
             <Link 
-                to={`/product/${product.slug || product.id}`}
-                className="relative aspect-[4/4.5] rounded-[24px] bg-[#f2f6f0] overflow-hidden flex items-center justify-center p-8 mb-4 cursor-pointer"
+                to={`/products/${product.slug || product.id}`}
+                className="relative aspect-square rounded-[24px] bg-page overflow-hidden flex items-center justify-center p-10 mb-5 border border-transparent group-hover:border-primary/5 transition-colors"
             >
                 <div className="absolute top-4 left-4 z-20">
                     {product.badge && (
-                        <div className="bg-lime text-[#121212] text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-tighter shadow-sm">
+                        <div className="bg-accent-green text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
                             {product.badge}
                         </div>
                     )}
@@ -63,26 +63,26 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                 <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" 
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000 drop-shadow-sm" 
                 />
             </Link>
 
             {/* Content Area */}
-            <div className="px-4 pb-4 flex flex-col flex-1">
+            <div className="px-3 pb-3 flex flex-col flex-1">
                 {/* Category Label */}
-                <span className="text-[10px] font-black text-lime uppercase tracking-[0.1em] mb-1">
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2 opacity-60">
                     {typeof product.category === 'string' ? product.category : product.category.name}
                 </span>
 
                 {/* Title */}
-                <Link to={`/product/${product.slug || product.id}`}>
-                    <h3 className="text-lg font-bold text-white mb-0.5 group-hover:text-lime transition-colors leading-tight">
+                <Link to={`/products/${product.slug || product.id}`}>
+                    <h3 className="text-xl font-black text-primary mb-1 group-hover:text-accent-green transition-colors leading-tight line-clamp-1 tracking-tighter">
                         {product.name}
                     </h3>
                 </Link>
 
                 {/* Ratio Caption */}
-                <p className="text-[11px] text-white/50 mb-4 font-medium italic">
+                <p className="text-[11px] text-text-muted mb-6 font-medium italic opacity-80">
                     {getRatioCaption()}
                 </p>
 
@@ -95,14 +95,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setSelectedWeight(weight);
-                                    // Reset pack size to first available for this weight
                                     const v = product.variants?.find(v => v.weight === weight);
                                     if(v) setSelectedPackSize(v.pack_size);
-                                }}
-                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
+                                 }}
+                                className={`px-3 py-1.5 rounded-full text-[10px] font-black border uppercase tracking-widest transition-all duration-300 ${
                                     selectedWeight === weight 
-                                    ? "bg-white/10 border-white/20 text-white" 
-                                    : "bg-transparent border-white/5 text-white/30 hover:border-white/20"
+                                    ? "bg-primary text-white border-primary shadow-soft" 
+                                    : "bg-page text-primary border-border hover:border-primary/30"
                                 }`}
                             >
                                 {weight}
@@ -111,23 +110,32 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                     </div>
                 )}
 
-                {/* Footer: Price & Add Button */}
-                <div className="mt-auto flex items-center justify-between pt-2 border-t border-white/5">
+                {/* Footer: Price & CTA */}
+                <div className="mt-auto flex items-center justify-between pt-4 border-t border-border/50">
                     <div className="flex flex-col">
                         <div className="flex items-center gap-1.5">
-                            <span className="text-xl font-black text-white">₹{displayPrice}</span>
+                            <span className="text-xl font-black text-primary tracking-tighter">₹{displayPrice}</span>
                             {currentVariant?.discount_price && (
-                                <span className="text-[10px] text-white/30 line-through">₹{currentVariant.price}</span>
+                                <span className="text-[10px] text-text-muted line-through opacity-50">₹{currentVariant.price}</span>
                             )}
                         </div>
                     </div>
                     
-                    <button 
-                        onClick={handleAddToCart}
-                        className="bg-lime/10 hover:bg-lime text-lime hover:text-[#121212] w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 group/add border border-lime/20 hover:border-lime active:scale-95"
-                    >
-                        <Plus className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <Link to={`/products/${product.slug || product.id}`}>
+                            <Button variant="ghost" size="sm" className="text-[10px] uppercase font-black tracking-[0.15em] text-primary hover:bg-secondary px-3 rounded-full">
+                                Details
+                            </Button>
+                        </Link>
+                        <Button 
+                            onClick={handleAddToCart}
+                            size="sm"
+                            className="bg-primary hover:bg-primary/95 text-white rounded-full px-5 py-5 text-[11px] font-black uppercase tracking-widest shadow-button transition-transform hover:scale-105 active:scale-95 group/btn"
+                        >
+                            <Plus className="w-3.5 h-3.5 mr-1 group-hover/btn:rotate-90 transition-transform duration-300" />
+                            Add
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

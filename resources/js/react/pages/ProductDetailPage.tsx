@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Star, Heart, Check, Truck, RotateCcw, Info, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 import { Product } from "@/data/products";
 import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/contexts/CartContext";
@@ -12,22 +13,23 @@ import { useState, useEffect } from "react";
 import ReviewsSection from "@/components/ReviewsSection";
 
 // ─── Design Tokens ───
+// ─── Design Tokens (Natural Premium Theme) ───
 const T = {
-  bgPage:    '#0d1f0e',
-  bgCard:    '#1a2e1b',
-  textPrimary:'#f0f4ee',
-  textSec:    '#9db89e',
-  textMuted:  '#5a7a5b',
-  textGreen:  '#97c459',
-  accentGreen:'#2d7a3a',
-  accentDark: '#173404',
-  amber:      '#ba7517',
-  borderCard: 'rgba(45,122,58,0.25)',
-  borderActive:'#2d7a3a',
-  pillInactiveBg:    '#132113',
-  pillInactiveBorder:'rgba(45,122,58,0.3)',
-  pillActiveBg:      '#1f4a22',
-  pillActiveBorder:  '#2d7a3a',
+  bgPage:    'var(--bg-page)',   /* #f4f7f1 (Creamy Mint) */
+  bgCard:    '#ffffff',
+  textPrimary: 'var(--text-primary)', /* #064e3b (Deep Forest) */
+  textSec:    'var(--text-muted)',   /* #4b6358 */
+  textMuted:  '#9ca3af',
+  textGreen:  'var(--accent-bright)', /* #22c55e */
+  accentGreen: 'var(--accent-bright)',
+  accentDark:  'var(--primary)',      /* #064e3b */
+  amber:      '#d97706',
+  borderCard:  'rgba(6, 78, 59, 0.05)',
+  borderActive: 'var(--primary)',
+  pillInactiveBg:    'var(--bg-card)',
+  pillInactiveBorder: 'var(--border)',
+  pillActiveBg:      'var(--bg-mint)',
+  pillActiveBorder:  'var(--primary)',
 };
 
 // Ratio explainer messages (Section 5.3)
@@ -281,56 +283,59 @@ const ProductDetailPage = () => {
             </p>
 
             {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-extrabold leading-tight" style={{ color: T.textPrimary }}>
+            <h1 className="text-4xl md:text-5xl font-black leading-[1] uppercase tracking-tighter" style={{ color: T.textPrimary }}>
               {product.name}
             </h1>
 
             {/* Tagline */}
-            <p className="text-sm leading-relaxed" style={{ color: T.textSec }}>
+            <p className="text-lg leading-relaxed font-medium" style={{ color: T.textSec }}>
               {product.sweetness_description || (product.ratio ? `${product.ratio} means 1g replaces ${product.ratio === '1:50' ? '50g' : '10g'} of sugar.` : 'Natural, zero-calorie sweetener.')}{' '}
               Ideal for {product.use_case || 'tea, coffee, and smoothies'}.
             </p>
 
             {/* Star rating */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <div className="flex gap-0.5">
                 {[1,2,3,4,5].map(s => (
-                  <Star key={s} className="w-4 h-4" style={{ color: T.amber, fill: s <= Math.round(product.rating) ? T.amber : 'transparent' }} />
+                  <Star key={s} className="w-5 h-5" style={{ color: T.amber, fill: s <= Math.round(product.rating) ? T.amber : 'transparent' }} />
                 ))}
               </div>
-              <span className="text-sm font-semibold" style={{ color: T.textPrimary }}>
+              <span className="text-lg font-black" style={{ color: T.textPrimary }}>
                 {product.rating.toFixed(1)}
               </span>
-              <span className="text-xs" style={{ color: T.textMuted }}>
+              <span className="text-sm font-medium" style={{ color: T.textSec }}>
                 ({product.reviews_count || product.reviews} reviews)
               </span>
             </div>
 
             {/* ─── § 3.3 Strength Ratio Selector ─── */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <p className="text-xs font-semibold" style={{ color: T.textPrimary }}>
-                  Strength ratio — how concentrated is it?
+            <div className="pt-4">
+              <div className="flex items-center gap-2 mb-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: T.textPrimary }}>
+                  Strength Ratio
                 </p>
-                <Info className="w-3.5 h-3.5" style={{ color: T.textMuted }} />
+                <div className="w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
+                  <Info className="w-2.5 h-2.5" style={{ color: T.textPrimary }} />
+                </div>
               </div>
 
-              <div className="flex gap-3 mb-3">
+              <div className="flex gap-4 mb-5">
                 {['1:10', '1:50'].map(ratio => (
                   <button
                     key={ratio}
                     onClick={() => setSelectedRatio(ratio)}
-                    className="flex-1 py-3 px-4 rounded-xl text-center transition-all"
+                    className="flex-1 py-4 px-6 rounded-2xl text-center transition-all duration-300"
                     style={{
-                      background: selectedRatio === ratio ? T.pillActiveBg : T.pillInactiveBg,
-                      border: `1px solid ${selectedRatio === ratio ? T.pillActiveBorder : T.pillInactiveBorder}`,
+                      background: selectedRatio === ratio ? 'var(--primary)' : 'var(--bg-card)',
+                      border: `1px solid ${selectedRatio === ratio ? 'var(--primary)' : 'var(--border)'}`,
+                      boxShadow: selectedRatio === ratio ? 'var(--shadow-button)' : 'none',
                     }}
                   >
-                    <p className="text-sm font-bold" style={{ color: selectedRatio === ratio ? T.textGreen : T.textSec }}>
+                    <p className="text-base font-black uppercase tracking-widest" style={{ color: selectedRatio === ratio ? 'white' : 'var(--text-primary)' }}>
                       {ratio}
                     </p>
-                    <p className="text-[10px] mt-0.5" style={{ color: T.textMuted }}>
-                      {ratio === '1:10' ? 'mild · everyday' : 'strong · baking'}
+                    <p className="text-[10px] mt-1 font-bold uppercase tracking-tighter opacity-60" style={{ color: selectedRatio === ratio ? 'white' : 'var(--text-muted)' }}>
+                      {ratio === '1:10' ? 'Everyday' : 'Extra Strong'}
                     </p>
                   </button>
                 ))}
@@ -344,11 +349,13 @@ const ProductDetailPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.2 }}
-                  className="flex gap-3 p-3 rounded-xl"
-                  style={{ background: '#1e2d0e', border: '1px solid #3b6d11' }}
+                  className="flex gap-4 p-5 rounded-3xl"
+                  style={{ background: 'var(--bg-mint)', border: '1px solid rgba(6, 78, 59, 0.05)' }}
                 >
-                  <span className="text-lg flex-shrink-0">💡</span>
-                  <p className="text-xs leading-relaxed" style={{ color: T.textSec }}>
+                  <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-soft">
+                    <span className="text-lg">💡</span>
+                  </div>
+                  <p className="text-xs leading-relaxed font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                     {ratioGuide.detail}
                   </p>
                 </motion.div>
@@ -356,27 +363,28 @@ const ProductDetailPage = () => {
             </div>
 
             {/* ─── § 3.4 Size Selector ─── */}
-            <div>
-              <p className="text-xs font-semibold mb-3" style={{ color: T.textPrimary }}>Size</p>
-              <div className="flex gap-3">
+            <div className="pt-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: T.textPrimary }}>Size</p>
+              <div className="flex gap-4">
                 {[
                   { size: '50g', price: price50 },
-                  { size: '100g', price: price100, savings: savings > 0 ? `save ${savings}%` : undefined },
+                  { size: '100g', price: price100, savings: savings > 0 ? `Save ${savings}%` : undefined },
                 ].map(({ size, price, savings: sv }) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className="flex-1 py-3 px-4 rounded-xl text-center transition-all"
+                    className="flex-1 py-4 px-6 rounded-2xl text-center transition-all duration-300"
                     style={{
-                      background: selectedSize === size ? T.pillActiveBg : T.pillInactiveBg,
-                      border: `1px solid ${selectedSize === size ? T.pillActiveBorder : T.pillInactiveBorder}`,
+                      background: selectedSize === size ? 'var(--primary)' : 'var(--bg-card)',
+                      border: `1px solid ${selectedSize === size ? 'var(--primary)' : 'var(--border)'}`,
+                      boxShadow: selectedSize === size ? 'var(--shadow-button)' : 'none',
                     }}
                   >
-                    <p className="text-sm font-bold" style={{ color: selectedSize === size ? T.textGreen : T.textSec }}>
+                    <p className="text-base font-black uppercase tracking-widest" style={{ color: selectedSize === size ? 'white' : 'var(--text-primary)' }}>
                       {size} · ₹{price}
                     </p>
                     {sv && (
-                      <p className="text-[10px] mt-0.5" style={{ color: T.amber }}>{sv}</p>
+                      <p className="text-[10px] mt-1 font-black uppercase tracking-tighter" style={{ color: selectedSize === size ? 'white' : 'var(--accent-bright)' }}>{sv}</p>
                     )}
                   </button>
                 ))}
@@ -384,57 +392,57 @@ const ProductDetailPage = () => {
             </div>
 
             {/* ─── § 3.5 Price + Add to Cart ─── */}
-            <div>
+            <div className="pt-6">
               {/* Price row */}
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-3xl font-extrabold" style={{ color: T.textPrimary }}>₹{displayPrice}</span>
-                <span className="text-xs" style={{ color: T.textMuted }}>
+              <div className="flex items-baseline gap-4 mb-4">
+                <span className="text-4xl font-black tracking-tighter" style={{ color: T.textPrimary }}>₹{displayPrice}</span>
+                <span className="text-xs font-bold opacity-60" style={{ color: T.textPrimary }}>
                   {selectedSize} · ₹{(displayPrice / parseFloat(selectedSize)).toFixed(2)}/g
                 </span>
                 <span
-                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(45,122,58,0.15)', color: T.textGreen, border: `1px solid ${T.borderCard}` }}
+                  className="text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest"
+                  style={{ background: 'var(--bg-mint)', color: 'var(--accent-bright)', border: `1px solid rgba(34, 197, 94, 0.1)` }}
                 >
                   Free shipping
                 </span>
               </div>
 
               {/* Quantity + Add to Cart row */}
-              <div className="flex gap-3 mb-4">
-                {/* Quantity stepper */}
-                <div className="flex items-center rounded-xl overflow-hidden" style={{ border: `1px solid ${T.borderCard}` }}>
-                  <button
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="px-3 py-3 text-sm transition-colors"
-                    style={{ color: T.textSec }}
-                  >−</button>
-                  <span className="px-4 text-sm font-semibold" style={{ color: T.textPrimary }}>{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(q => q + 1)}
-                    className="px-3 py-3 text-sm transition-colors"
-                    style={{ color: T.textSec }}
-                  >+</button>
-                </div>
-
-                {/* Add to Cart */}
+              <div className="flex gap-4">
+              {/* Quantity stepper */}
+              <div className="flex items-center rounded-2xl overflow-hidden bg-white shadow-soft" style={{ border: `1px solid var(--border)` }}>
                 <button
-                  onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: T.accentGreen, height: 44 }}
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
-                </button>
-
-                {/* Wishlist */}
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  className="px-4 py-4 text-sm font-black transition-colors hover:bg-secondary"
+                  style={{ color: T.textPrimary }}
+                >−</button>
+                <span className="px-4 text-base font-black" style={{ color: T.textPrimary }}>{quantity}</span>
                 <button
-                  onClick={toggleWishlist}
-                  className="w-11 h-11 rounded-xl flex items-center justify-center transition-all"
-                  style={{ border: `1px solid ${wishlisted ? '#ef4444' : T.borderCard}` }}
-                >
-                  <Heart className="w-4 h-4" style={{ color: wishlisted ? '#ef4444' : T.textSec, fill: wishlisted ? '#ef4444' : 'none' }} />
-                </button>
+                  onClick={() => setQuantity(q => q + 1)}
+                  className="px-4 py-4 text-sm font-black transition-colors hover:bg-secondary"
+                  style={{ color: T.textPrimary }}
+                >+</button>
               </div>
+
+              {/* Add to Cart */}
+              <Button
+                onClick={handleAddToCart}
+                className="flex-1 flex items-center justify-center gap-3 py-8 rounded-2xl text-base font-black uppercase tracking-widest text-white transition-all shadow-button hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: 'var(--primary)' }}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                Add to Cart
+              </Button>
+
+              {/* Wishlist */}
+              <button
+                onClick={toggleWishlist}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all bg-white shadow-soft border border-border"
+                style={{ borderColor: wishlisted ? '#ef4444' : 'var(--border)' }}
+              >
+                <Heart className="w-6 h-6 transition-all duration-300" style={{ color: wishlisted ? '#ef4444' : 'var(--text-primary)', fill: wishlisted ? '#ef4444' : 'none' }} />
+              </button>
+            </div>
 
               {/* Trust badges */}
               <div className="flex gap-4 flex-wrap">

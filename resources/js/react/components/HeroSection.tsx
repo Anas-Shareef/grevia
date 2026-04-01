@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Award, Heart } from "lucide-react";
+import { Sparkles, Award, Heart, Check } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
@@ -21,12 +21,12 @@ const FloatingBadge = ({
     initial={{ opacity: 0, scale: 0.8, y: 20 }}
     animate={{ opacity: 1, scale: 1, y: 0 }}
     transition={{ delay, duration: 0.5, ease: "easeOut" }}
-    className={`absolute bg-background/90 backdrop-blur-md rounded-squircle-lg shadow-card px-4 py-3 flex items-center gap-2 ${className}`}
+    className={`absolute bg-white/95 backdrop-blur-md rounded-2xl shadow-card px-5 py-4 flex items-center gap-3 border border-primary/5 z-20 ${className}`}
   >
-    <div className="w-8 h-8 bg-lime/20 rounded-squircle flex items-center justify-center">
-      <Icon className="w-4 h-4 text-primary" />
+    <div className="w-9 h-9 bg-secondary rounded-xl flex items-center justify-center">
+      <Icon className="w-5 h-5 text-primary" />
     </div>
-    <span className="text-sm font-bold text-foreground">{text}</span>
+    <span className="text-[10px] font-black text-primary uppercase tracking-[0.15em] leading-none">{text}</span>
   </motion.div>
 );
 
@@ -53,140 +53,112 @@ const HeroSection = () => {
       .catch(err => console.error("Failed to fetch hero banner", err));
   }, []);
 
-  // Icon mapping
   const getIcon = (name: string) => {
     switch (name) {
       case 'Sparkles': return Sparkles;
       case 'Award': return Award;
       case 'Heart': return Heart;
-      default: return Sparkles;
+      default: return Check;
     }
   };
 
-  const titleHtml = banner?.title
-    ? { __html: banner.title }
-    : { __html: `Sweetness<br /><span class="text-gradient-forest">Without</span><br />Sacrifice` };
+const titleText = banner?.title || "Sweetness <span class='text-accent-green'>Without</span> Sacrifice";
 
   return (
-    <section
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
-      aria-labelledby="hero-heading"
-    >
-      {/* Background with organic blobs */}
-      <div className="absolute inset-0 bg-gradient-hero" />
-
-      {/* Radial grid pattern */}
-      <div className="absolute inset-0 bg-radial-grid opacity-50" />
-
-      {/* Animated blobs */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-lime/20 rounded-full blur-3xl animate-blob" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
-      <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-lime/15 rounded-full blur-3xl animate-blob animation-delay-4000" />
-
+    <section className="relative min-h-[90vh] lg:min-h-screen flex items-center bg-page overflow-hidden pt-32 pb-20">
+      {/* Soft natural elements */}
+      <div className="absolute top-0 right-0 w-[60%] h-full bg-mint-soft rounded-l-[100px] -z-10 translate-x-[10%] hidden lg:block" />
+      <div className="absolute top-20 right-40 w-4 h-4 bg-accent-green/20 rounded-full blur-xl" />
+      
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
+          {/* Left: Content */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-center lg:text-left"
+            transition={{ duration: 0.8 }}
+            className="max-w-2xl px-2"
           >
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-lime/15 rounded-squircle px-4 py-2 mb-6"
+              transition={{ delay: 0.2 }}
+              className="flex items-center gap-2 mb-8"
             >
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-primary">{banner?.badge_text || '100% Natural Sweeteners'}</span>
+              <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-primary font-black tracking-[0.2em] text-[10px] uppercase">
+                {banner?.badge_text || "100% Natural Sweeteners"}
+              </span>
             </motion.div>
-
-            <h1
-              id="hero-heading"
-              className="text-5xl md:text-6xl lg:text-7xl font-black text-foreground leading-[0.9] tracking-tight mb-6"
-              dangerouslySetInnerHTML={titleHtml}
+            
+            <h1 
+              className="text-6xl md:text-8xl lg:text-[100px] leading-[0.85] font-black uppercase tracking-tighter text-primary mb-10"
+              dangerouslySetInnerHTML={{ __html: titleText }}
             />
-
-            <p className="text-lg md:text-xl text-muted-foreground max-w-lg mx-auto lg:mx-0 mb-8">
+            
+            <p className="text-lg md:text-xl text-text-muted mb-12 leading-relaxed font-medium max-w-xl">
               {banner?.description || "Experience the pure taste of nature with Grevia's premium Stevia and Monkfruit sweeteners. Zero calories, zero guilt, endless flavor."}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to={banner?.primary_button_link || "/collections/all"}>
-                <Button variant="hero" size="xl">
+            <div className="flex flex-col sm:flex-row gap-5 items-center">
+              <Link to={banner?.primary_button_link || "/collection"}>
+                <Button className="bg-primary hover:bg-primary/95 text-white rounded-2xl px-10 py-8 text-lg font-black uppercase tracking-widest shadow-button transition-transform hover:scale-105 active:scale-95">
                   {banner?.primary_button_text || "Shop Collection"}
                 </Button>
               </Link>
               <Link to={banner?.secondary_button_link || "/benefits"}>
-                <Button variant="heroOutline" size="xl">
+                <Button variant="outline" className="border-border hover:bg-secondary text-primary rounded-2xl px-10 py-8 text-lg font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95">
                   {banner?.secondary_button_text || "Learn More"}
                 </Button>
               </Link>
             </div>
           </motion.div>
 
-          {/* Hero Image */}
+          {/* Right: Interactive Image & Badges */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative"
+            initial={{ opacity: 0, scale: 0.9, x: 50 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="flex justify-center relative px-4"
           >
-            <div className="relative aspect-square max-w-lg mx-auto">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-lime/20 rounded-squircle-xl blur-2xl transform scale-90" />
+            <div className="relative group">
+              {/* Product Background Blob */}
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  rotate: [0, 5, 0]
+                }}
+                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 bg-secondary rounded-[60px] -rotate-6 scale-95 group-hover:bg-mint transition-colors duration-700" 
+              />
+              
+              <img 
+                src={banner?.image_url || heroBg} 
+                alt="Grevia Premium Sweeteners" 
+                className="relative h-auto max-w-full lg:max-w-[500px] drop-shadow-2xl hover:scale-105 transition-transform duration-700 z-10" 
+              />
 
-              {/* Main image container */}
-              <div className="relative rounded-squircle-xl overflow-hidden shadow-card">
-                <img
-                  src={banner?.image_url || heroBg}
-                  alt="Grevia premium stevia and monkfruit organic sweetener products"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Dynamic Floating badges */}
-              {banner?.features && banner.features.length > 0 ? (
-                banner.features.map((feature, index) => {
-                  // Determine position classes based on index to replicate original layout
-                  let posClass = "";
-                  if (index === 0) posClass = "top-4 -left-4 lg:-left-8 animate-float";
-                  else if (index === 1) posClass = "bottom-20 -right-4 lg:-right-8 animate-float animation-delay-2000";
-                  else if (index === 2) posClass = "-bottom-4 left-8 animate-float animation-delay-4000";
-
-                  return (
-                    <FloatingBadge
-                      key={index}
-                      icon={getIcon(feature.icon)}
-                      text={feature.text}
-                      delay={0.8 + (index * 0.2)}
-                      className={posClass}
-                    />
-                  );
-                })
-              ) : (
-                <>
-                  <FloatingBadge
-                    icon={Award}
-                    text="Zero Glycemic"
-                    delay={0.8}
-                    className="top-4 -left-4 lg:-left-8 animate-float"
-                  />
-                  <FloatingBadge
-                    icon={Heart}
-                    text="Keto Friendly"
-                    delay={1}
-                    className="bottom-20 -right-4 lg:-right-8 animate-float animation-delay-2000"
-                  />
-                  <FloatingBadge
-                    icon={Sparkles}
-                    text="100% Pure"
-                    delay={1.2}
-                    className="-bottom-4 left-8 animate-float animation-delay-4000"
-                  />
-                </>
-              )}
+              {/* Floating feature badges - Exactly as reference */}
+              <FloatingBadge 
+                icon={Award} 
+                text="Zero Glycemic" 
+                delay={0.6} 
+                className="-top-8 -left-12 hidden sm:flex" 
+              />
+              <FloatingBadge 
+                icon={Heart} 
+                text="Keto Friendly" 
+                delay={0.8} 
+                className="top-1/2 -right-16 translate-y-12 hidden sm:flex" 
+              />
+              <FloatingBadge 
+                icon={Sparkles} 
+                text="100% Pure" 
+                delay={1.0} 
+                className="-bottom-10 left-12 hidden sm:flex" 
+              />
             </div>
           </motion.div>
         </div>

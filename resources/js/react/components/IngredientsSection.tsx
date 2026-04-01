@@ -38,12 +38,9 @@ const IngredientsSection = () => {
   return (
     <section
       id="ingredients"
-      className="py-24 md:py-32 bg-secondary/30 relative overflow-hidden"
+      className="py-24 md:py-40 bg-white relative overflow-hidden"
       aria-labelledby="ingredients-heading"
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-radial-grid opacity-30" />
-
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Section Header */}
         <motion.div
@@ -51,84 +48,88 @@ const IngredientsSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
+          className="text-center max-w-3xl mx-auto mb-20 md:mb-28"
         >
-          <span className="inline-block text-sm font-bold text-lime uppercase tracking-widest mb-4">
+          <motion.span 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            className="inline-block text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 bg-secondary px-4 py-2 rounded-full"
+          >
             Ingredient Spotlight
-          </span>
+          </motion.span>
           <h2
             id="ingredients-heading"
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-tight mb-6"
+            className="text-5xl md:text-6xl lg:text-8xl font-black text-primary leading-[1] mb-8 tracking-tighter"
           >
             Nature's Finest
             <br />
-            <span className="text-primary">Sweeteners</span>
+            <span className="text-accent-green">Sweeteners</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-xl text-text-muted max-w-2xl mx-auto font-medium leading-relaxed">
             Discover the powerful plants behind our pure, natural sweetness.
           </p>
         </motion.div>
 
         {/* Ingredients Comparison */}
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
           {ingredients.map((ingredient, index) => (
             <motion.article
               key={ingredient.name}
-              initial={{ opacity: 0, x: index === 0 ? -50 : 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="group bg-card rounded-squircle-xl overflow-hidden shadow-card border border-border/50"
+              transition={{ duration: 0.8, delay: index * 0.2 }}
+              className="group bg-page rounded-[40px] overflow-hidden border border-border/40 hover:border-accent-green/20 transition-all duration-700"
             >
-              {/* Image */}
-              <div className="relative h-64 md:h-80 overflow-hidden">
+              {/* Image Banner */}
+              <div className="relative h-[250px] md:h-[350px] overflow-hidden">
                 <img
                   src={ingredient.image}
                   alt={`Fresh ${ingredient.name} plant`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6">
-                  <h3 className="text-3xl md:text-4xl font-black text-foreground">
+                <div className="absolute inset-0 bg-gradient-to-t from-page/80 via-transparent to-transparent" />
+                <div className="absolute bottom-8 left-8">
+                  <h3 className="text-4xl md:text-5xl font-black text-primary tracking-tighter uppercase">
                     {ingredient.name}
                   </h3>
                 </div>
               </div>
 
-              {/* Content */}
-              <div className="p-6 md:p-8">
-                <p className="text-muted-foreground mb-6 leading-relaxed">
+              {/* Content Area */}
+              <div className="p-8 md:p-12">
+                <p className="text-lg text-text-muted mb-10 leading-relaxed font-medium">
                   {ingredient.description}
                 </p>
 
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-secondary/50 rounded-squircle p-4">
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 gap-5 mb-10">
+                  <div className="bg-white rounded-2xl p-6 shadow-soft border border-border/30">
+                    <span className="text-[10px] font-black text-text-muted uppercase tracking-widest block mb-2">
                       Sweetness
                     </span>
-                    <p className="text-sm font-bold text-foreground mt-1">
+                    <p className="text-base font-black text-primary">
                       {ingredient.sweetness}
                     </p>
                   </div>
-                  <div className="bg-secondary/50 rounded-squircle p-4">
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  <div className="bg-white rounded-2xl p-6 shadow-soft border border-border/30">
+                    <span className="text-[10px] font-black text-text-muted uppercase tracking-widest block mb-2">
                       Origin
                     </span>
-                    <p className="text-sm font-bold text-foreground mt-1">
+                    <p className="text-base font-black text-primary">
                       {ingredient.origin}
                     </p>
                   </div>
                 </div>
 
-                {/* Benefits */}
-                <ul className="space-y-3">
+                {/* Feature List */}
+                <ul className="grid sm:grid-cols-2 gap-y-4 gap-x-8">
                   {ingredient.benefits.map((benefit) => (
                     <li key={benefit} className="flex items-center gap-3">
-                      <div className="w-5 h-5 bg-lime/20 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Check className="w-3 h-3 text-primary" />
+                      <div className="w-6 h-6 bg-accent-green/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3.5 h-3.5 text-accent-green" />
                       </div>
-                      <span className="text-sm font-medium text-foreground">
+                      <span className="text-sm font-bold text-primary tracking-tight">
                         {benefit}
                       </span>
                     </li>
@@ -139,18 +140,18 @@ const IngredientsSection = () => {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* Global CTA */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-12"
+          className="text-center mt-20"
         >
           <Link to="/benefits">
-            <Button variant="outline" size="lg" className="group">
+            <Button variant="outline" className="border-primary/20 text-primary rounded-2xl px-12 py-8 text-lg font-black uppercase tracking-widest hover:bg-secondary transition-all active:scale-95 group">
               Learn More About Our Sourcing
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
             </Button>
           </Link>
         </motion.div>

@@ -70,37 +70,37 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-foreground text-primary-foreground py-16 md:py-20" role="contentinfo">
+    <footer className="bg-primary text-white py-16 md:py-24 border-t border-primary/10" role="contentinfo">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-16 mb-16">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="/" className="flex items-center gap-2 mb-6">
+            <Link to="/" className="flex items-center gap-2 mb-8">
               <img
                 src={greviaLogo}
                 alt="Grevia - Healthy Natural Foods"
-                className="h-12 w-auto brightness-0 invert"
+                className="h-10 w-auto brightness-0 invert opacity-90"
               />
-            </a>
-            <div className="text-primary-foreground/70 max-w-sm mb-6 leading-relaxed space-y-4">
+            </Link>
+            <div className="text-secondary-foreground/60 max-w-sm mb-8 leading-relaxed space-y-4 font-medium italic">
               {textSections.length > 0 ? (
                 textSections.map((section, idx) => (
                   <div key={idx}>
-                    {section.content?.text ? <div dangerouslySetInnerHTML={{ __html: section.content.text }} /> : null}
+                    {section.content?.text ? <div dangerouslySetInnerHTML={{ __html: section.content.text }} className="opacity-80" /> : null}
                   </div>
                 ))
               ) : (
-                <div dangerouslySetInnerHTML={{ __html: defaultAbout.content.text }} />
+                <div dangerouslySetInnerHTML={{ __html: defaultAbout.content.text }} className="opacity-80" />
               )}
             </div>
             {/* Newsletter */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 max-w-md">
               <div className="flex-1 relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full h-12 bg-primary-foreground/10 rounded-squircle pl-12 pr-4 text-primary-foreground placeholder:text-primary-foreground/50 border border-primary-foreground/20 focus:border-lime focus:outline-none transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-accent-green/20 transition-all outline-none text-white"
                   aria-label="Email address for newsletter"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -110,10 +110,10 @@ const Footer = () => {
               <button
                 onClick={handleSubscribe}
                 disabled={loading || !email}
-                className="h-12 px-6 bg-lime text-foreground font-bold rounded-squircle hover:bg-lime-glow transition-colors disabled:opacity-50"
+                className="px-6 bg-accent-green text-white font-black uppercase tracking-widest text-[10px] rounded-xl hover:bg-accent-green/90 transition-all active:scale-95 disabled:opacity-50"
                 aria-label="Subscribe to newsletter"
               >
-                {loading ? '...' : 'Subscribe'}
+                {loading ? '...' : 'Join'}
               </button>
             </div>
           </div>

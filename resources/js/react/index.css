@@ -6,98 +6,92 @@
 
 @layer base {
   :root {
-    /* Nature-Luxe Palette */
-    --background: 100 50% 98%;
-    --foreground: 145 55% 15%;
+    /* Natural Premium Palette - Inspired by Lovable/Wellness Aesthetics */
+    --background: 84 25% 96%;   /* #f4f7f1 (Creamy Mint White) */
+    --foreground: 162 84% 17%;  /* #064e3b (Deep Forest Green) */
 
-    --card: 100 50% 99%;
-    --card-foreground: 145 55% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 162 84% 17%;
 
-    --popover: 100 50% 99%;
-    --popover-foreground: 145 55% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 162 84% 17%;
 
-    /* Deep Forest Green */
-    --primary: 145 55% 24%;
-    --primary-foreground: 60 33% 97%;
+    /* Forest Green Primary - #064e3b */
+    --primary: 162 84% 17%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Soft Cream accent */
-    --secondary: 80 33% 95%;
-    --secondary-foreground: 145 55% 20%;
+    /* Vibrant Highlight Green - #22c55e */
+    --accent-green: 142 71% 45%; 
+    --accent-green-foreground: 0 0% 100%;
 
-    --muted: 80 20% 92%;
-    --muted-foreground: 145 20% 40%;
+    /* Secondary Mint BG - #dcfce7 */
+    --secondary: 142 70% 92%;
+    --secondary-foreground: 162 84% 25%;
 
-    /* Vibrant Lime */
-    --accent: 100 55% 55%;
-    --accent-foreground: 145 55% 15%;
+    --muted: 162 20% 94%;
+    --muted-foreground: 162 30% 35%;
+
+    --accent: 142 70% 96%;
+    --accent-foreground: 162 84% 17%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 60 33% 97%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 100 20% 88%;
-    --input: 100 20% 88%;
-    --ring: 145 55% 24%;
+    --border: 162 20% 90%;
+    --input: 162 20% 90%;
+    --ring: 162 84% 17%;
 
-    --radius: 1.5rem;
+    --radius: 2rem; /* More rounded premium feel */
 
-    /* Custom Nature Colors */
-    --forest: 145 55% 24%;
-    --forest-light: 145 45% 35%;
-    --lime: 100 55% 55%;
-    --lime-glow: 100 60% 65%;
-    --cream: 60 33% 97%;
-    --cream-dark: 60 20% 94%;
-
-    /* Gradients */
-    --gradient-forest: linear-gradient(135deg, hsl(145 55% 24%), hsl(145 45% 30%));
-    --gradient-lime: linear-gradient(135deg, hsl(100 55% 55%), hsl(100 60% 65%));
-    --gradient-hero: radial-gradient(ellipse at 50% 0%, hsl(100 40% 95%) 0%, hsl(60 33% 97%) 70%);
-
-    /* Master Prompt Custom Theme Variables */
-    --bg-page:        #0d1f0e;
-    --bg-card:        #1a2e1b;
-    --bg-card-hover:  #1f3620;
-    --bg-image-stevia: #eaf3de;
-    --bg-image-monk:   #faeeda;
-
-    --text-primary:   #f0f4ee;
-    --text-secondary: #9db89e;
-    --text-muted:     #5a7a5b;
-    --text-green:     #97c459;
-
-    --accent-green:   #2d7a3a;
-    --accent-dark:    #173404;
-    --accent-light:   #eaf3de;
-    --accent-amber:   #ba7517;
-
-    --border-card:    rgba(45, 122, 58, 0.25);
-    --border-active:  #2d7a3a;
-
-    --pill-inactive-bg:     #132113;
-    --pill-inactive-border: rgba(45,122,58,0.3);
-    --pill-active-bg:       #1f4a22;
-    --pill-active-border:   #2d7a3a;
+    /* Custom Nature Tokens */
+    --bg-page:        #f4f7f1; /* Off-white / Creamy Mint */
+    --bg-card:        #ffffff;
+    --bg-mint:        #dcfce7;
+    --bg-mint-soft:   #eafaf1;
     
-    --radius-card: 16px;
-    --radius-pill: 8px;
-    --radius-btn:  12px;
+    --text-primary:   #064e3b; /* Deep Forest */
+    --text-highlight: #16a34a; /* Vibrant Action Green */
+    --text-muted:     #4b6358;
+    
+    --accent-dark:    #022c22;
+    --accent-bright:  #22c55e;
+    
+    --radius-card: 32px;
+    --radius-pill: 9999px;
+    --radius-icon: 24px;
 
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(145 30% 20% / 0.12);
-    --shadow-card: 0 8px 30px -8px hsl(145 30% 20% / 0.15);
-    --shadow-glow: 0 0 40px hsl(100 55% 55% / 0.3);
-    --shadow-button: 0 4px 14px -2px hsl(145 55% 24% / 0.4);
+    /* Shadows - Ultra Soft & Advanced */
+    --shadow-soft: 0 4px 20px -2px rgba(6, 78, 59, 0.04);
+    --shadow-card: 0 20px 40px -12px rgba(6, 78, 59, 0.08);
+    --shadow-glow: 0 0 40px rgba(22, 197, 94, 0.1);
+    --shadow-button: 0 10px 20px -5px rgba(6, 78, 59, 0.2);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-background: 84 25% 98%;
+    --sidebar-foreground: 162 84% 17%;
+    --sidebar-primary: 162 84% 17%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 142 70% 96%;
+    --sidebar-accent-foreground: 162 84% 17%;
+    --sidebar-border: 162 20% 90%;
+    --sidebar-ring: 162 84% 17%;
   }
 
+  .dark {
+    /* No dark mode for this brand identity as requested */
+  }
+}
+
+@layer utilities {
+  .heading-chunky {
+    @apply font-[Montserrat] font-black uppercase tracking-tighter leading-[0.9] text-primary;
+  }
+  .card-natural {
+    @apply bg-white rounded-[32px] shadow-card border border-border/50 hover:border-primary/20 transition-all duration-500;
+  }
+  .icon-circle {
+    @apply w-12 h-12 rounded-2xl flex items-center justify-center bg-secondary text-primary shadow-soft;
+  }
+}
   .dark {
     --background: 145 30% 8%;
     --foreground: 60 33% 97%;

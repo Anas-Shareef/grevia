@@ -1,17 +1,18 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const ConversionBanner = () => {
   return (
     <section
-      className="py-20 md:py-28 relative overflow-hidden bg-primary"
+      className="py-24 md:py-32 relative overflow-hidden bg-white"
       aria-labelledby="cta-heading"
     >
       {/* Background elements */}
-      <div className="absolute inset-0 bg-radial-grid opacity-10" />
-      <div className="absolute top-0 right-0 w-96 h-96 bg-lime/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-lime/15 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-page opacity-50" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[80px]" />
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <motion.div
@@ -27,38 +28,38 @@ const ConversionBanner = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-lime/20 rounded-squircle px-4 py-2 mb-8"
+            className="inline-flex items-center gap-3 bg-secondary rounded-full px-6 py-3 mb-10 shadow-soft"
           >
-            <Sparkles className="w-4 h-4 text-lime" />
-            <span className="text-sm font-semibold text-lime">Limited Time Offer</span>
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Our Sweet Switch</span>
           </motion.div>
 
           <h2
             id="cta-heading"
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-primary-foreground leading-tight mb-6"
+            className="text-5xl md:text-6xl lg:text-8xl font-black text-primary leading-[0.95] mb-10 tracking-tighter"
           >
             Ready to Make
             <br />
-            the Sweet Switch?
+            the <span className="text-accent-bright">Sweet Switch?</span>
           </h2>
           
-          <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-10">
-            Join thousands who've already discovered the pure taste of natural sweetness. 
-            Get 20% off your first order with code <span className="font-bold text-lime">PURESWEET20</span>
+          <p className="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto mb-16 leading-relaxed font-medium">
+            Join 50k+ health-conscious people who've already discovered the pure taste of natural sweetness. 
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="limeLg" size="xl" className="group">
-              Shop Now & Save 20%
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Button className="bg-primary hover:bg-primary/95 text-white rounded-2xl px-12 py-10 text-xl font-black uppercase tracking-widest shadow-button transition-transform hover:scale-105 active:scale-95 group">
+              Shop Now & Save
+              <ArrowRight className="w-7 h-7 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button
-              variant="ghost"
-              size="xl"
-              className="text-primary-foreground border-2 border-primary-foreground/30 hover:bg-primary-foreground/10 hover:border-primary-foreground/50"
-            >
-              Learn More
-            </Button>
+            <Link to="/benefits">
+              <Button
+                variant="outline"
+                className="border-primary/20 border-2 bg-white hover:bg-secondary text-primary rounded-2xl px-12 py-10 text-xl font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95"
+              >
+                Learn More
+              </Button>
+            </Link>
           </div>
 
           {/* Trust badges */}
@@ -67,19 +68,19 @@ const ConversionBanner = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="flex flex-wrap justify-center gap-8 mt-12 pt-8 border-t border-primary-foreground/20"
+            className="flex flex-wrap justify-center gap-16 mt-20 pt-16 border-t border-primary/5"
           >
             <div className="text-center">
-              <div className="text-3xl font-black text-lime">50K+</div>
-              <div className="text-sm text-primary-foreground/70">Happy Customers</div>
+              <div className="text-5xl font-black text-primary tracking-tighter">50K+</div>
+              <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mt-3">Happy Customers</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-black text-lime">4.9★</div>
-              <div className="text-sm text-primary-foreground/70">Average Rating</div>
+              <div className="text-5xl font-black text-primary tracking-tighter">4.9★</div>
+              <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mt-3">Average Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-black text-lime">100%</div>
-              <div className="text-sm text-primary-foreground/70">Natural Ingredients</div>
+              <div className="text-5xl font-black text-primary tracking-tighter">100%</div>
+              <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mt-3">Pure Organic</div>
             </div>
           </motion.div>
         </motion.div>

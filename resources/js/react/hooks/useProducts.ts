@@ -35,7 +35,7 @@ const transformProduct = (data: any): Product => {
         originalPrice: data.original_price ? Number(data.original_price) : undefined,
         rating: Number(data.rating),
         reviews: data.reviews_count || 0,
-        image: getImageUrl(data.image) || (Array.isArray(data.gallery) && data.gallery.length > 0 ? getImageUrl(data.gallery[0].url || data.gallery[0].image_path) : ''),
+        image: getImageUrl(data.image_url || data.image) || (Array.isArray(data.gallery) && data.gallery.length > 0 ? getImageUrl(data.gallery[0].url || data.gallery[0].image_path) : ''),
         images: Array.isArray(data.images) ? data.images.map(getImageUrl) : [],
         category: data.category?.slug || 'sweeteners',
         subcategory: data.subcategory,
