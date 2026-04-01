@@ -176,6 +176,36 @@ class ProductForm
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
                             ->collapsible(),
                     ]),
+                Section::make('Sweetener Specific Attributes')
+                    ->description('Data specific to sweetener products like ratio, form, and use cases.')
+                    ->components([
+                        TextInput::make('type')
+                            ->label('Type')
+                            ->placeholder('e.g. stevia, monk-fruit'),
+                        TextInput::make('form')
+                            ->label('Form')
+                            ->placeholder('e.g. powder, drops'),
+                        TextInput::make('ratio')
+                            ->label('Ratio')
+                            ->placeholder('e.g. 1:10, 1:50'),
+                        TextInput::make('size_label')
+                            ->label('Size Label')
+                            ->placeholder('e.g. 50g, 100g'),
+                        TextInput::make('sweetness_description')
+                            ->label('Sweetness Description')
+                            ->placeholder('e.g. 1g replaces 10g of sugar')
+                            ->columnSpanFull(),
+                        TextInput::make('use_case')
+                            ->label('Ideal Use Case')
+                            ->placeholder('e.g. tea, coffee, smoothies')
+                            ->columnSpanFull(),
+                        TextInput::make('related_products')
+                            ->label('Related Products (You may also like)')
+                            ->placeholder('Comma-separated slugs, e.g. stevia-powder-1-10-100g,stevia-drops-1-10-50g')
+                            ->helperText('Exact slugs of the products to show in the "You may also like" row.')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
                 Section::make('Additional Data')
                     ->components([
                         TagsInput::make('ingredients')

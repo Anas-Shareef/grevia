@@ -59,6 +59,8 @@ export interface Product {
   type?: string;
   size_label?: string;
   use_case?: string;
+  sweetness_description?: string;
+  related_products?: string;
 }
 
 export const products: Product[] = [

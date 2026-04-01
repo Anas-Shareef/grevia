@@ -82,6 +82,8 @@ const transformProduct = (data: any): Product => {
         type: data.type,
         size_label: data.size_label,
         use_case: data.use_case,
+        sweetness_description: data.sweetness_description,
+        related_products: data.related_products,
     };
 };
 

@@ -33,6 +33,7 @@ class Product extends Model
         'size_label',
         'sweetness_description',
         'use_case',
+        'related_products',
     ];
 
     protected $casts = [
