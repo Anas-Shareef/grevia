@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api, STORAGE_URL } from "@/lib/api";
 import { Product } from "@/data/products";
+import { FilterState } from "./useProductFilters";
 
 // Helper to handle various image path formats
 const getImageUrl = (path: string | null | undefined) => {
@@ -89,8 +90,6 @@ const transformProduct = (data: any): Product => {
         related_products: data.related_products,
     };
 };
-
-import { FilterState } from "./useProductFilters";
 
 export const useProducts = (filters?: Partial<FilterState>) => {
     return useQuery({

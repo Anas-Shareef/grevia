@@ -16,9 +16,6 @@ import ContactPage from "./pages/ContactPage";
 import WishlistPage from "./pages/WishlistPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CartDrawer from "./components/CartDrawer";
-
-const queryClient = new QueryClient();
-
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoginPage from "@/pages/LoginPage";
@@ -30,6 +27,8 @@ import DashboardOrderDetail from "@/pages/dashboard/OrderDetailPage";
 import DashboardAddresses from "@/pages/dashboard/AddressesPage";
 import DashboardReviews from "@/pages/dashboard/ReviewsPage";
 import NewsletterPopup from "@/components/NewsletterPopup";
+
+const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
