@@ -3,59 +3,67 @@ import {
   Zap, 
   Heart, 
   Leaf, 
-  Scale, 
+  Flame, 
   Droplets, 
-  Shield 
+  Smile 
 } from "lucide-react";
 
-const benefits = [
+interface Benefit {
+  icon: any;
+  title: string;
+  desc: string;
+}
+
+const benefits: Benefit[] = [
   {
     icon: Zap,
     title: "Zero Glycemic",
-    description: "No impact on blood sugar levels, making it perfect for diabetics and health-conscious individuals.",
+    desc: "No impact on blood sugar levels, making it perfect for diabetics and health-conscious individuals.",
   },
   {
     icon: Heart,
     title: "Keto-Friendly",
-    description: "Maintain ketosis without sacrificing sweetness. Zero carbs, zero compromise.",
+    desc: "Maintain ketosis without sacrificing sweetness. Zero carbs, zero compromise.",
   },
   {
     icon: Leaf,
     title: "Pure Extraction",
-    description: "Carefully extracted from nature's finest plants using clean, sustainable methods.",
+    desc: "Carefully extracted from nature's finest plants using clean, sustainable methods.",
   },
   {
-    icon: Scale,
+    icon: Flame,
     title: "Zero Calories",
-    description: "Enjoy guilt-free sweetness without adding to your daily calorie count.",
+    desc: "Enjoy guilt-free sweetness without adding to your daily calorie count.",
   },
   {
     icon: Droplets,
     title: "No Aftertaste",
-    description: "Clean, pure sweetness that tastes just like sugar without the bitter aftertaste.",
+    desc: "Clean, pure sweetness that tastes just like sugar without the bitter aftertaste.",
   },
   {
-    icon: Shield,
+    icon: Smile,
     title: "Dentist Approved",
-    description: "Doesn't contribute to tooth decay or cavities. Your smile stays perfect.",
+    desc: "Doesn't contribute to tooth decay or cavities. Your smile stays perfect.",
   },
 ];
 
 const BenefitsSection = () => {
   return (
-    <section id="benefits" className="benefits-section">
+    <section id="benefits" className="py-24 md:py-32 bg-[var(--bg-card)]">
       <div className="container">
-        {/* Section Header (Step 9) */}
-        <div className="section-header">
-          <span className="section-eyebrow">The Sweet Truth</span>
-          <h2 className="section-title">Designed for Your <br /> Well-being</h2>
-          <p className="section-subtitle">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-20">
+          <span className="text-[var(--green-primary)] font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">The Sweet Truth</span>
+          <h2 className="text-4xl md:text-6xl font-[900] tracking-tighter leading-[1.1] mb-6">
+            The Sweet Truth <br /> About Health
+          </h2>
+          <p className="text-[var(--text-muted)] text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
             Our natural sweeteners deliver pure, clean sweetness backed by science and nature.
           </p>
         </div>
 
-        {/* Benefits Grid (Step 11) */}
-        <div className="benefits-grid">
+        {/* Benefits Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {benefits.map((benefit, index) => (
             <motion.div
               key={benefit.title}
@@ -63,13 +71,13 @@ const BenefitsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="benefit-card"
+              className="group bg-white rounded-[var(--radius-squircle)] p-10 border border-[var(--border-light)] transition-all hover:shadow-[var(--shadow-card)] hover:-translate-y-2"
             >
-              <div className="benefit-icon">
-                <benefit.icon className="w-6 h-6 text-[var(--green-primary)]" />
+              <div className="w-16 h-16 rounded-2xl bg-[var(--green-pale)] flex items-center justify-center text-[var(--green-primary)] mb-8 transition-transform group-hover:scale-110">
+                <benefit.icon className="w-7 h-7" />
               </div>
-              <h3 className="benefit-title">{benefit.title}</h3>
-              <p className="benefit-desc">{benefit.description}</p>
+              <h3 className="text-xl font-black uppercase tracking-tight mb-4">{benefit.title}</h3>
+              <p className="text-[var(--text-muted)] text-sm font-medium leading-relaxed">{benefit.desc}</p>
             </motion.div>
           ))}
         </div>

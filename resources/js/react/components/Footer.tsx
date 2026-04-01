@@ -1,117 +1,92 @@
-import { Instagram, Twitter, Facebook, Mail } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { api } from "@/lib/api";
-import { toast } from "sonner";
+import { Instagram, Twitter, Facebook, Mail, ArrowUpRight } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const { data: footerData } = useQuery<any[]>({
-    queryKey: ['footer-content'],
-    queryFn: () => api.get('/content/footer'),
-  });
-
-  const handleSubscribe = async () => {
-    if (!email) return;
-    setLoading(true);
-    try {
-      await api.subscribe({ email, source: 'footer' });
-      toast.success("Success! You've been subscribed to our newsletter.");
-      setEmail("");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to subscribe.");
-    } finally {
-      setLoading(false);
-    }
+  const footerLinks = {
+    Shop: [
+      { label: "All Products", href: "/collections/all" },
+      { label: "Pure Stevia", href: "/collections/stevia" },
+      { label: "Monk Fruit", href: "/collections/monk-fruit" },
+      { label: "New Arrivals", href: "/collections/new" },
+    ],
+    Company: [
+      { label: "Our Story", href: "/about" },
+      { label: "Benefits", href: "/benefits" },
+      { label: "Sustainability", href: "/sustainability" },
+      { label: "Contact", href: "/contact" },
+    ],
+    Support: [
+      { label: "Track Order", href: "/dashboard/orders" },
+      { label: "Shipping Policy", href: "/shipping" },
+      { label: "Returns", href: "/returns" },
+      { label: "Privacy Policy", href: "/privacy" },
+    ],
   };
 
-  const linksSections = footerData?.filter(s => s.type === 'links') || [];
-  
   return (
-    <footer className="footer">
-      <div className="footer-inner container">
-        <div className="footer-top">
+    <footer className="bg-[var(--green-primary)] text-white pt-24 pb-12 overflow-hidden relative">
+      <div className="container relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+          
           {/* Brand Col */}
-          <div>
-            <Link to="/" className="footer-logo inline-block">
-              GREVIA<span className="accent">.</span>
+          <div className="flex flex-col gap-8">
+            <Link to="/" className="text-4xl font-[900] tracking-tighter text-white flex items-center gap-0.5">
+              GREVIA<span className="text-[var(--green-accent)]">.</span>
             </Link>
-            <p className="footer-desc">
-              Experience the pure taste of nature with our premium organic sweeteners. Join our journey towards a healthier, sweeter life without compromise.
+            <p className="text-white/60 text-base font-medium leading-relaxed max-w-xs">
+              Building a healthier, sweeter world one leaf at a time. Join our mission to enjoy nature's sweetness without sacrifice.
             </p>
-            {/* Newsletter Minimal */}
-            <div className="flex gap-2 max-w-sm">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 bg-white/5 border border-white/10 rounded-[var(--radius-sm)] px-4 py-2 text-sm text-white outline-none focus:border-[#4ade80]/50 transition-colors"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <button
-                onClick={handleSubscribe}
-                disabled={loading || !email}
-                className="px-4 py-2 bg-[#4ade80] text-[#111827] font-bold text-xs rounded-[var(--radius-sm)] hover:bg-[#4ade80]/90 transition-all"
-              >
-                Join
-              </button>
+            <div className="flex gap-4">
+              {[Instagram, Twitter, Facebook].map((Icon, i) => (
+                <a 
+                  key={i} 
+                  href="#" 
+                  className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/60 hover:bg-[var(--green-accent)] hover:text-[var(--green-primary)] hover:-translate-y-1 transition-all duration-300"
+                >
+                  <Icon className="w-5 h-5" />
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Dynamic Links from Backend */}
-          {linksSections.map((section, idx) => (
-            <div key={idx}>
-              <h3 className="footer-col-title">{section.section_name}</h3>
-              {(section.content?.links || []).map((link: any, i: number) => (
-                <Link key={i} to={link.url} className="footer-link">
-                  {link.label}
-                </Link>
-              ))}
+          {/* Link Cols */}
+          {Object.entries(footerLinks).map(([title, links]) => (
+            <div key={title} className="flex flex-col gap-8">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{title}</h3>
+              <ul className="flex flex-col gap-4">
+                {links.map((link) => (
+                  <li key={link.label}>
+                    <Link 
+                      to={link.href} 
+                      className="text-sm font-bold text-white/70 hover:text-white flex items-center gap-2 group"
+                    >
+                      {link.label}
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
-
-          {/* Fallback Static Col if backend empty */}
-          {linksSections.length === 0 && (
-            <>
-              <div>
-                <h3 className="footer-col-title">Shop</h3>
-                <Link to="/collections/all" className="footer-link">All Products</Link>
-                <Link to="/collections/stevia" className="footer-link">Stevia Range</Link>
-                <Link to="/collections/monk-fruit" className="footer-link">Monk Fruit</Link>
-              </div>
-              <div>
-                <h3 className="footer-col-title">Company</h3>
-                <Link to="/benefits" className="footer-link">Our Benefits</Link>
-                <Link to="/contact" className="footer-link">Contact Us</Link>
-                <Link to="/privacy" className="footer-link">Privacy Policy</Link>
-              </div>
-              <div>
-                <h3 className="footer-col-title">Social</h3>
-                <a href="#" className="footer-link">Instagram</a>
-                <a href="#" className="footer-link">Twitter</a>
-                <a href="#" className="footer-link">Facebook</a>
-              </div>
-            </>
-          )}
         </div>
 
-        <hr className="footer-divider" />
-
-        <div className="footer-bottom">
-          <p className="footer-copy">
-            © {currentYear} Grevia. Designed with love for a healthier world.
+        {/* Bottom Bar */}
+        <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+            © {currentYear} Grevia. All Rights Reserved.
           </p>
-          <div className="flex gap-4">
-            <Instagram className="w-5 h-5 text-[#9ca3af] hover:text-[#4ade80] cursor-pointer transition-colors" />
-            <Twitter className="w-5 h-5 text-[#9ca3af] hover:text-[#4ade80] cursor-pointer transition-colors" />
-            <Facebook className="w-5 h-5 text-[#9ca3af] hover:text-[#4ade80] cursor-pointer transition-colors" />
+          <div className="flex gap-10">
+            <Link to="/terms" className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-white transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-white transition-colors">Privacy Policy</Link>
           </div>
         </div>
       </div>
+
+      {/* Background Decorative Element */}
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-white/5 blur-[150px] -translate-y-1/4 translate-x-1/4 rounded-full" />
     </footer>
   );
 };

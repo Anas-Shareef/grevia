@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, Quote } from "lucide-react";
 
 const staticReviews = [
   {
@@ -27,19 +27,21 @@ const staticReviews = [
 
 const ReviewsSection = () => {
   return (
-    <section className="reviews-section">
-      <div className="container">
+    <section className="py-24 md:py-32 bg-white relative overflow-hidden">
+      <div className="container relative z-10">
         {/* Section Header */}
-        <div className="section-header">
-          <span className="section-eyebrow">Wall of Love</span>
-          <h2 className="section-title">Trusted by Thousands <br /> of Happy Souls</h2>
-          <p className="section-subtitle">
-            Don't just take our word for it. Here's what our community has to say about their journey to natural sweetness.
+        <div className="text-center max-w-3xl mx-auto mb-20">
+          <span className="text-[var(--green-primary)] font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Testimonials</span>
+          <h2 className="text-4xl md:text-6xl font-[900] tracking-tighter leading-[1.1] mb-6">
+            Wall of Love
+          </h2>
+          <p className="text-[var(--text-muted)] text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
+            Trusted by thousands of happy souls who've made the switch to natural sweetness.
           </p>
         </div>
 
-        {/* Step 14: Reviews Grid */}
-        <div className="reviews-grid">
+        {/* Reviews Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {staticReviews.map((review, i) => (
             <motion.div
               key={i}
@@ -47,27 +49,37 @@ const ReviewsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="review-card"
+              className="bg-[var(--bg-page)] rounded-[var(--radius-squircle)] p-10 border border-[var(--border-light)] relative group hover:shadow-[var(--shadow-card)] transition-all duration-500"
             >
-              <div className="review-stars flex gap-1 mb-4">
+              <Quote className="absolute top-8 right-8 w-12 h-12 text-[var(--green-primary)]/5 group-hover:scale-110 transition-transform" />
+              
+              <div className="flex gap-1 mb-6">
                 {[...Array(review.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current text-[var(--green-primary)]" />
+                  <Star key={i} className="w-4 h-4 fill-[var(--green-accent)] text-[var(--green-accent)]" />
                 ))}
               </div>
-              <p className="review-text">"{review.text}"</p>
-              <div className="review-author">
-                <div className="review-avatar">
+              
+              <p className="text-[var(--text-body)] text-base font-medium leading-relaxed italic mb-8 relative z-10">
+                "{review.text}"
+              </p>
+              
+              <div className="flex items-center gap-4 border-t border-[var(--border-light)] pt-8">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--green-primary)] text-white flex items-center justify-center font-black text-lg shadow-lg">
                   {review.avatar}
                 </div>
                 <div>
-                  <div className="review-name">{review.name}</div>
-                  <div className="review-meta">{review.role}</div>
+                  <div className="text-sm font-[900] uppercase tracking-widest text-[var(--text-heading)]">{review.name}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mt-0.5">{review.role}</div>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
+
+      {/* Decorative Orbs */}
+      <div className="absolute top-1/4 left-10 w-96 h-96 bg-[var(--green-accent)]/5 blur-[120px] rounded-full" />
+      <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-[var(--green-primary)]/5 blur-[100px] rounded-full" />
     </section>
   );
 };

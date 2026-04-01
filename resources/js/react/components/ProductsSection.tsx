@@ -6,44 +6,41 @@ import { ProductCard } from "./ProductCard";
 const ProductsSection = () => {
   const { data: response } = useProducts({ category: 'sweeteners', featured: '1' });
   const allProducts = Array.isArray(response) ? response : response?.data || [];
-  const displayProducts = allProducts.slice(0, 8); // Showing up to 8 products in the primary grid
+  const displayProducts = allProducts.slice(0, 8);
 
   return (
-    <section id="products" className="products-section bg-[var(--bg-page)]">
-      <div className="container">
-        {/* Step 9: Section Header */}
-        <div className="section-header">
-          <span className="section-eyebrow">Curated for Wellness</span>
-          <h2 className="section-title">Natural <br /> Collection</h2>
-          <p className="section-subtitle">
-            Explore our range of premium, plant-based sweeteners designed for a balanced and healthy lifestyle. Experience pure sweetness today.
+    <section id="products" className="py-24 md:py-32 bg-[var(--bg-page)] relative overflow-hidden">
+      <div className="container relative z-10">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-20 animate-reveal">
+          <span className="text-[var(--green-primary)] font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Curated Collections</span>
+          <h2 className="text-4xl md:text-6xl font-[900] tracking-tighter leading-[1.1] mb-6">
+            Premium <br /> Collections
+          </h2>
+          <p className="text-[var(--text-muted)] text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
+            Discover our range of meticulously crafted natural sweeteners for a healthier, sweeter lifestyle.
           </p>
         </div>
 
-        {/* Step 10: Products Grid */}
-        <div className="products-grid">
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
           {displayProducts.map((product, i) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
         {/* View All CTA */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-20">
           <Link to="/collections/all">
-            <button className="btn-primary px-12 py-4">
+            <button className="btn-secondary px-12 py-5 text-[11px]">
               View All Products
             </button>
           </Link>
         </div>
       </div>
+
+      {/* Decorative background element */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--green-accent)]/5 blur-[120px] -z-10 rounded-full" />
     </section>
   );
 };
