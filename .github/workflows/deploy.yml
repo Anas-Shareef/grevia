@@ -1,0 +1,72 @@
+name: Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Adjust to your Hostinger server PHP version
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Step 1: Install frontend dependencies and build assets
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Frontend Assets
+        run: npm run build
+
+      # Step 2: Deploy to Hostinger via SSH
+      - name: Deploy to Hostinger
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          script: |
+             echo "Starting automated deployment..."
+             
+             # Navigate to the site's public_html directory
+             cd /home/u766289801/domains/grevia.in/public_html
+             
+             # Discard any local modifications on the server to ensure a clean pull
+             git reset --hard HEAD
+             
+             # Pull latest code from main
+             git pull origin main
+             
+             # Setup PHP dependencies (Optional: Uncomment if your github action doesn't sync vendor folder via rsync)
+             # composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+             
+             # Database Migrations (Safe force)
+             php artisan migrate --force
+             
+             # Clear and rebuild caches for performance
+             php artisan config:cache
+             php artisan route:cache
+             php artisan view:cache
+             php artisan event:cache
+             
+             # Restart queue workers if queue system is being used
+             # php artisan queue:restart
+             
+             echo "Automated Deployment Successful! 🎉"
