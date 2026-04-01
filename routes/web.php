@@ -2,10 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Serve React SPA for all non-API/Admin routes
-Route::get('/{any?}', function () {
-    return view('app');
-})->where('any', '^(?!api|admin|storage|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|fix-db).*$');
+// Redirect legacy URLs to the new React collections structure
+Route::redirect('/sweeteners', '/collections');
+Route::redirect('/products/sweeteners', '/collections');
 
 Route::get('/test-email', function () {
     try {
@@ -300,3 +299,8 @@ Route::get('/sync-moosend', function () {
 
     return response($html);
 });
+
+// Catch-all route for React SPA - moved to bottom to prevent route conflicts
+Route::get('/{any?}', function () {
+    return view('app');
+})->where('any', '^(?!api|admin|filament|storage|build|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|fix-db).*$');
