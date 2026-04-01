@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Redirect legacy URLs to the new React collections structure
-Route::redirect('/sweeteners', '/collections');
-Route::redirect('/products/sweeteners', '/collections');
+// Redirect legacy URLs to the new React collections structure with 301 Permanent Redirect
+Route::get('/sweeteners', function() { return redirect('/collections', 301); });
+Route::get('/products/sweeteners', function() { return redirect('/collections', 301); });
 
 Route::get('/test-email', function () {
     try {
@@ -303,4 +303,4 @@ Route::get('/sync-moosend', function () {
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '^(?!api|admin|filament|storage|build|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|fix-db).*$');
+})->where('any', '^(?!api|admin|filament|storage|build|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|fix-db|fix-server|\..*\.php$).*$');
