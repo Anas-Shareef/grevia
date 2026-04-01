@@ -126,7 +126,7 @@ const BeyondSweetenersSection = () => {
 
               {/* Content */}
               <div className="p-6">
-                <Link to={`/products/${product.id}`}>
+                <Link to={`/products/${product.slug || product.id}`}>
                   <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>

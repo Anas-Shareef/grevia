@@ -111,7 +111,7 @@ const ProductsSection = () => {
                 <div className="absolute top-4 right-4 z-10">
                   <WishlistButton product={product} size="sm" />
                 </div>
-                <Link to={`/products/${product.id}`}>
+                <Link to={`/products/${product.slug || product.id}`}>
                   <img
                     src={product.image}
                     alt={product.name}
@@ -135,7 +135,7 @@ const ProductsSection = () => {
               {/* Content */}
               <div className="p-6">
                 {/* Title & Description */}
-                <Link to={`/products/${product.id}`}>
+                <Link to={`/products/${product.slug || product.id}`}>
                   <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
