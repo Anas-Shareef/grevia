@@ -136,14 +136,24 @@ const ProductDetailPage = () => {
   const mainImageUrl = galleryImages[selectedThumb] || product.mainImage?.url || product.image;
 
   // Build breadcrumbs
-  const catName = typeof product.category === 'object'
-    ? product.category.name
-    : product.category || 'Natural Sweeteners';
+  const categoryData = product.category;
+  const catName = typeof categoryData === 'object' && categoryData !== null
+    ? categoryData.name
+    : typeof categoryData === 'string'
+    ? categoryData.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : 'Natural Sweeteners';
+    
+  const catSlug = typeof categoryData === 'object' && categoryData !== null
+    ? categoryData.slug
+    : typeof categoryData === 'string'
+    ? categoryData
+    : 'natural-sweeteners';
+
   const breadcrumbs = [
     { label: 'Home', href: '/' },
     { label: 'Natural Sweeteners', href: '/collections/all' },
     { label: isMonk ? 'Monk Fruit' : 'Stevia', href: `/collections/all?type=${product.type || 'stevia'}` },
-    { label: catName, href: `/collections/all?type=${product.type || 'stevia'}&form=${product.form || 'powder'}` },
+    { label: catName, href: `/collections/${catSlug}` },
     { label: product.name, href: '#' },
   ];
 

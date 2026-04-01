@@ -21,8 +21,11 @@ const getImageUrl = (path: string | null | undefined) => {
 
 // Helper to transform backend product to frontend product
 const transformProduct = (data: any): Product => {
+    if (!data) return {} as Product;
+    
     return {
-        id: data.slug || data.id,
+        id: String(data.slug || data.id),
+        slug: data.slug,
         dbId: data.id,
         name: data.name,
         description: data.description,
