@@ -66,6 +66,7 @@ const App = () => (
                 <Route path="/collections/all" element={<CollectionsPage />} />
                 <Route path="/collections/:category" element={<CollectionsPage />} />
                 <Route path="/collections/:category/:subcategory" element={<CollectionsPage />} />
+                <Route path="/products/sweeteners" element={<Navigate to="/collections" replace />} />
                 <Route path="/sweeteners" element={<Navigate to="/collections" replace />} />
                 <Route path="/products" element={<Navigate to="/collections" replace />} />
                 <Route path="/product/:id" element={<Navigate to="/products/:id" replace />} />

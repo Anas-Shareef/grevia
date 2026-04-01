@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 // Redirect legacy URLs to the new React collections structure with 301 Permanent Redirect
-Route::get('/sweeteners', function() { return redirect('/collections', 301); });
-Route::get('/products/sweeteners', function() { return redirect('/collections', 301); });
+Route::get('/sweeteners', function() { return redirect('/collections?' . request()->getQueryString(), 301); });
+Route::get('/products/sweeteners', function() { return redirect('/collections?' . request()->getQueryString(), 301); });
 
 Route::get('/test-email', function () {
     try {

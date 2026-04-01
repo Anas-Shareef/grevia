@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Deliver the public folder contents as the root
+    # e.g., grevia.in/build/assets -> public/build/assets 
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Handle the main index.php if not caught above
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
