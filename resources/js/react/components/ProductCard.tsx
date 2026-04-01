@@ -50,12 +50,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white rounded-[24px] border border-[var(--border-light)] p-5 transition-all duration-500 hover:shadow-[var(--shadow-card)] hover:-translate-y-2 group relative overflow-hidden"
+      className="bg-[var(--bg-card)] rounded-[32px] border border-[var(--border-light)] p-6 transition-all duration-500 hover:shadow-[var(--shadow-card)] hover:-translate-y-2 group relative overflow-hidden"
     >
       {/* Image Area */}
       <div className={`aspect-square rounded-[20px] mb-6 flex items-center justify-center p-8 transition-colors duration-500 relative ${bgClass}`}>
         {product.badge && (
-          <div className="absolute top-4 left-4 px-3 py-1 bg-[var(--green-primary)] text-white text-[9px] font-black uppercase tracking-wider rounded-full z-10">
+          <div className="absolute top-4 left-4 px-4 py-1.5 bg-[var(--green-accent)] text-[var(--green-primary)] text-[10px] font-black uppercase tracking-widest rounded-full z-10 shadow-sm">
             {product.badge}
           </div>
         )}

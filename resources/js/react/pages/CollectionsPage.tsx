@@ -142,7 +142,7 @@ const CollectionsPage = () => {
             </motion.div>
             <h1 className="text-5xl md:text-8xl font-[900] tracking-tighter leading-[0.9] text-[var(--green-primary)] mb-8">
               Sweetness <br />
-              <span className="text-[var(--text-body)] opacity-10">Without</span> <br />
+              <span className="text-outline">Without</span> <br />
               Sacrifice<span className="text-[var(--green-accent)]">.</span>
             </h1>
             <p className="text-[var(--text-muted)] text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-12">

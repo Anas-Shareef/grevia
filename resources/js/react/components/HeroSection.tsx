@@ -24,24 +24,15 @@ const HeroSection = () => {
               100% Natural Choice
             </div>
             
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-[900] tracking-tighter leading-[0.9] text-[var(--green-primary)] mb-8">
+            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-[900] tracking-tighter leading-[0.9] mb-10 text-[var(--green-primary)]">
               Sweetness <br />
-              <span className="text-[var(--text-body)] opacity-10">Without</span> <br />
+              <span className="text-outline">Without</span> <br />
               Sacrifice<span className="text-[var(--green-accent)]">.</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-xl mb-10">
+            <p className="text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-xl mb-12">
               Experience the pure taste of nature with Grevia's premium Stevia and Monkfruit sweeteners. Zero calories, zero guilt, endless flavor.
             </p>
-            
-            <div className="flex flex-wrap gap-4 mb-12">
-              {["Zero Glycemic", "Keto Friendly", "100% Pure"].map((badge) => (
-                <div key={badge} className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-[var(--green-primary)]/10 text-[var(--green-primary)] font-black uppercase tracking-widest text-[10px] bg-white/50 backdrop-blur-sm">
-                  <Check className="w-3.5 h-3.5" />
-                  {badge}
-                </div>
-              ))}
-            </div>
             
             <div className="flex flex-col sm:flex-row gap-5">
               <Link to="/collections/all" className="btn-primary flex items-center justify-center">
@@ -53,36 +44,53 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* Right Visual */}
+          {/* Right Visual - Exact Clone Layout */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, x: 50 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="relative"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="relative lg:ml-auto"
           >
-            <div className="relative aspect-square rounded-[40px] bg-white shadow-2xl border border-[var(--border-light)] p-12 flex items-center justify-center overflow-hidden group">
+            {/* The Textured Squircle Showcase */}
+            <div className="relative aspect-[4/3] w-full max-w-[650px] rounded-[60px] bg-[#F2F8F1] border border-[var(--green-primary)]/5 p-16 flex items-center justify-center shadow-2xl overflow-visible group">
+              {/* Marble Texture Overlay */}
+              <div className="absolute inset-0 opacity-40 mix-blend-overlay rounded-[60px] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')]" />
+              
               {/* Product Image */}
               <img 
                 src={heroImage} 
-                alt="Grevia Premium Sweetener" 
-                className="relative z-10 w-full max-w-[400px] drop-shadow-2xl animate-float"
+                alt="Grevia Premium Sweetener Range" 
+                className="relative z-10 w-full max-h-[110%] object-contain drop-shadow-[0_35px_35px_rgba(26,69,46,0.2)] animate-float"
               />
-              
-              {/* Floating Review Badge */}
-              <div className="absolute bottom-8 right-8 bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-[var(--border-light)] z-20 flex flex-col gap-2">
-                <div className="flex items-center gap-1 text-yellow-400">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="w-4 h-4 fill-current" />
-                  ))}
+
+              {/* Floating Badge: Zero Glycemic */}
+              <div className="absolute top-[10%] -left-[10%] bg-white/90 backdrop-blur-md px-6 py-4 rounded-[28px] shadow-xl border border-[var(--green-primary)]/5 z-20 flex items-center gap-3 animate-float transition-transform hover:scale-110 pointer-events-none">
+                <div className="w-10 h-10 rounded-xl bg-[var(--green-pale)] flex items-center justify-center text-[var(--green-primary)]">
+                  <Leaf className="w-5 h-5" />
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[var(--green-primary)]">
-                  4.9/5 from 2,000+ Happy Souls
-                </p>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[var(--green-primary)]">Zero Glycemic</p>
+                </div>
               </div>
 
-              {/* Decorative Leaf */}
-              <div className="absolute top-10 right-10 opacity-20 rotate-12">
-                <Leaf className="w-20 h-20 text-[var(--green-primary)]" />
+              {/* Floating Badge: Keto Friendly */}
+              <div className="absolute bottom-[20%] -right-[15%] bg-white/90 backdrop-blur-md px-6 py-4 rounded-[28px] shadow-xl border border-[var(--green-primary)]/5 z-20 flex items-center gap-3 animate-float [animation-delay:1s] transition-transform hover:scale-110 pointer-events-none">
+                <div className="w-10 h-10 rounded-xl bg-[var(--green-pale)] flex items-center justify-center text-[var(--green-primary)]">
+                  <Check className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[var(--green-primary)]">Keto Friendly</p>
+                </div>
+              </div>
+
+              {/* Floating Badge: 100% Pure */}
+              <div className="absolute -bottom-[10%] left-[20%] bg-white/90 backdrop-blur-md px-6 py-4 rounded-[28px] shadow-xl border border-[var(--green-primary)]/5 z-20 flex items-center gap-3 animate-float [animation-delay:2s] transition-transform hover:scale-110 pointer-events-none">
+                <div className="w-10 h-10 rounded-xl bg-[var(--green-pale)] flex items-center justify-center text-[var(--green-primary)]">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[var(--green-primary)]">100% Pure</p>
+                </div>
               </div>
             </div>
           </motion.div>

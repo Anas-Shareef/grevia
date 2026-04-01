@@ -56,9 +56,9 @@
 
   /* Step 3: Buttons */
   .btn-primary {
-    @apply bg-[var(--green-primary)] text-white font-black uppercase tracking-widest text-[11px] px-10 py-5 
-           rounded-[var(--radius-squircle)] transition-all duration-300 shadow-[var(--shadow-button)]
-           hover:bg-[var(--green-hover)] hover:-translate-y-1 hover:shadow-xl active:scale-95;
+    @apply bg-[var(--green-primary)] text-white font-black uppercase tracking-[0.2em] text-[10px] px-12 py-5 
+           rounded-full transition-all duration-500 shadow-xl
+           hover:bg-[var(--green-hover)] hover:-translate-y-1 hover:shadow-2xl active:scale-95;
   }
 
   .btn-secondary {
@@ -76,7 +76,8 @@
   /* Step 6: Visual Elements */
   .eyebrow-badge {
     @apply inline-flex items-center gap-2 px-4 py-2 bg-[var(--green-mint)] text-[var(--green-primary)] 
-           text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6 border border-[var(--green-primary)]/10;
+           text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6 border border-[var(--green-primary)];
+    border-color: rgba(26, 69, 46, 0.1);
   }
 
   .eyebrow-badge .dot {
@@ -152,6 +153,17 @@
   }
   .size-pill.active {
     @apply bg-[var(--green-primary)] text-white border-[var(--green-primary)] shadow-md;
+  }
+
+  /* NEW: High-fidelity Clone Utilities */
+  .text-outline {
+    color: transparent !important;
+    -webkit-text-stroke: 1.5px var(--green-primary);
+    opacity: 0.3;
+  }
+
+  .logo-chunky {
+    @apply text-3xl font-[900] tracking-tighter lowercase text-[var(--green-primary)];
   }
 }
 

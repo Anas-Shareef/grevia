@@ -49,8 +49,8 @@ const Header = () => {
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'h-16 bg-white/90 backdrop-blur-md shadow-sm' : 'h-20 bg-transparent'}`}>
       <div className="container h-full flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-[900] tracking-tighter text-[var(--green-primary)] flex items-center gap-0.5">
-          GREVIA<span className="text-[var(--green-accent)]">.</span>
+        <Link to="/" className="group flex items-center gap-0.5">
+          <span className="logo-chunky">grevia</span><span className="text-3xl font-[900] text-[var(--green-accent)]">.</span>
         </Link>
 
         {/* Desktop Navigation */}
