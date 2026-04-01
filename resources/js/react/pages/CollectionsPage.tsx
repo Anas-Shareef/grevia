@@ -1,37 +1,12 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Heart, X, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { X, ChevronDown, SlidersHorizontal, Star } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
-import { useCart } from "@/contexts/CartContext";
-import { useWishlist } from "@/contexts/WishlistContext";
-import { toast } from "sonner";
 import { ProductCard } from "@/components/ProductCard";
-
-// ─── Design tokens (Natural Premium Theme) ───
-const T = {
-  bgPage:    'var(--bg-page)',   /* #f4f7f1 (Creamy Mint) */
-  bgCard:    '#ffffff',
-  bgHover:   'rgba(6, 78, 59, 0.05)',
-  imageStevia: '#f0f3eb',
-  imageMonk:  '#faeeda',
-  textPrimary: 'var(--text-primary)', /* #064e3b (Deep Forest) */
-  textSec:    'var(--text-muted)',   /* #4b6358 */
-  textMuted:  '#9ca3af',
-  textGreen:  'var(--accent-bright)', /* #22c55e */
-  accentGreen: 'var(--accent-bright)',
-  accentDark:  'var(--primary)',      /* #064e3b */
-  amber:      '#d97706',
-  borderCard:  'rgba(6, 78, 59, 0.05)',
-  borderActive: 'var(--primary)',
-  pillInactiveBg:    'var(--bg-card)',
-  pillInactiveBorder: 'var(--border)',
-  pillActiveBg:      'var(--bg-mint)',
-  pillActiveBorder:  'var(--primary)',
-};
 
 const CATEGORY_CARDS = [
   {
@@ -41,8 +16,7 @@ const CATEGORY_CARDS = [
     type: 'stevia',
     form: 'powder',
     count: 6,
-    bg: '#f0f3eb',
-    color: 'var(--primary)',
+    bg: 'stevia-bg',
   },
   {
     emoji: '💧',
@@ -51,8 +25,7 @@ const CATEGORY_CARDS = [
     type: 'stevia',
     form: 'drops',
     count: 2,
-    bg: '#eff6ff',
-    color: '#1e40af',
+    bg: 'blue-50', // Fallback
   },
   {
     emoji: '🍈',
@@ -61,8 +34,7 @@ const CATEGORY_CARDS = [
     type: 'monk-fruit',
     form: 'powder',
     count: 2,
-    bg: '#fff7ed',
-    color: '#9a3412',
+    bg: 'monk-bg',
   },
 ];
 
@@ -112,14 +84,7 @@ type FilterKey = 'type' | 'form' | 'ratio' | 'size';
 
 const CollectionsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  const toggleWishlist = (product: Product) => {
-    if (isInWishlist(String(product.id))) removeFromWishlist(String(product.id));
-    else addToWishlist(product);
-  };
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({});
   const [isSticky, setIsSticky] = useState(false);
 
   // Read active filters from URL
@@ -155,91 +120,53 @@ const CollectionsPage = () => {
     }).map(o => ({ key: g.key as FilterKey, label: o.label, value: o.value }))
   );
 
-  // Build query for the API
-  const apiFilters = {
+  const { data: response, isLoading } = useProducts({
     type: activeFilters.type,
     form: activeFilters.form,
-    ratio: activeFilters.ratio.replace('-', ':') || '', // convert "1-10" → "1:10"
+    ratio: activeFilters.ratio.replace('-', ':') || '',
     size: activeFilters.size,
     sort_by: activeFilters.sort_by,
-  };
-
-  const { data: response, isLoading } = useProducts(apiFilters);
+  });
+  
   const products: Product[] = Array.isArray(response) ? response : (response as any)?.data || [];
 
-  // Sticky scroll behavior
   useEffect(() => {
-    const handler = () => setIsSticky(window.scrollY > 320);
+    const handler = () => setIsSticky(window.scrollY > 300);
     window.addEventListener('scroll', handler);
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  const getProductPrice = (p: Product) => {
-    const sel = selectedSizes[p.id];
-    if (!sel || sel === p.size_label) return p.price;
-    // Estimate alternate price: if current is 50g, 100g is ~1.67x
-    return p.size_label === '50g' ? Math.round(p.price * 1.67) : Math.round(p.price * 0.6);
-  };
-
   return (
-    <div style={{ background: T.bgPage, minHeight: '100vh', fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div className="bg-[var(--bg-page)] min-h-screen">
       <Header />
 
-      {/* ─────────────────────────────────
-          § 2.1  Hero Banner
-         ───────────────────────────────── */}
-      <section
-        className="pt-32 pb-20 px-4 relative overflow-hidden"
-        style={{ background: 'var(--bg-page)' }}
-      >
-        <div className="container mx-auto relative z-10">
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-4">
+        <div className="container">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-            {/* Left copy */}
             <div className="max-w-2xl text-center lg:text-left">
-              <motion.span 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="inline-block text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 bg-secondary px-4 py-2 rounded-full"
-              >
+              <div className="eyebrow-badge mb-6 inline-flex">
+                <span className="dot" />
                 Our Collections
-              </motion.span>
-              <h1 className="text-5xl md:text-6xl lg:text-8xl font-black mb-6 leading-[0.95] tracking-tighter" style={{ color: 'var(--primary)' }}>
-                Sweetness Without<br />
-                <span className="text-accent-bright">Compromise</span>
-              </h1>
-              <p className="text-xl mb-10 leading-relaxed font-medium max-w-lg mx-auto lg:mx-0" style={{ color: 'var(--text-muted)' }}>
-                Zero-calorie, plant-based alternatives crafted for pure health and uncompromising taste.
-              </p>
-              <div className="flex gap-4 flex-wrap justify-center lg:justify-start">
-                <Link
-                  to="/collections/all?type=stevia"
-                  className="px-8 py-5 rounded-2xl text-base font-black uppercase tracking-widest text-white transition-all shadow-button hover:scale-105 active:scale-95"
-                  style={{ background: 'var(--primary)' }}
-                >
-                  Shop Stevia
-                </Link>
-                <Link
-                  to="/collections/all?type=monk-fruit"
-                  className="px-8 py-5 rounded-2xl text-base font-black uppercase tracking-widest transition-all border-2 hover:bg-white/50"
-                  style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}
-                >
-                  Shop Monk Fruit
-                </Link>
               </div>
+              <h1 className="mb-6">
+                Sweetness Without <br />
+                <span className="text-[var(--green-primary)]">Compromise</span>
+              </h1>
+              <p className="hero-subtitle mb-8 max-w-lg mx-auto lg:mx-0">
+                Zero-calorie, plant-based alternatives crafted for pure health and uncompromising taste. Discover your perfect match.
+              </p>
             </div>
             
-            {/* Right stat badges */}
+            {/* Stat Badges */}
             <div className="grid grid-cols-2 gap-4 w-full lg:w-auto">
               {[
                 { label: '0 Calories', sub: 'Zero glycemic impact' },
                 { label: '100% Raw', sub: 'Pure plant extract' },
               ].map(b => (
-                <div key={b.label}
-                  className="rounded-3xl px-8 py-10 text-center bg-white shadow-soft transition-transform hover:-translate-y-1"
-                  style={{ border: '1px solid rgba(6, 78, 59, 0.05)' }}
-                >
-                  <p className="text-2xl font-black tracking-tighter" style={{ color: 'var(--primary)' }}>{b.label}</p>
-                  <p className="text-[10px] uppercase font-black tracking-widest mt-2 opacity-40">{b.sub}</p>
+                <div key={b.label} className="benefit-card !p-8 !mb-0 text-center flex flex-col items-center">
+                  <p className="text-2xl font-black text-[var(--text-heading)]">{b.label}</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest mt-2 text-[var(--text-muted)]">{b.sub}</p>
                 </div>
               ))}
             </div>
@@ -247,32 +174,25 @@ const CollectionsPage = () => {
         </div>
       </section>
 
-      {/* ─────────────────────────────────
-          § 2.2  Category Shortcut Cards
-         ───────────────────────────────── */}
-      <section className="py-12 px-4 bg-page">
-        <div className="container mx-auto">
+      {/* Category Shortcuts */}
+      <section className="pb-16 px-4">
+        <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {CATEGORY_CARDS.map(card => (
               <Link
                 key={card.name}
                 to={`/collections/all?type=${card.type}&form=${card.form}`}
-                className="relative rounded-[32px] p-8 flex items-center gap-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-white border border-border group"
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--accent-bright)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)'; }}
+                className="benefit-card !flex-row group !p-8 !mb-0 items-center gap-6"
               >
-                {/* Count badge */}
-                <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-mint text-primary border border-primary/5">
-                  {card.count} Items
-                </span>
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 shadow-inner"
-                  style={{ background: card.bg }}>
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 ${card.bg}`}>
                   {card.emoji}
                 </div>
                 <div>
-                  <p className="text-lg font-black uppercase tracking-tighter" style={{ color: 'var(--primary)' }}>{card.name}</p>
-                  <p className="text-xs mt-1 font-medium leading-relaxed opacity-60">{card.desc}</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest mt-4 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--accent-bright)' }}>Shop Collection →</p>
+                  <h3 className="benefit-title mb-1">{card.name}</h3>
+                  <p className="benefit-desc !mb-0">{card.desc}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest mt-3 text-[var(--green-primary)] group-hover:translate-x-1 transition-transform">
+                    Shop Now →
+                  </p>
                 </div>
               </Link>
             ))}
@@ -280,87 +200,61 @@ const CollectionsPage = () => {
         </div>
       </section>
 
-      {/* ─────────────────────────────────
-          § 2.3  Sticky Filter Bar + Active Chips
-         ───────────────────────────────── */}
+      {/* Sticky Filter Bar */}
       <div
-        className="transition-all duration-300 z-30 py-4 px-4"
-        style={{
-          position: isSticky ? 'sticky' : 'relative',
-          top: isSticky ? 80 : 'auto',
-          background: isSticky ? 'rgba(244, 247, 241, 0.95)' : 'transparent',
-          backdropFilter: isSticky ? 'blur(12px)' : 'none',
-          borderBottom: isSticky ? '1px solid rgba(6, 78, 59, 0.05)' : 'none',
-        }}
+        className={`z-30 py-4 px-4 transition-all duration-300 ${isSticky ? 'sticky top-16 bg-white/80 backdrop-blur-md border-b border-[var(--border-light)]' : ''}`}
       >
-        <div className="container mx-auto flex items-center justify-between gap-4 flex-wrap">
+        <div className="container flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3 flex-wrap">
-            {/* Active filter chips */}
             {activeChips.map(chip => (
               <button
                 key={chip.key + chip.value}
                 onClick={() => toggleFilter(chip.key, chip.value)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-mint text-primary border border-primary/10 shadow-soft hover:bg-white"
+                className="size-pill active !px-4 !py-2 flex items-center gap-2"
               >
                 {chip.label} <X className="w-3 h-3" />
               </button>
             ))}
             {activeChips.length > 0 && (
-              <button onClick={clearAllFilters} className="text-[10px] font-black uppercase tracking-widest underline opacity-40 hover:opacity-100" style={{ color: 'var(--primary)' }}>
+              <button onClick={clearAllFilters} className="text-[10px] font-black uppercase tracking-widest underline opacity-40 hover:opacity-100">
                 Clear all
               </button>
             )}
             {activeChips.length === 0 && (
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
                 {isLoading ? '...' : `${products.length} Products`}
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Sort dropdown */}
-            <div className="relative">
-              <select
-                value={activeFilters.sort_by}
-                onChange={e => setFilter('sort_by', e.target.value)}
-                className="appearance-none px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest pr-10 cursor-pointer bg-white border border-border shadow-soft focus:ring-0 outline-none"
-                style={{ color: 'var(--primary)' }}
-              >
-                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none opacity-40" />
-            </div>
+            <select
+              value={activeFilters.sort_by}
+              onChange={e => setFilter('sort_by', e.target.value)}
+              className="px-4 py-2 rounded-full text-xs font-bold border border-[var(--border-light)] bg-white outline-none focus:border-[var(--green-primary)] transition-colors"
+            >
+              {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
 
-            {/* Mobile Filters button */}
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="md:hidden flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-white border border-border shadow-soft"
-              style={{ color: 'var(--primary)' }}
+              className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border border-[var(--border-light)] bg-white"
             >
-              <SlidersHorizontal className="w-4 h-4" /> Filters {activeChips.length > 0 && `(${activeChips.length})`}
+              <SlidersHorizontal className="w-4 h-4" /> Filters
             </button>
           </div>
         </div>
       </div>
 
-      {/* ─────────────────────────────────
-          § 2.3 Main Body: Sidebar + Grid
-         ───────────────────────────────── */}
-      <div className="container mx-auto px-4 py-8 flex gap-8">
-
-        {/* Filter Sidebar — desktop */}
-        <aside className="hidden md:block flex-shrink-0" style={{ width: 220 }}>
-          <div className="sticky top-28 pr-6">
-            <div className="flex items-center justify-between mb-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Refine By</p>
-              {activeChips.length > 0 && (
-                <button onClick={clearAllFilters} className="text-[10px] font-black uppercase tracking-tighter hover:underline">Reset</button>
-              )}
-            </div>
+      <div className="container py-12 flex gap-12">
+        {/* Sidebar Filters */}
+        <aside className="hidden lg:block w-64 flex-shrink-0">
+          <div className="sticky top-32">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-8 opacity-40">Refine Selection</p>
             {FILTER_GROUPS.map(group => (
-              <div key={group.key} className="mb-8">
-                <p className="text-xs font-black uppercase tracking-widest mb-4" style={{ color: 'var(--primary)' }}>{group.label}</p>
-                <div className="space-y-3">
+              <div key={group.key} className="mb-10">
+                <h4 className="text-xs font-black uppercase tracking-widest mb-6">{group.label}</h4>
+                <div className="space-y-4">
                   {group.options.map(opt => {
                     const isChecked = activeFilters[group.key as FilterKey] === opt.value;
                     return (
@@ -369,20 +263,13 @@ const CollectionsPage = () => {
                         className="flex items-center gap-3 cursor-pointer group"
                         onClick={() => toggleFilter(group.key as FilterKey, opt.value)}
                       >
-                        <div
-                          className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300"
-                          style={{
-                            background: isChecked ? 'var(--primary)' : 'white',
-                            border: `1px solid ${isChecked ? 'var(--primary)' : 'var(--border)'}`,
-                            boxShadow: isChecked ? 'var(--shadow-button)' : 'none',
-                          }}
-                        >
-                          {isChecked && <svg className="w-2.5 h-2.5" viewBox="0 0 10 9"><path d="M1 4l3 3 5-6" stroke="white" strokeWidth="2.5" fill="none" strokeLinecap="round"/></svg>}
+                        <div className={`w-5 h-5 rounded-full border transition-all flex items-center justify-center ${isChecked ? 'bg-[var(--green-primary)] border-[var(--green-primary)]' : 'border-[var(--border-light)] group-hover:border-[var(--green-primary)]'}`}>
+                          {isChecked && <div className="w-2 h-2 bg-white rounded-full" />}
                         </div>
-                        <span className="text-xs font-bold transition-colors group-hover:text-accent-bright" style={{ color: isChecked ? 'var(--primary)' : 'var(--text-muted)' }}>
+                        <span className={`text-sm font-medium transition-colors ${isChecked ? 'text-[var(--text-heading)]' : 'text-[var(--text-muted)] group-hover:text-[var(--green-primary)]'}`}>
                           {opt.label}
                         </span>
-                        <span className="text-[10px] font-black ml-auto opacity-30">({opt.count})</span>
+                        <span className="text-[10px] font-bold ml-auto opacity-30">({opt.count})</span>
                       </label>
                     );
                   })}
@@ -392,67 +279,60 @@ const CollectionsPage = () => {
           </div>
         </aside>
 
-        {/* Product Grid */}
-        <main className="flex-1 min-w-0">
-          <p className="text-sm mb-4" style={{ color: T.textMuted }}>
-            {isLoading ? 'Loading...' : `${products.length} products`}
-          </p>
-
+        {/* Product Grid Area */}
+        <main className="flex-1">
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="products-grid">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-2xl animate-pulse" style={{ background: T.bgCard, height: 320 }} />
+                <div key={i} className="aspect-[4/5] rounded-[20px] bg-white animate-pulse border border-[var(--border-light)]" />
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-24">
-              <p className="text-4xl mb-4">🌿</p>
-              <p className="text-lg font-semibold mb-2" style={{ color: T.textPrimary }}>No products found</p>
-              <p className="text-sm mb-6" style={{ color: T.textMuted }}>Try adjusting your filters</p>
-              <button onClick={clearAllFilters} className="px-6 py-2 rounded-xl text-sm font-semibold text-white" style={{ background: T.accentGreen }}>
-                Clear Filters
-              </button>
+            <div className="text-center py-24 bg-white rounded-[40px] border border-[var(--border-light)]">
+              <p className="text-4xl mb-4">🍃</p>
+              <h3 className="text-xl font-bold mb-2">No products found</h3>
+              <p className="text-[var(--text-muted)] mb-8">Try adjusting your filters to find your perfect match.</p>
+              <button onClick={clearAllFilters} className="btn-primary px-8">Clear All Filters</button>
             </div>
           ) : (
-            <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8"
-              initial="hidden"
-              animate="visible"
-              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } }}
-            >
+            <div className="products-grid">
               {products.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
-            </motion.div>
+            </div>
           )}
         </main>
       </div>
 
-      {/* ─────────────────────────────────
-          Mobile Filter Bottom Sheet
-         ───────────────────────────────── */}
+      <Footer />
+
+      {/* Mobile Filter Sheet */}
       <AnimatePresence>
         {showMobileFilters && (
           <>
             <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40"
-              style={{ background: 'rgba(0,0,0,0.6)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
               onClick={() => setShowMobileFilters(false)}
             />
             <motion.div
-              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl p-6 overflow-y-auto max-h-[80vh]"
-              style={{ background: T.bgCard, border: `1px solid ${T.borderCard}` }}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              className="fixed inset-x-0 bottom-0 z-[60] bg-white rounded-t-[40px] p-8 max-h-[85vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-5">
-                <p className="text-base font-bold" style={{ color: T.textPrimary }}>Filters</p>
-                <button onClick={() => setShowMobileFilters(false)}><X className="w-5 h-5" style={{ color: T.textMuted }} /></button>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-bold">Filters</h3>
+                <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-[var(--bg-page)] rounded-full">
+                  <X className="w-5 h-5" />
+                </button>
               </div>
+              
               {FILTER_GROUPS.map(group => (
-                <div key={group.key} className="mb-5">
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: T.textMuted }}>{group.label}</p>
+                <div key={group.key} className="mb-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest mb-4 opacity-40">{group.label}</p>
                   <div className="flex flex-wrap gap-2">
                     {group.options.map(opt => {
                       const isChecked = activeFilters[group.key as FilterKey] === opt.value;
@@ -460,12 +340,7 @@ const CollectionsPage = () => {
                         <button
                           key={opt.value}
                           onClick={() => toggleFilter(group.key as FilterKey, opt.value)}
-                          className="px-4 py-1.5 rounded-lg text-xs font-medium transition-all"
-                          style={{
-                            background: isChecked ? T.pillActiveBg : T.pillInactiveBg,
-                            border: `1px solid ${isChecked ? T.pillActiveBorder : T.pillInactiveBorder}`,
-                            color: isChecked ? T.textGreen : T.textSec,
-                          }}
+                          className={`size-pill ${isChecked ? 'active' : ''}`}
                         >
                           {opt.label}
                         </button>
@@ -474,10 +349,10 @@ const CollectionsPage = () => {
                   </div>
                 </div>
               ))}
-              <button
+              
+              <button 
                 onClick={() => setShowMobileFilters(false)}
-                className="w-full mt-4 py-3 rounded-xl text-sm font-bold text-white"
-                style={{ background: T.accentGreen }}
+                className="btn-primary w-full py-4 mt-4"
               >
                 Apply Filters
               </button>
@@ -485,8 +360,6 @@ const CollectionsPage = () => {
           </>
         )}
       </AnimatePresence>
-
-      <Footer />
     </div>
   );
 };
