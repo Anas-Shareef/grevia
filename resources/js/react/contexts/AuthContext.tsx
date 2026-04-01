@@ -6,17 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { auth } from "@/lib/firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-interface AuthContextType {
-    user: User | null;
-    isLoading: boolean;
-    login: (values: any) => Promise<void>;
-    loginWithGoogle: () => Promise<void>;
-    register: (values: any) => Promise<void>;
-    logout: () => Promise<void>;
-    checkAuth: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext, AuthContextType } from "./AuthContext.model";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);

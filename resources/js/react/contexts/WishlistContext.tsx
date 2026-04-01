@@ -1,16 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { Product } from "@/data/products";
 
-interface WishlistContextType {
-  items: Product[];
-  addToWishlist: (product: Product) => void;
-  removeFromWishlist: (productId: string) => void;
-  isInWishlist: (productId: string) => boolean;
-  getWishlistCount: () => number;
-  clearWishlist: () => void;
-}
-
-const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
+import { WishlistContext, WishlistContextType } from "./WishlistContext.model";
 
 const WISHLIST_STORAGE_KEY = "grevia-wishlist";
 

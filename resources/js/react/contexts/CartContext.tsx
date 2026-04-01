@@ -4,27 +4,7 @@ import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 import { api } from "@/lib/api";
 
-export interface CartItem {
-  product: Product;
-  variantId?: string | number;
-  weight?: string;
-  packSize?: number;
-  quantity: number;
-}
-
-interface CartContextType {
-  items: CartItem[];
-  addToCart: (product: Product, quantity?: number, variantId?: string | number) => void;
-  removeFromCart: (productId: string, variantId?: string | number) => void;
-  updateQuantity: (productId: string, quantity: number, variantId?: string | number) => void;
-  clearCart: () => void;
-  getCartTotal: () => number;
-  getCartCount: () => number;
-  isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
-}
-
-const CartContext = createContext<CartContextType | undefined>(undefined);
+import { CartContext, CartItem, CartContextType } from "./CartContext.model";
 
 const CART_STORAGE_KEY = 'grevia_cart';
 
