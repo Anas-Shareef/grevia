@@ -126,7 +126,7 @@ const BeyondSweetenersSection = () => {
 
               {/* Content */}
               <div className="p-6">
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/products/${product.id}`}>
                   <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
@@ -160,7 +160,7 @@ const BeyondSweetenersSection = () => {
                       </span>
                     )}
                   </div>
-                  <Link to={`/product/${product.id}`}>
+                  <Link to={`/products/${product.id}`}>
                     <Button variant="outline" size="sm">
                       View Details
                     </Button>
@@ -179,7 +179,7 @@ const BeyondSweetenersSection = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-12"
         >
-          <Link to="/products/other-products">
+          <Link to="/collections/other-products">
             <Button variant="default" size="lg">
               View All Products
             </Button>

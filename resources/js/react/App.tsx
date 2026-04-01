@@ -63,15 +63,16 @@ const App = () => (
                 </Route>
 
                 <Route path="/collections" element={<CollectionsPage />} />
+                <Route path="/collections/all" element={<CollectionsPage />} />
                 <Route path="/collections/:category" element={<CollectionsPage />} />
                 <Route path="/collections/:category/:subcategory" element={<CollectionsPage />} />
-                <Route path="/collections/all" element={<Navigate to="/collections" replace />} />
+                <Route path="/sweeteners" element={<Navigate to="/collections" replace />} />
+                <Route path="/products" element={<Navigate to="/collections" replace />} />
+                <Route path="/product/:id" element={<Navigate to="/products/:id" replace />} />
+                <Route path="/products/:id" element={<ProductDetailPage />} />
                 <Route path="/benefits" element={<BenefitsPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
-                <Route path="/products/:category" element={<ProductsPage />} />
-                <Route path="/products/:category/:subcategory" element={<ProductsPage />} />
-                <Route path="/product/:id" element={<ProductDetailPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
                 <Route path="*" element={<NotFound />} />

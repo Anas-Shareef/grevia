@@ -111,7 +111,7 @@ const ProductsSection = () => {
                 <div className="absolute top-4 right-4 z-10">
                   <WishlistButton product={product} size="sm" />
                 </div>
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/products/${product.id}`}>
                   <img
                     src={product.image}
                     alt={product.name}
@@ -135,7 +135,7 @@ const ProductsSection = () => {
               {/* Content */}
               <div className="p-6">
                 {/* Title & Description */}
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/products/${product.id}`}>
                   <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
@@ -170,7 +170,7 @@ const ProductsSection = () => {
                         </span>
                       )}
                     </div>
-                    <Link to={`/product/${product.id}`}>
+                    <Link to={`/products/${product.id}`}>
                       <Button variant="outline" size="sm">
                         View Details
                       </Button>
@@ -190,7 +190,7 @@ const ProductsSection = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-12"
         >
-          <Link to="/products/sweeteners">
+          <Link to="/collections">
             <Button variant="default" size="lg">
               View All Products
             </Button>

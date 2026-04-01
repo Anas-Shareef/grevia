@@ -237,7 +237,7 @@ const Header = () => {
               </AnimatePresence>
             </div>
 
-            <Link to="/products/other-products" className={navLinkClass} style={navLinkStyle}
+            <Link to="/collections/other-products" className={navLinkClass} style={navLinkStyle}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-green)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
               Other Products
@@ -485,7 +485,7 @@ const Header = () => {
                 </AnimatePresence>
               </div>
 
-              <Link to="/products/other-products" onClick={() => setIsMenuOpen(false)} className="block text-lg font-semibold py-3 px-2" style={{ color: 'var(--text-primary)' }}>Other Products</Link>
+              <Link to="/collections/other-products" onClick={() => setIsMenuOpen(false)} className="block text-lg font-semibold py-3 px-2" style={{ color: 'var(--text-primary)' }}>Other Products</Link>
               <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block text-lg font-semibold py-3 px-2" style={{ color: 'var(--text-primary)' }}>Contact Us</Link>
 
               {/* Bottom search bar */}
