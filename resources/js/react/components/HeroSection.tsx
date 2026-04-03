@@ -117,7 +117,7 @@ const HeroSection = () => {
                 style={{ aspectRatio: '1.6/1' }}
               >
                 <img
-                  src="/assets/hero-bg-D-TWzogc.jpg"
+                  src="/build/assets/hero-bg-D-TWzogc.jpg"
                   alt="Grevia Organic Sweetener products laid elegantly on cream marble surface"
                   className="w-full h-full object-cover"
                 />
