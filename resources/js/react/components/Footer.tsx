@@ -1,104 +1,141 @@
 import { motion } from "framer-motion";
+import { Send, Instagram, Twitter, Facebook } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Instagram, Twitter, Facebook, Send } from "lucide-react";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
   const footerLinks = {
-    Shop: [
+    shop: [
       { label: "All Products", href: "/collections/all" },
-      { label: "Stevia", href: "/collections/stevia" },
-      { label: "Monkfruit", href: "/collections/monkfruit" },
-      { label: "Bundles", href: "/collections/bundles" },
+      { label: "Stevia", href: "/collections/all?filter=stevia" },
+      { label: "Monkfruit", href: "/collections/all?filter=monk-fruit" },
+      { label: "Bundles", href: "/collections/all" },
     ],
-    Company: [
-      { label: "About Us", href: "/about" },
-      { label: "Our Story", href: "/story" },
-      { label: "Sustainability", href: "/sustainability" },
-      { label: "Press", href: "/press" },
+    company: [
+      { label: "About Us", href: "/#benefits" },
+      { label: "Our Story", href: "/#benefits" },
+      { label: "Sustainability", href: "#" },
+      { label: "Press", href: "#" },
     ],
-    Support: [
+    support: [
       { label: "Contact", href: "/contact" },
-      { label: "FAQ", href: "/faq" },
-      { label: "Shipping", href: "/shipping" },
-      { label: "Returns", href: "/returns" },
+      { label: "FAQ", href: "/contact" },
+      { label: "Shipping", href: "#" },
+      { label: "Returns", href: "#" },
     ],
   };
 
+  const socials = [
+    { label: "Instagram", icon: <Instagram className="w-5 h-5" />, href: "#" },
+    { label: "Twitter", icon: <Twitter className="w-5 h-5" />, href: "#" },
+    { label: "Facebook", icon: <Facebook className="w-5 h-5" />, href: "#" },
+  ];
+
   return (
-    <footer className="bg-[#1a452e] text-white pt-24 pb-12 relative overflow-hidden">
-      <div className="container mx-auto px-6 md:px-10 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-20">
+    <footer className="bg-primary text-white pt-24 pb-12 overflow-hidden" role="contentinfo">
+      <div className="container mx-auto px-4 md:px-6">
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12 lg:gap-16 mb-20">
           
-          {/* Brand & Newsletter Section (Span 5 columns) */}
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            <Link to="/" className="text-3xl font-black tracking-tighter text-white">
-              grevia
+          {/* Brand & Newsletter - Span 3 */}
+          <div className="lg:col-span-3">
+            <Link to="/" className="flex items-center gap-2 mb-8">
+              <img 
+                src="/grevia-logo.png" 
+                alt="Grevia" 
+                className="h-10 w-auto brightness-0 invert" 
+              />
             </Link>
-            <p className="text-white/60 text-base font-medium leading-relaxed max-w-sm">
+            <p className="text-white/60 max-w-sm mb-10 leading-relaxed font-medium">
               Experience the pure taste of nature with our premium organic sweeteners. Zero calories, zero guilt, endless flavor.
             </p>
             
-            {/* Newsletter Input */}
-            <div className="relative max-w-sm mt-4">
-              <div className="flex gap-2 p-1.5 bg-white/5 rounded-full border border-white/10 focus-within:border-[#A3E635]/50 transition-all">
+            {/* Newsletter Field */}
+            <div className="max-w-md">
+              <label htmlFor="footer-email" className="block text-xs font-black uppercase tracking-[0.2em] text-white/40 mb-4">Stay Sweet & Updated</label>
+              <div className="flex p-1.5 bg-white/5 border border-white/10 rounded-2xl focus-within:border-white/30 transition-colors">
                 <input 
                   type="email" 
+                  id="footer-email"
                   placeholder="Enter your email" 
-                  className="bg-transparent border-none focus:ring-0 text-white placeholder:text-white/30 px-4 py-2 w-full text-sm font-medium"
+                  className="flex-1 bg-transparent px-4 py-2 text-white placeholder:text-white/30 focus:outline-none font-medium"
                 />
-                <button className="bg-[#A3E635] text-[#1a452e] font-bold px-6 py-2 rounded-full text-sm hover:bg-white transition-colors duration-300">
-                  Subscribe
+                <button 
+                  className="w-12 h-12 bg-white text-primary rounded-xl flex items-center justify-center hover:bg-cream transition-colors"
+                  aria-label="Subscribe"
+                >
+                  <Send className="w-5 h-5" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Links Section (Span 7 columns) */}
-          <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
-            {Object.entries(footerLinks).map(([title, links]) => (
-              <div key={title} className="flex flex-col gap-6">
-                <h3 className="text-sm font-bold text-white tracking-tight">{title}</h3>
-                <ul className="flex flex-col gap-3">
-                  {links.map((link) => (
-                    <li key={link.label}>
-                      <Link 
-                        to={link.href} 
-                        className="text-white/50 hover:text-[#A3E635] transition-colors duration-300 text-[15px] font-medium"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          {/* Links Columns */}
+          <div className="lg:col-span-1">
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white/40 mb-6">Shop</h3>
+            <ul className="space-y-4">
+              {footerLinks.shop.map((link) => (
+                <li key={link.label}>
+                  <Link to={link.href} className="text-white/70 hover:text-white font-medium transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-1">
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white/40 mb-6">Company</h3>
+            <ul className="space-y-4">
+              {footerLinks.company.map((link) => (
+                <li key={link.label}>
+                  <Link to={link.href} className="text-white/70 hover:text-white font-medium transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-1">
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white/40 mb-6">Support</h3>
+            <ul className="space-y-4">
+              {footerLinks.support.map((link) => (
+                <li key={link.label}>
+                  <Link to={link.href} className="text-white/70 hover:text-white font-medium transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-white/30 text-sm font-medium">
-            © {currentYear} Grevia. All rights reserved.
-          </p>
+        {/* Bottom Bar: Copyright & Socials */}
+        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-10">
+            <p className="text-xs font-bold text-white/30">
+              © 2026 GREVIA. ALL RIGHTS RESERVED.
+            </p>
+            <div className="hidden md:flex gap-6">
+              <Link to="#" className="text-xs font-bold text-white/30 hover:text-white transition-colors">PRIVACY POLICY</Link>
+              <Link to="#" className="text-xs font-bold text-white/30 hover:text-white transition-colors">TERMS OF SERVICE</Link>
+            </div>
+          </div>
           
           <div className="flex items-center gap-4">
-            {[
-              { Icon: Instagram, href: "#" },
-              { Icon: Twitter, href: "#" },
-              { Icon: Facebook, href: "#" }
-            ].map(({ Icon, href }, i) => (
+            {socials.map((social) => (
               <a 
-                key={i} 
-                href={href} 
-                className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-white hover:text-[#1a452e] transition-all duration-300"
+                key={social.label}
+                href={social.href} 
+                aria-label={social.label}
+                className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-300"
               >
-                <Icon className="w-5 h-5" />
+                {social.icon}
               </a>
             ))}
           </div>
         </div>
+
       </div>
     </footer>
   );

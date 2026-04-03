@@ -1,5 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@fontsource/montserrat;
+@layer base {
+  :root {
+    --background: 45 23% 94%;
+    --foreground: 120 28% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 120 28% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 28% 14%;
+    --primary: 123 46% 34%;
+    --primary-foreground: 45 23% 94%;
+    --secondary: 45 23% 88%;
+    --secondary-foreground: 123 46% 34%;
+    --muted: 0 0% 56%;
+    --muted-foreground: 120 28% 14%;
+    --accent: 84 79% 55%;
+    --accent-foreground: 120 28% 14%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 45 23% 94%;
+    --border: 45 23% 80%;
+    --input: 45 23% 80%;
+    --ring: 123 46% 34%;
+    --radius: 1.5rem;
+
+    /* Custom Brand Tokens */
+    --forest: 123 46% 34%;
+    --forest-light: 123 40% 41%;
+    --lime: 84 79% 55%;
+    --lime-glow: 82 85% 60%;
+    --cream: 45 23% 94%;
+    --cream-dark: 45 23% 88%;
+
+    /* Gradients */
+    --gradient-forest: linear-gradient(135deg, hsl(123 46% 34%), hsl(123 40% 41%));
+    --gradient-lime: linear-gradient(135deg, hsl(84 79% 55%), hsl(82 85% 60%));
+    --gradient-hero: radial-gradient(ellipse at 50% 0%, hsl(45 30% 98%) 0%, hsl(45 23% 94%) 70%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(145 30% 20% / .12);
+    --shadow-card: 0 8px 30px -8px hsl(145 30% 20% / .15);
+    --shadow-glow: 0 0 40px hsl(100 55% 55% / .3);
+    --shadow-button: 0 4px 14px -2px hsl(145 55% 24% / .4);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-size-adjust: 100%;
+  }
+
+  .text-gradient-forest {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-forest);
+  }
+
+  .text-gradient-lime {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-lime);
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-button {
+    box-shadow: var(--shadow-button);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .rounded-squircle {
+    border-radius: var(--radius);
+  }
+}
+
+@layer utilities {
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}

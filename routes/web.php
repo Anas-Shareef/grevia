@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Root route for React SPA
+Route::get('/', function () { return view('app'); });
+
 // Redirect legacy URLs to the new React collections structure with 301 Permanent Redirect
 Route::get('/sweeteners', function() { return redirect('/collections?' . request()->getQueryString(), 301); });
 Route::get('/products/sweeteners', function() { return redirect('/collections?' . request()->getQueryString(), 301); });

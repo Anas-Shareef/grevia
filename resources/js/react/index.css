@@ -1,36 +1,35 @@
-/* Grevia 'Natural Premium' - Exact Lovable Clone Design Tokens */
+/* Grevia 'Natural Premium' - Exact Redesign Design Tokens */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   /* === BRAND COLORS (Forest & Lime) === */
-  --green-primary:    #1A452E; /* Deep Forest Green */
-  --green-hover:      #112e1f;
+  --green-primary:    #2E7D32; /* Deep Forest Green (Exact) */
+  --green-hover:      #3E8E42;
   --green-accent:     #A3E635; /* Vibrant Lime */
-  --green-mint:       #D9F99D; /* Soft Lime background */
-  --green-pale:       #F7FAF7; /* Creamy Mint White */
+  --green-mint:       #E8E4D8; /* Soft Cream background */
+  --bg-page:          #F5F2EA; /* Exact Cream BG from reference */
+  --bg-card:          #FFFFFF;
   
   /* === NEUTRALS === */
-  --text-heading:     #1A452E;
-  --text-body:        #374151;
-  --text-muted:       #6B7280;
-  --border-light:     #E5E7EB;
-  --bg-page:          #F8FAF8; /* Refined airy off-white */
-  --bg-card:          #F9F9F2;
-
+  --text-heading:     #1A2E1A; /* Dark Green / Charcoal */
+  --text-body:        #1A2E1A;
+  --text-muted:       rgba(26, 46, 26, 0.6);
+  --border-light:     rgba(46, 125, 50, 0.1);
+  
   /* === SPACING & RADIUS === */
   --radius-squircle:  1.5rem;   /* 24px */
   --radius-lg:        2rem;     /* 32px */
   --radius-xl:        3rem;     /* 48px - Signature Lovable Radius */
   --radius-2xl:       4rem;     /* 64px */
   
-  --shadow-button:    0 4px 14px -2px rgba(26, 69, 46, 0.4);
-  --shadow-card:      0 8px 30px -8px rgba(26, 69, 46, 0.12);
+  --shadow-button:    0 4px 14px -2px rgba(46, 125, 50, 0.4);
+  --shadow-card:      0 8px 30px -8px rgba(46, 125, 50, 0.12);
   --shadow-glow:      0 0 40px rgba(163, 230, 53, 0.3);
 
   /* === TYPOGRAPHY === */
-  --font-main:        'Montserrat', sans-serif;
+  --font-main:        'Poppins', 'Inter', sans-serif;
 }
 
 @layer base {
@@ -48,97 +47,70 @@
   }
 
   h1 { @apply text-5xl md:text-7xl lg:text-8xl; }
-  h2 { @apply text-4xl md:text-6xl; }
+  h2 { @apply text-4xl md:text-5xl; }
   h3 { @apply text-2xl md:text-3xl; }
 }
 
 @layer components {
-  /* Step 4: Navbar */
+  /* Navbar */
   .navbar {
-    @apply fixed top-0 left-0 right-0 h-20 bg-white/80 backdrop-blur-md z-50 border-b border-[var(--border-light)];
+    @apply fixed top-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-md z-50 border-b border-[var(--border-light)];
   }
 
-  /* Step 3: Buttons */
+  /* Buttons */
   .btn-primary {
-    @apply bg-[var(--green-primary)] text-white font-black uppercase tracking-[0.2em] text-[10px] px-12 py-5 
-           rounded-full transition-all duration-500 shadow-xl
-           hover:bg-[var(--green-hover)] hover:-translate-y-1 hover:shadow-2xl active:scale-95;
+    @apply bg-[var(--green-primary)] text-white font-black rounded-full transition-all duration-500 shadow-xl
+           hover:-translate-y-1 hover:shadow-2xl active:scale-95 px-10 py-4 text-sm;
   }
 
   .btn-secondary {
-    @apply bg-white text-[var(--green-primary)] font-black uppercase tracking-widest text-[11px] px-10 py-5
-           rounded-[var(--radius-squircle)] border-2 border-[var(--green-primary)] transition-all duration-300
-           hover:bg-[var(--green-primary)] hover:text-white hover:-translate-y-1 active:scale-95 shadow-sm;
+    @apply bg-white text-[var(--green-primary)] font-black rounded-full border-2 border-[var(--green-primary)] transition-all duration-300
+           hover:bg-[var(--green-primary)] hover:text-white hover:-translate-y-1 active:scale-95 shadow-sm px-8 py-3 text-sm;
   }
 
   .btn-lime {
-    @apply bg-[var(--green-accent)] text-[var(--green-primary)] font-black uppercase tracking-widest text-[11px] px-10 py-5
-           rounded-[var(--radius-squircle)] transition-all duration-300 shadow-[var(--shadow-button)]
-           hover:brightness-105 hover:-translate-y-1 active:scale-95;
+    @apply text-white font-black rounded-full transition-all duration-300 px-10 py-4;
+    background-color: var(--green-accent);
+    box-shadow: var(--shadow-button);
+    font-size: 14px;
   }
 
-  /* Step 6: Visual Elements */
+  .btn-lime:hover {
+    @apply brightness-105 -translate-y-1;
+  }
+
+  .btn-lime:active {
+    @apply scale-95;
+  }
+
+  /* Visual Elements */
   .eyebrow-badge {
-    @apply inline-flex items-center gap-2 px-4 py-2 bg-[var(--green-mint)] text-[var(--green-primary)] 
-           text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6 border border-[var(--green-primary)];
-    border-color: rgba(26, 69, 46, 0.1);
+    @apply inline-flex items-center gap-2 px-4 py-1.5 font-black uppercase tracking-[0.2em] rounded-full mb-8 border;
+    background-color: rgba(46, 125, 50, 0.05);
+    color: var(--green-primary);
+    border-color: rgba(46, 125, 50, 0.1);
+    font-size: 11px;
   }
 
-  .eyebrow-badge .dot {
-    @apply w-1.5 h-1.5 rounded-full bg-[var(--green-primary)] animate-pulse;
-  }
-
-  /* Step 9: Section Styles */
+  /* Section Styles */
   .section-header {
-    @apply text-center max-w-3xl mx-auto mb-20;
+    @apply text-center max-w-3xl mx-auto mb-20 md:mb-24;
   }
 
-  .section-eyebrow {
-    @apply text-[var(--green-primary)] font-black uppercase tracking-[0.3em] text-[10px] mb-4 block;
-  }
-
-  .section-title {
-    @apply mb-6;
-  }
-
-  .section-subtitle {
-    @apply text-[var(--text-muted)] text-lg font-medium leading-relaxed max-w-2xl mx-auto;
-  }
-
-  /* Step 10: Product Cards */
+  /* Product Cards */
   .product-card {
-    @apply bg-white rounded-[var(--radius-squircle)] border border-[var(--border-light)] p-5 transition-all duration-500
+    @apply bg-white rounded-[var(--radius-squircle)] border border-[var(--green-primary)]/5 p-6 transition-all duration-500
            hover:shadow-[var(--shadow-card)] hover:-translate-y-2 group relative overflow-hidden;
   }
 
-  .product-img-area {
-    @apply aspect-square rounded-[20px] mb-6 flex items-center justify-center p-8 transition-colors duration-500 relative;
-  }
-
-  .stevia-bg { @apply bg-[#F0F4EF]; }
-  .monk-bg { @apply bg-[#FDF7ED]; }
-
-  .product-badge {
-    @apply absolute top-4 left-4 px-3 py-1 bg-[var(--green-primary)] text-white text-[9px] font-black uppercase tracking-wider rounded-full z-10;
-  }
-
-  /* Step 11: Feature Cards */
+  /* Feature Cards */
   .feature-card {
-    @apply bg-[var(--bg-card)] rounded-[var(--radius-squircle)] p-10 border border-[var(--border-light)] transition-all 
-           hover:bg-white hover:shadow-[var(--shadow-card)] hover:border-[var(--green-primary)]/20;
+    @apply bg-white rounded-[var(--radius-squircle)] p-10 border border-[var(--green-primary)]/5 transition-all 
+           hover:shadow-[var(--shadow-card)] hover:-translate-y-2;
   }
 
   .icon-box {
-    @apply w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-3xl mb-8 shadow-sm transition-transform duration-300 group-hover:scale-110;
-  }
-
-  /* Interaction Utilities */
-  .reveal-animation {
-    @apply opacity-0 translate-y-10 transition-all duration-1000 ease-out;
-  }
-
-  .reveal-animation.active {
-    @apply opacity-100 translate-y-0;
+    @apply w-16 h-16 rounded-2xl bg-[var(--green-primary)]/5 flex items-center justify-center text-3xl mb-8 transition-transform duration-300 group-hover:scale-110;
   }
 
   /* Specific Design Elements for Exact Clone */
@@ -157,14 +129,7 @@
   .shadow-glow { box-shadow: var(--shadow-glow); }
   
   .text-gradient-forest {
-    background: linear-gradient(135deg, var(--green-primary), var(--green-accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .logo-chunky {
-    @apply text-3xl font-[900] tracking-tighter lowercase text-[var(--green-primary)];
+    @apply text-[var(--green-primary)];
   }
 }
 

@@ -1,161 +1,115 @@
 import { motion } from "framer-motion";
+import { Sparkles, Award, Heart, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Award, Heart, Sparkles } from "lucide-react";
-import heroImage from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative overflow-hidden bg-[#f4faf0]" aria-labelledby="hero-heading">
+    <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-20 overflow-hidden" aria-labelledby="hero-heading">
+      
+      {/* Background Blobs - Strategic positioning for 'airy' feel */}
+      <div className="absolute top-[10%] left-[-5%] w-[40%] h-[40%] bg-lime/10 rounded-full blur-[120px] animate-blob" />
+      <div className="absolute bottom-[10%] right-[10%] w-[35%] h-[35%] bg-primary/5 rounded-full blur-[100px] animate-blob animation-delay-2000" />
+      <div className="absolute top-[40%] left-[30%] w-[25%] h-[25%] bg-lime/5 rounded-full blur-[80px] animate-blob animation-delay-4000" />
 
-      {/* === BACKGROUND === */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_10%_20%,#d4edcf_0%,#f4faf0_58%,#f7fbf6_100%)]" />
-
-      {/* Top-left dominant lime orb — exactly as in Picture 2 */}
-      <motion.div
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-10 -left-10 w-[420px] h-[420px] bg-[#A3E635]/25 rounded-full blur-[100px] pointer-events-none"
-      />
-      {/* Bottom-right subtle orb */}
-      <motion.div
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-[#1a452e]/[0.06] rounded-full blur-[80px] pointer-events-none"
-      />
-
-      {/* === CONTENT === */}
-      <div className="container mx-auto px-6 md:px-10 relative z-10 py-16 md:py-24">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-
-          {/* ── LEFT: Text ── */}
-          <div className="lg:text-left text-center">
-
-            {/* Pill badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 bg-[#A3E635]/20 rounded-full px-4 py-1.5 mb-7 border border-[#A3E635]/30"
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          
+          {/* Left: Content */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-left"
+          >
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="inline-flex items-center gap-2 bg-primary/5 border border-primary/10 rounded-full px-4 py-1.5 mb-8"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#1a452e]" strokeWidth={2.5} />
-              <span className="text-[13px] font-semibold text-[#1a452e] tracking-wide">100% Natural Sweeteners</span>
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <span className="text-[13px] font-bold text-primary uppercase tracking-wider">100% Natural Sweeteners</span>
             </motion.div>
 
-            {/* Main Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              id="hero-heading"
-              className="font-black leading-[1.0] tracking-tight mb-6"
-              style={{ fontSize: 'clamp(52px, 7vw, 88px)' }}
-            >
-              <span className="text-[#1c5f38] block">Sweetness</span>
-              {/* "Without" — exact forest→lime gradient from Lovable .text-gradient-forest */}
-              <span
-                className="block"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(145,55%,24%), hsl(100,55%,55%))',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Without
-              </span>
-              <span className="text-[#1c5f38] block">Sacrifice</span>
-            </motion.h1>
+            <h1 id="hero-heading" className="text-5xl md:text-6xl lg:text-7xl font-black text-foreground leading-[1.05] tracking-tighter mb-8 max-w-xl">
+              Sweetness<br />
+              <span className="text-primary">Without</span><br />
+              Sacrifice
+            </h1>
 
-            {/* Subtext */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-[#5a6e60] text-[15px] md:text-[17px] leading-relaxed max-w-[380px] lg:mx-0 mx-auto mb-9"
-            >
-              Experience the pure taste of nature with Grevia's premium Stevia and Monkfruit sweeteners. Zero calories, zero guilt, endless flavor.
-            </motion.p>
+            <p className="text-lg md:text-xl text-foreground/70 max-w-lg mb-10 leading-relaxed font-medium">
+              Experience the pure taste of nature with Grevia's premium Stevia and Monkfruit. Zero calories, zero glycemic impact, endless flavor.
+            </p>
 
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-3 lg:justify-start justify-center"
-            >
-              <Link
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link 
                 to="/collections/all"
-                className="inline-flex items-center justify-center font-bold text-[15px] h-14 px-9 bg-[#1c5f38] text-white rounded-full shadow-[0_4px_16px_-2px_rgba(28,95,56,0.45)] hover:bg-[#174e2e] hover:-translate-y-0.5 transition-all duration-300"
+                className="inline-flex items-center justify-center gap-2 font-black bg-primary text-white rounded-full shadow-lg hover:bg-forest-light hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-16 px-10 group"
               >
                 Shop Collection
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link
-                to="/benefits"
-                className="inline-flex items-center justify-center font-bold text-[15px] h-14 px-9 border-2 border-[#1c5f38]/25 text-[#1c5f38] bg-white/60 backdrop-blur-sm rounded-full hover:border-[#1c5f38]/60 hover:bg-white/80 transition-all duration-300"
+              <Link 
+                to="/#benefits"
+                className="inline-flex items-center justify-center font-bold border-2 border-primary/20 text-primary hover:border-primary hover:bg-primary/5 rounded-full transition-all duration-300 h-16 px-10"
               >
                 Learn More
               </Link>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
 
-          {/* ── RIGHT: Image + Floating Badges ── */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, delay: 0.15, ease: "easeOut" }}
+          {/* Right: Image Card & Floating Badges */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
             className="relative"
           >
-            {/* Outer wrapper — gives room for overflowing badges */}
-            <div className="relative mx-auto max-w-[600px] lg:max-w-none pb-20 pt-10 px-4">
-
-              {/* Soft lime glow behind the image */}
-              <div className="absolute inset-10 bg-[#A3E635]/10 rounded-full blur-[100px]" />
-
-              {/* ── MAIN IMAGE: Natural height wrapping without forced h-full ── */}
-              <div
-                className="relative rounded-[48px] overflow-hidden shadow-[0_20px_50px_-20px_rgba(28,95,56,0.15)] bg-white"
-              >
-                <img
-                  src="/build/assets/hero-bg-D-TWzogc.jpg"
-                  alt="Grevia Organic Sweetener products laid elegantly on cream marble surface"
-                  className="w-full"
-                />
+            <div className="relative max-w-[540px] mx-auto lg:ml-auto lg:mr-0">
+              
+              {/* Image Container - Horizontal Card Style */}
+              <div className="relative rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(46,125,50,0.12)] bg-white p-2">
+                <div className="aspect-[16/10] overflow-hidden rounded-[24px]">
+                  <img 
+                    src="/build/assets/hero-bg-D-TWzogc.jpg" 
+                    alt="Grevia natural products" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
               </div>
 
-              {/* ── BADGE 1: Zero Glycemic — top-left overlapping ── */}
-              <motion.div
-                animate={{ y: [-4, 4, -4] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-0 -left-2 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
+              {/* Floating Badges - Exactly placed as in prototype */}
+              <motion.div 
+                animate={{ y: [-6, 6, -6] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-6 -left-6 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 border border-primary/5"
               >
-                <div className="w-8 h-8 bg-[#A3E635]/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Award className="w-4 h-4 text-[#1a452e]" />
+                <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <Award className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">Zero Glycemic</span>
+                <span className="text-sm font-bold text-foreground pr-2">Zero Glycemic</span>
               </motion.div>
 
-              {/* ── BADGE 2: Keto Friendly — floating bottom-right far out ── */}
-              <motion.div
-                animate={{ y: [4, -4, 4] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -bottom-4 right-0 lg:right-4 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
+              <motion.div 
+                animate={{ y: [6, -6, 6] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute -bottom-6 -right-6 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 border border-primary/5"
               >
-                <div className="w-8 h-8 bg-[#A3E635]/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Heart className="w-4 h-4 text-[#1a452e]" strokeWidth={2.5} />
+                <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">Keto Friendly</span>
+                <span className="text-sm font-bold text-foreground pr-2">Keto Friendly</span>
               </motion.div>
 
-              {/* ── BADGE 3: 100% Pure — floating bottom-left ── */}
-              <motion.div
-                animate={{ y: [-3, 5, -3] }}
-                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                className="absolute -bottom-16 left-12 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
+              <motion.div 
+                animate={{ y: [-4, 6, -4] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                className="absolute bottom-1/2 -left-12 translate-y-1/2 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 border border-primary/5"
               >
-                <div className="w-8 h-8 bg-[#A3E635]/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-4 h-4 text-[#1a452e]" />
+                <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">100% Pure</span>
+                <span className="text-sm font-bold text-foreground pr-2">100% Pure</span>
               </motion.div>
 
             </div>
