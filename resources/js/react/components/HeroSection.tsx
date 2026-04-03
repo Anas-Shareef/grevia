@@ -106,57 +106,57 @@ const HeroSection = () => {
             className="relative"
           >
             {/* Outer wrapper — gives room for overflowing badges */}
-            <div className="relative mx-auto max-w-[560px] lg:max-w-none pb-10">
+            <div className="relative mx-auto max-w-[600px] lg:max-w-none pb-20 pt-10 px-4">
 
               {/* Soft lime glow behind the image */}
-              <div className="absolute inset-4 bg-[#A3E635]/15 rounded-[36px] blur-2xl" />
+              <div className="absolute inset-10 bg-[#A3E635]/10 rounded-full blur-[100px]" />
 
-              {/* ── MAIN IMAGE: 4:3 landscape, no border, soft rounded corners ── */}
+              {/* ── MAIN IMAGE: Exact match to screenshot shape and radius ── */}
               <div
-                className="relative rounded-[28px] overflow-hidden shadow-[0_16px_48px_-12px_rgba(28,95,56,0.18)]"
-                style={{ aspectRatio: '4/3' }}
+                className="relative rounded-[60px] overflow-hidden shadow-[0_20px_50px_-20px_rgba(28,95,56,0.15)] bg-white"
+                style={{ aspectRatio: '1.6/1' }}
               >
                 <img
-                  src={heroImage}
-                  alt="Grevia Organic Sweetener products — Stevia and Monkfruit"
+                  src="/assets/hero-bg-D-TWzogc.jpg"
+                  alt="Grevia Organic Sweetener products laid elegantly on cream marble surface"
                   className="w-full h-full object-cover"
                 />
               </div>
 
-              {/* ── BADGE 1: Zero Glycemic — top-left overlapping image edge ── */}
+              {/* ── BADGE 1: Zero Glycemic — top-left overlapping ── */}
               <motion.div
                 animate={{ y: [-4, 4, -4] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-4 -left-5 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-4 py-2 shadow-[0_4px_20px_-4px_rgba(28,95,56,0.18)] border border-[#e8f0e8]"
+                className="absolute top-0 -left-2 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
               >
-                <div className="w-6 h-6 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Award className="w-3 h-3 text-[#1c5f38]" />
+                <div className="w-8 h-8 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Award className="w-4 h-4 text-[#1a452e]" />
                 </div>
-                <span className="text-[12px] font-bold text-[#1c5f38] whitespace-nowrap">Zero Glycemic</span>
+                <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">Zero Glycemic</span>
               </motion.div>
 
-              {/* ── BADGE 2: Keto Friendly — right side, vertically centered-ish ── */}
+              {/* ── BADGE 2: Keto Friendly — floating bottom-right far out ── */}
               <motion.div
                 animate={{ y: [4, -4, 4] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute bottom-16 -right-4 lg:-right-8 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-4 py-2 shadow-[0_4px_20px_-4px_rgba(28,95,56,0.18)] border border-[#e8f0e8]"
+                className="absolute -bottom-4 right-0 lg:right-4 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
               >
-                <div className="w-6 h-6 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Heart className="w-3 h-3 text-[#1c5f38]" />
+                <div className="w-8 h-8 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Heart className="w-4 h-4 text-[#1a452e]" strokeWidth={2.5} />
                 </div>
-                <span className="text-[12px] font-bold text-[#1c5f38] whitespace-nowrap">Keto Friendly</span>
+                <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">Keto Friendly</span>
               </motion.div>
 
-              {/* ── BADGE 3: 100% Pure — bottom-left, below image ── */}
+              {/* ── BADGE 3: 100% Pure — floating bottom-left ── */}
               <motion.div
                 animate={{ y: [-3, 5, -3] }}
                 transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                className="absolute bottom-0 left-6 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-4 py-2 shadow-[0_4px_20px_-4px_rgba(28,95,56,0.18)] border border-[#e8f0e8]"
+                className="absolute -bottom-16 left-12 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
               >
-                <div className="w-6 h-6 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-3 h-3 text-[#1c5f38]" />
+                <div className="w-8 h-8 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-4 h-4 text-[#1a452e]" />
                 </div>
-                <span className="text-[12px] font-bold text-[#1c5f38] whitespace-nowrap">100% Pure</span>
+                <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">100% Pure</span>
               </motion.div>
 
             </div>
