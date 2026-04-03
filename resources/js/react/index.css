@@ -16,14 +16,18 @@
   --text-body:        #374151;
   --text-muted:       #6B7280;
   --border-light:     #E5E7EB;
-  --bg-page:          #F7FAF7;
+  --bg-page:          #F8FAF8; /* Refined airy off-white */
   --bg-card:          #F9F9F2;
 
   /* === SPACING & RADIUS === */
-  --radius-squircle:  24px;
-  --radius-lg:        32px;
-  --shadow-button:    0 10px 20px -10px rgba(26, 69, 46, 0.3);
-  --shadow-card:      0 20px 40px -15px rgba(0, 0, 0, 0.05);
+  --radius-squircle:  1.5rem;   /* 24px */
+  --radius-lg:        2rem;     /* 32px */
+  --radius-xl:        3rem;     /* 48px - Signature Lovable Radius */
+  --radius-2xl:       4rem;     /* 64px */
+  
+  --shadow-button:    0 4px 14px -2px rgba(26, 69, 46, 0.4);
+  --shadow-card:      0 8px 30px -8px rgba(26, 69, 46, 0.12);
+  --shadow-glow:      0 0 40px rgba(163, 230, 53, 0.3);
 
   /* === TYPOGRAPHY === */
   --font-main:        'Montserrat', sans-serif;
@@ -142,24 +146,21 @@
     @apply absolute -z-10 rounded-full blur-[100px] opacity-40;
   }
 
-  .squircle-mask {
-    border-radius: var(--radius-squircle);
-  }
+  /* Lovable Style Squircle Classes */
+  .rounded-squircle { border-radius: var(--radius-squircle); }
+  .rounded-squircle-lg { border-radius: var(--radius-lg); }
+  .rounded-squircle-xl { border-radius: var(--radius-xl); }
+  .rounded-squircle-2xl { border-radius: var(--radius-2xl); }
 
-  /* Size Pills */
-  .size-pill {
-    @apply px-4 py-2 rounded-xl border border-[var(--border-light)] text-[11px] font-bold uppercase transition-all
-           hover:border-[var(--green-primary)] text-[var(--text-muted)];
-  }
-  .size-pill.active {
-    @apply bg-[var(--green-primary)] text-white border-[var(--green-primary)] shadow-md;
-  }
-
-  /* NEW: High-fidelity Clone Utilities */
-  .text-outline {
-    color: transparent !important;
-    -webkit-text-stroke: 1.5px var(--green-primary);
-    opacity: 0.3;
+  .shadow-button { box-shadow: var(--shadow-button); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  
+  .text-gradient-forest {
+    background: linear-gradient(135deg, var(--green-primary), var(--green-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .logo-chunky {
