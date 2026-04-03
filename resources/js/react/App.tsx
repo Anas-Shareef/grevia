@@ -28,10 +28,33 @@ import DashboardAddresses from "@/pages/dashboard/AddressesPage";
 import DashboardReviews from "@/pages/dashboard/ReviewsPage";
 import NewsletterPopup from "@/components/NewsletterPopup";
 
-const queryClient = new QueryClient();
+import React, { useMemo, useEffect } from "react";
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+const App = () => {
+  const queryClient = useMemo(() => new QueryClient(), []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('opacity-100');
+          e.target.classList.add('translate-y-0');
+          e.target.classList.remove('opacity-0');
+          e.target.classList.remove('translate-y-5');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.product-card, .benefit-card, .review-card, .ingredient-card, .section-header').forEach(el => {
+      el.classList.add('reveal-animation');
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <TooltipProvider>
         <AuthProvider>
@@ -82,7 +105,8 @@ const App = () => (
         </AuthProvider>
       </TooltipProvider>
     </BrowserRouter>
-  </QueryClientProvider>
-);
+      </QueryClientProvider>
+    );
+};
 
 export default App;

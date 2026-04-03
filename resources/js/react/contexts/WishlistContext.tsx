@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
-import { Product } from "@/data/products";
+import { Product } from "@/types";
 
-import { WishlistContext, WishlistContextType } from "./WishlistContext.model";
+import { WishlistContext, WishlistContextType } from "./Definitions";
 
 const WISHLIST_STORAGE_KEY = "grevia-wishlist";
 

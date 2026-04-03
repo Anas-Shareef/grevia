@@ -4,64 +4,7 @@ import product3 from "@/assets/product-3.jpg";
 import bakeryCategory from "@/assets/bakery-category.jpg";
 import picklesCategory from "@/assets/pickles-category.jpg";
 
-export interface ProductVariant {
-  id: number;
-  product_id: number;
-  weight: string;
-  pack_size: number;
-  price: number | string;
-  discount_price?: number | string;
-  stock_quantity: number;
-  sku: string;
-  status: 'active' | 'inactive';
-  image_path?: string;
-  image_url?: string;     // main image URL (computed from gallery or image_path)
-  gallery?: {             // full ordered gallery for this variant
-    id: number;
-    url: string;
-    is_main: boolean;
-    sort_order: number;
-  }[];
-}
-
-export interface Product {
-  id: string;
-  dbId?: number; // Added for backend compatibility
-  name: string;
-  slug?: string;
-  description: string;
-  longDescription?: string;
-  ingredients?: string[];
-  price: number;
-  originalPrice?: number;
-  rating: number;
-  reviews: number;
-  reviews_count?: number; // Dynamic count from approved reviews
-  average_rating?: number; // Dynamic average from approved reviews
-  image: string;
-  images?: string[];
-  category: string | { id: number; name: string; slug: string; parent_id?: number | null }; // Support both string and API object
-  subcategory?: string;
-  badge?: string;
-  inStock: boolean;
-  gallery?: Array<{
-    id: number;
-    url: string;
-    is_main: boolean;
-    sort_order: number;
-  }>;
-  mainImage?: {
-    url: string;
-  };
-  variants?: ProductVariant[];
-  ratio?: string;
-  form?: string;
-  type?: string;
-  size_label?: string;
-  use_case?: string;
-  sweetness_description?: string;
-  related_products?: string;
-}
+import { Product, ProductVariant } from "@/types";
 
 export const products: Product[] = [
   // Stevia Sweeteners

@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { auth } from "@/lib/firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-import { AuthContext, AuthContextType } from "./AuthContext.model";
+import { AuthContext, AuthContextType } from "./Definitions";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);

@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
-import { Product } from "@/data/products";
+import { Product } from "@/types";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 import { api } from "@/lib/api";
 
-import { CartContext, CartItem, CartContextType } from "./CartContext.model";
+import { CartContext, CartItem, CartContextType } from "./Definitions";
 
 const CART_STORAGE_KEY = 'grevia_cart';
 

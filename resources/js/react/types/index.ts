@@ -85,3 +85,62 @@ export interface Order {
     invoices?: any[];
     refunds?: any[];
 }
+
+export interface ProductVariant {
+  id: number;
+  product_id: number;
+  weight: string;
+  pack_size: number;
+  price: number | string;
+  discount_price?: number | string;
+  stock_quantity: number;
+  sku: string;
+  status: 'active' | 'inactive';
+  image_path?: string;
+  image_url?: string;
+  gallery?: {
+    id: number;
+    url: string;
+    is_main: boolean;
+    sort_order: number;
+  }[];
+}
+
+export interface Product {
+  id: string;
+  dbId?: number;
+  name: string;
+  slug?: string;
+  description: string;
+  longDescription?: string;
+  ingredients?: string[];
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviews: number;
+  reviews_count?: number;
+  average_rating?: number;
+  image: string;
+  images?: string[];
+  category: string | { id: number; name: string; slug: string; parent_id?: number | null };
+  subcategory?: string;
+  badge?: string;
+  inStock: boolean;
+  gallery?: Array<{
+    id: number;
+    url: string;
+    is_main: boolean;
+    sort_order: number;
+  }>;
+  mainImage?: {
+    url: string;
+  };
+  variants?: ProductVariant[];
+  ratio?: string;
+  form?: string;
+  type?: string;
+  size_label?: string;
+  use_case?: string;
+  sweetness_description?: string;
+  related_products?: string;
+}
