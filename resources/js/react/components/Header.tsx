@@ -51,19 +51,12 @@ const Header = () => {
       <div className="h-full flex items-center justify-between px-6 md:px-10 max-w-[1920px] mx-auto">
         
         {/* Left Section: Logo */}
-        <Link to="/" className="flex flex-col justify-center items-start group">
-          <div className="flex items-center text-[#1c5f38]">
-            <span className="text-[28px] md:text-[32px] font-[900] tracking-tighter leading-none relative">
-              grevia
-              {/* Decorative subtle leaf mark integrated in the text visually */}
-              <svg className="absolute -top-1 -right-3 w-4 h-4 text-[#527a63] opacity-80" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm-1 14.5v-5A1.5 1.5 0 0 1 12.5 10h1.88c.35 0 .58.33.45.65l-2.43 5.46a.5.5 0 0 1-.9.39z"/>
-              </svg>
-            </span>
-          </div>
-          <span className="text-[9px] md:text-[10px] font-medium text-[#8a8a8a] tracking-[0.15em] uppercase mt-1">
-            Healthy Natural Foods
-          </span>
+        <Link to="/" className="flex items-center group py-2">
+          <img 
+            src="/grevia-logo.png" 
+            alt="Grevia Healthy Natural Foods" 
+            className="h-10 w-auto md:h-12 object-contain group-hover:scale-[1.02] transition-transform duration-300"
+          />
         </Link>
 
         {/* Center Section: Navigation */}
