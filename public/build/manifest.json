@@ -1,33 +1,18 @@
 {
-  "resources/js/react/assets/grevia-logo.png": {
-    "file": "assets/grevia-logo-CY32JlmK.png",
-    "src": "resources/js/react/assets/grevia-logo.png"
-  },
   "resources/js/react/assets/hero-bg.jpg": {
     "file": "assets/hero-bg-D-TWzogc.jpg",
     "src": "resources/js/react/assets/hero-bg.jpg"
   },
-  "resources/js/react/assets/monkfruit.jpg": {
-    "file": "assets/monkfruit-BcPScPOr.jpg",
-    "src": "resources/js/react/assets/monkfruit.jpg"
-  },
-  "resources/js/react/assets/stevia-plant.jpg": {
-    "file": "assets/stevia-plant-DuYBZTxB.jpg",
-    "src": "resources/js/react/assets/stevia-plant.jpg"
-  },
   "resources/js/react/main.tsx": {
-    "file": "assets/main-CrC2FjGA.js",
+    "file": "assets/main-C4b53uBa.js",
     "name": "main",
     "src": "resources/js/react/main.tsx",
     "isEntry": true,
     "css": [
-      "assets/main-BQsJ4Jr4.css"
+      "assets/main-BRH47KCW.css"
     ],
     "assets": [
-      "assets/grevia-logo-CY32JlmK.png",
-      "assets/hero-bg-D-TWzogc.jpg",
-      "assets/stevia-plant-DuYBZTxB.jpg",
-      "assets/monkfruit-BcPScPOr.jpg"
+      "assets/hero-bg-D-TWzogc.jpg"
     ]
   }
 }
