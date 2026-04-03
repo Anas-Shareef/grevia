@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X, Heart, User, LogOut, LayoutDashboard, Package, ShoppingBag } from "lucide-react";
+import { ShoppingCart, Menu, X, Heart, User, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
@@ -8,12 +8,11 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  
   const { setIsCartOpen, getCartCount } = useCart();
   const { getWishlistCount } = useWishlist();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,163 +20,213 @@ const Header = () => {
   const wishlistCount = getWishlistCount();
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
     setIsMenuOpen(false);
-    setIsUserMenuOpen(false);
+    setActiveDropdown(null);
   }, [location.pathname]);
-
-  const handleLogout = async () => {
-    await logout();
-    setIsUserMenuOpen(false);
-  };
 
   const navLinks = [
     { label: "Home", href: "/" },
-    { label: "Collections", href: "/collections/all" },
-    { label: "Our Benefits", href: "/benefits" },
-    { label: "Contact", href: "/contact" },
+    { label: "Benefits", href: "/benefits" },
+    { 
+      label: "Sweeteners", 
+      href: "/collections/all",
+      dropdown: [
+        { label: "Pure Stevia", href: "/collections/all?filter=stevia" },
+        { label: "Monk Fruit", href: "/collections/all?filter=monk-fruit" },
+      ]
+    },
+    { 
+      label: "Other Products", 
+      href: "/collections/all",
+      dropdown: [
+        { label: "Baking Blends", href: "/collections/all?filter=baking" },
+        { label: "Liquid Drops", href: "/collections/all?filter=liquid" },
+      ]
+    },
+    { label: "Contact Us", href: "/contact" },
   ];
 
-  const navLinkClass = "text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-heading)] hover:text-[var(--green-accent)] transition-all duration-300";
-
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'h-16 bg-white/90 backdrop-blur-md shadow-sm' : 'h-20 bg-transparent'}`}>
-      <div className="container h-full flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="group flex items-center gap-0.5">
-          <span className="logo-chunky">grevia</span><span className="text-3xl font-[900] text-[var(--green-accent)]">.</span>
+    <header className="sticky top-0 left-0 right-0 z-50 w-full h-[75px] bg-[#f5f6f4] transition-all duration-300" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+      <div className="h-full flex items-center justify-between px-6 md:px-10 max-w-[1920px] mx-auto">
+        
+        {/* Left Section: Logo */}
+        <Link to="/" className="flex flex-col justify-center items-start group">
+          <div className="flex items-center text-[#1c5f38]">
+            <span className="text-[28px] md:text-[32px] font-[900] tracking-tighter leading-none relative">
+              grevia
+              {/* Decorative subtle leaf mark integrated in the text visually */}
+              <svg className="absolute -top-1 -right-3 w-4 h-4 text-[#527a63] opacity-80" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm-1 14.5v-5A1.5 1.5 0 0 1 12.5 10h1.88c.35 0 .58.33.45.65l-2.43 5.46a.5.5 0 0 1-.9.39z"/>
+              </svg>
+            </span>
+          </div>
+          <span className="text-[9px] md:text-[10px] font-medium text-[#8a8a8a] tracking-[0.15em] uppercase mt-1">
+            Healthy Natural Foods
+          </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-10">
+        {/* Center Section: Navigation */}
+        <nav className="hidden lg:flex items-center gap-8 xl:gap-10 h-full">
           {navLinks.map((link) => (
-            <Link key={link.label} to={link.href} className={navLinkClass}>
-              {link.label}
-            </Link>
+            <div 
+              key={link.label} 
+              className="relative h-full flex items-center group"
+              onMouseEnter={() => link.dropdown && setActiveDropdown(link.label)}
+              onMouseLeave={() => link.dropdown && setActiveDropdown(null)}
+            >
+              <Link 
+                to={link.href} 
+                className="flex items-center gap-1 text-[15px] font-[500] text-[#4a4a4a] hover:text-[#527a63] transition-colors duration-200 relative overflow-hidden py-2"
+              >
+                {link.label}
+                {link.dropdown && <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform duration-300" />}
+                
+                {/* Underline Animation */}
+                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#527a63] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+              </Link>
+
+              {/* Dropdown Menu */}
+              {link.dropdown && (
+                <AnimatePresence>
+                  {activeDropdown === link.label && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10, transition: { duration: 0.1 } }}
+                      className="absolute top-[65px] left-0 min-w-[200px] bg-white rounded-xl shadow-lg border border-[#dee7da] overflow-hidden py-2 z-50"
+                    >
+                      {link.dropdown.map((subItem) => (
+                        <Link 
+                          key={subItem.label} 
+                          to={subItem.href}
+                          className="block px-5 py-2.5 text-[14px] font-[500] text-[#4a4a4a] hover:bg-[#f5f6f4] hover:text-[#1c5f38] transition-colors"
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
+            </div>
           ))}
         </nav>
 
-        {/* Desktop Actions */}
-        <div className="flex items-center gap-2 md:gap-5">
-          {/* Wishlist */}
-          <Link to="/wishlist" className="p-2 text-[var(--text-heading)] hover:text-[var(--green-accent)] transition-colors relative">
-            <Heart className="w-5 h-5" />
-            {wishlistCount > 0 && (
-              <span className="absolute top-0 right-0 w-4 h-4 bg-[var(--green-accent)] text-[var(--green-primary)] text-[9px] font-black rounded-full flex items-center justify-center border border-white">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
-
-          {/* User Profile */}
-          <div className="relative">
-            <button
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="p-2 text-[var(--text-heading)] hover:text-[var(--green-accent)] transition-colors"
+        {/* Right Section: Icons + CTA */}
+        <div className="flex items-center gap-5 md:gap-6">
+          <div className="flex items-center gap-4">
+            {/* Wishlist */}
+            <button 
+              onClick={() => navigate('/wishlist')}
+              className="text-[#4a4a4a] hover:text-[#1c5f38] transition-colors relative"
             >
-              <User className="w-5 h-5" />
+              <Heart className="w-[20px] h-[20px] stroke-[1.5]" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#1c5f38] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+            
+            {/* User Profile (Mobile/Tablet Hidden to save space if needed, but keeping for functionality) */}
+            <button 
+              onClick={() => navigate(user ? '/dashboard' : '/login')}
+              className="hidden sm:block text-[#4a4a4a] hover:text-[#1c5f38] transition-colors"
+            >
+              <User className="w-[20px] h-[20px] stroke-[1.5]" />
             </button>
 
-            <AnimatePresence>
-              {isUserMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-[var(--border-light)] overflow-hidden py-2 z-50"
-                >
-                  {user ? (
-                    <>
-                      <div className="px-5 py-3 border-b border-[var(--border-light)] mb-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-1">Account</p>
-                        <p className="text-xs font-bold text-[var(--text-heading)] truncate">{user.name}</p>
-                      </div>
-                      <Link to="/dashboard" className="flex items-center gap-3 px-5 py-3 text-xs font-bold text-[var(--text-heading)] hover:bg-[var(--green-pale)] hover:text-[var(--green-primary)] transition-colors">
-                        <LayoutDashboard className="w-4 h-4" /> My Dashboard
-                      </Link>
-                      <Link to="/dashboard/orders" className="flex items-center gap-3 px-5 py-3 text-xs font-bold text-[var(--text-heading)] hover:bg-[var(--green-pale)] hover:text-[var(--green-primary)] transition-colors">
-                        <Package className="w-4 h-4" /> Order History
-                      </Link>
-                      <button onClick={handleLogout} className="flex w-full items-center gap-3 px-5 py-3 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors">
-                        <LogOut className="w-4 h-4" /> Secure Logout
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link to="/login" className="block px-5 py-3 text-xs font-black uppercase tracking-widest text-[var(--text-heading)] hover:bg-[var(--green-pale)]">Log In</Link>
-                      <Link to="/register" className="block px-5 py-3 text-xs font-black uppercase tracking-widest text-[var(--text-heading)] hover:bg-[var(--green-pale)]">Sign Up</Link>
-                    </>
-                  )}
-                </motion.div>
+            {/* Cart */}
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="text-[#4a4a4a] hover:text-[#1c5f38] transition-colors relative"
+            >
+              <ShoppingCart className="w-[20px] h-[20px] stroke-[1.5]" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#1c5f38] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
               )}
-            </AnimatePresence>
+            </button>
           </div>
 
-          {/* Cart Bag */}
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="flex items-center gap-3 px-4 py-2 bg-[var(--green-primary)] text-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 relative"
+          {/* Shop Now CTA */}
+          <Link 
+            to="/collections/all" 
+            className="hidden sm:flex items-center justify-center px-[22px] py-[10px] bg-[#1c5f38] text-[#fafaf5] rounded-full text-[14px] font-[600] shadow-sm hover:shadow-md hover:bg-[#154a2a] hover:-translate-y-[1px] transition-all duration-200"
           >
-            <ShoppingBag className="w-5 h-5" />
-            <span className="text-[11px] font-black uppercase tracking-widest hidden sm:inline">Bag</span>
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--green-accent)] text-[var(--green-primary)] text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
-                {cartCount}
-              </span>
-            )}
-          </button>
+            Shop Now
+          </Link>
 
           {/* Mobile Menu Toggle */}
           <button
-            className="lg:hidden p-2 text-[var(--text-heading)]"
+            className="lg:hidden text-[#4a4a4a] ml-1"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? <X className="w-[22px] h-[22px]" /> : <Menu className="w-[22px] h-[22px]" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Navigation */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 top-0 left-0 bg-white z-[60] flex flex-col p-8 pt-24"
+            className="fixed inset-0 top-[75px] left-0 bg-[#f5f6f4] z-40 flex flex-col p-8 overflow-y-auto"
           >
-            <button 
-              onClick={() => setIsMenuOpen(false)}
-              className="absolute top-6 right-6 p-2 text-[var(--text-heading)]"
-            >
-              <X className="w-8 h-8" />
-            </button>
-
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6">
               {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  className="text-4xl font-[900] tracking-tighter text-[var(--green-primary)]"
-                >
-                  {link.label}
-                </Link>
+                <div key={link.label} className="flex flex-col gap-3">
+                  <Link
+                    to={link.href}
+                    className="text-2xl font-[700] text-[#1c5f38]"
+                    onClick={(e) => {
+                      if (link.dropdown) {
+                        e.preventDefault();
+                        setActiveDropdown(activeDropdown === link.label ? null : link.label);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      {link.label}
+                      {link.dropdown && (
+                        <ChevronDown className={`w-6 h-6 transition-transform ${activeDropdown === link.label ? 'rotate-180' : ''}`} />
+                      )}
+                    </div>
+                  </Link>
+                  
+                  {/* Mobile Submenu */}
+                  {link.dropdown && activeDropdown === link.label && (
+                    <div className="flex flex-col gap-3 pl-4 border-l-2 border-[#dee7da]">
+                      {link.dropdown.map(subItem => (
+                        <Link 
+                          key={subItem.label} 
+                          to={subItem.href}
+                          className="text-lg font-[500] text-[#527a63]"
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
 
-            <div className="mt-auto flex flex-col gap-4">
+            <div className="mt-12 flex flex-col gap-4 pb-12">
+              <Link to="/collections/all" className="flex items-center justify-center py-4 bg-[#1c5f38] text-white rounded-full font-bold text-lg">
+                Shop Now
+              </Link>
               {!user ? (
                 <>
-                  <Link to="/login" className="btn-secondary w-full text-center">Log In</Link>
-                  <Link to="/register" className="btn-primary w-full text-center">Join Movement</Link>
+                  <Link to="/login" className="flex items-center justify-center py-3 bg-white text-[#1c5f38] border border-[#dee7da] rounded-full font-bold">Log In</Link>
                 </>
               ) : (
-                <Link to="/dashboard" className="btn-primary w-full text-center">Visit Dashboard</Link>
+                <Link to="/dashboard" className="flex items-center justify-center py-3 bg-white text-[#1c5f38] border border-[#dee7da] rounded-full font-bold">My Account</Link>
               )}
             </div>
           </motion.div>
