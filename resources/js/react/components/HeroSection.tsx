@@ -111,15 +111,14 @@ const HeroSection = () => {
               {/* Soft lime glow behind the image */}
               <div className="absolute inset-10 bg-[#A3E635]/10 rounded-full blur-[100px]" />
 
-              {/* ── MAIN IMAGE: Exact match to screenshot shape and radius ── */}
+              {/* ── MAIN IMAGE: Natural height wrapping without forced h-full ── */}
               <div
-                className="relative rounded-[60px] overflow-hidden shadow-[0_20px_50px_-20px_rgba(28,95,56,0.15)] bg-white"
-                style={{ aspectRatio: '1.6/1' }}
+                className="relative rounded-[48px] overflow-hidden shadow-[0_20px_50px_-20px_rgba(28,95,56,0.15)] bg-white"
               >
                 <img
                   src="/build/assets/hero-bg-D-TWzogc.jpg"
                   alt="Grevia Organic Sweetener products laid elegantly on cream marble surface"
-                  className="w-full h-full object-cover"
+                  className="w-full"
                 />
               </div>
 
@@ -129,7 +128,7 @@ const HeroSection = () => {
                 transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute top-0 -left-2 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
               >
-                <div className="w-8 h-8 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#A3E635]/30 rounded-full flex items-center justify-center flex-shrink-0">
                   <Award className="w-4 h-4 text-[#1a452e]" />
                 </div>
                 <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">Zero Glycemic</span>
@@ -141,7 +140,7 @@ const HeroSection = () => {
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 className="absolute -bottom-4 right-0 lg:right-4 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
               >
-                <div className="w-8 h-8 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#A3E635]/30 rounded-full flex items-center justify-center flex-shrink-0">
                   <Heart className="w-4 h-4 text-[#1a452e]" strokeWidth={2.5} />
                 </div>
                 <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">Keto Friendly</span>
@@ -153,7 +152,7 @@ const HeroSection = () => {
                 transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
                 className="absolute -bottom-16 left-12 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-[0_8px_30px_-4px_rgba(28,95,56,0.08)] border border-[#e8f0e8]/50"
               >
-                <div className="w-8 h-8 bg-[#A3E635]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#A3E635]/30 rounded-full flex items-center justify-center flex-shrink-0">
                   <Sparkles className="w-4 h-4 text-[#1a452e]" />
                 </div>
                 <span className="text-[14px] font-bold text-[#1a452e] whitespace-nowrap">100% Pure</span>
