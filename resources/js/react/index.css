@@ -50,10 +50,8 @@
 }
 
 @layer base {
-  *,
   ::before,
   ::after {
-    border-color: transparent;
     font-family: var(--font-main);
   }
   body {
@@ -138,6 +136,16 @@
     @apply w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110;
     background: hsl(var(--lime) / 0.2);
     color: hsl(var(--primary));
+  }
+
+  /* === Standardized Eyebrow Typography === */
+  .eyebrow {
+    @apply text-[10px] font-black uppercase tracking-[0.3em] inline-flex items-center gap-2;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .sidebar-header {
+    @apply text-[11px] font-[900] uppercase tracking-widest mb-6 py-2 border-b border-border/50;
   }
 
   /* Shadow Orb (Background Glow) */

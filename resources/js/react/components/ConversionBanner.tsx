@@ -36,7 +36,7 @@ const ConversionBanner = () => {
             className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 mb-10"
           >
             <Sparkles className="w-4 h-4 text-white" />
-            <span className="text-xs font-black text-white uppercase tracking-[0.2em]">
+            <span className="eyebrow !text-white !tracking-[0.2em]">
               Limited Time Offer
             </span>
           </motion.div>

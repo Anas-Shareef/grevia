@@ -5,6 +5,7 @@ import bakeryCategory from "@/assets/bakery-category.jpg";
 import picklesCategory from "@/assets/pickles-category.jpg";
 
 import { Product, ProductVariant } from "@/types";
+export type { Product, ProductVariant };
 
 export const products: Product[] = [
   // Stevia Sweeteners

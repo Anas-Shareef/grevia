@@ -56,7 +56,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       <div className="relative aspect-square overflow-hidden bg-secondary/30">
         {/* Badge */}
         {product.badge && (
-          <div className="absolute top-4 left-4 z-10 bg-lime text-foreground text-xs font-bold px-3 py-1.5 rounded-squircle">
+          <div className="absolute top-4 left-4 z-10 bg-lime text-foreground eyebrow !tracking-widest !text-[10px] px-3 py-1.5 shadow-sm">
             {product.badge}
           </div>
         )}

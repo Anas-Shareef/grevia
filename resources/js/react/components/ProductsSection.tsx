@@ -3,6 +3,7 @@ import { Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import { Product } from "@/types";
 
 const ProductsSection = () => {
   const { addToCart } = useCart();
@@ -42,12 +43,11 @@ const ProductsSection = () => {
 
   const handleAddToCart = (product: (typeof products)[0]) => {
     addToCart({
-      id: product.id,
+      id: String(product.id),
       name: product.title,
       price: product.price,
       image: product.image,
-      quantity: 1,
-    });
+    } as Product, 1);
     toast.success(`${product.title} added to cart!`);
   };
 
@@ -69,7 +69,7 @@ const ProductsSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
         >
-          <span className="inline-block text-sm font-bold text-lime uppercase tracking-widest mb-4">
+          <span className="eyebrow mb-4 !text-lime">
             Our Collection
           </span>
           <h2
@@ -101,7 +101,7 @@ const ProductsSection = () => {
               <div className="relative aspect-square overflow-hidden bg-secondary/30">
                 {/* Badge */}
                 {product.badge && (
-                  <div className="absolute top-4 left-4 z-10 bg-lime text-foreground text-xs font-bold px-3 py-1.5 rounded-squircle">
+                  <div className="absolute top-4 left-4 z-10 bg-lime text-foreground eyebrow !tracking-widest !text-[10px] px-3 py-1.5 shadow-sm">
                     {product.badge}
                   </div>
                 )}

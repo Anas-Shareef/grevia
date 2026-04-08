@@ -52,7 +52,7 @@ const IngredientsSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
         >
-          <span className="inline-block text-sm font-bold text-lime uppercase tracking-widest mb-4">
+          <span className="eyebrow mb-4 !text-lime">
             Ingredient Spotlight
           </span>
           <h2
