@@ -4,7 +4,7 @@ import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Package, MapPin, Star, Heart, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const DashboardLayout = () => {
     const { logout, user } = useAuth();
@@ -21,48 +21,63 @@ const DashboardLayout = () => {
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#F5F2EA]">
+        <div className="min-h-screen flex flex-col bg-[#FDFCF6] selection:bg-primary/10 selection:text-primary">
             <Header />
-            <div className="container mx-auto px-4 md:px-6 py-12 pt-40 flex-grow">
-                <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
-                    {/* Sidebar */}
-                    <aside className="w-full lg:w-80 shrink-0">
+            
+            {/* Background Aesthetic Blobs - 'The Lovable Touch' */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+                <div className="absolute top-[20%] -left-[10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[20%] -right-[10%] w-[40%] h-[40%] bg-accent/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+            </div>
+
+            <main className="flex-grow container mx-auto px-4 md:px-6 pt-44 pb-32">
+                <div className="flex flex-col lg:flex-row gap-20">
+                    
+                    {/* Floating Pillar Sidebar Architecture */}
+                    <aside className="w-full lg:w-72 shrink-0">
                         <motion.div 
-                            initial={{ opacity: 0, x: -20 }}
+                            initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="bg-white rounded-[32px] shadow-[0_8px_30px_rgba(46,125,50,0.04)] border border-primary/5 p-8"
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="bg-white/80 backdrop-blur-xl rounded-[64px] shadow-[0_30px_60px_-15px_rgba(46,125,50,0.08)] border border-white/50 p-10 flex flex-col h-fit sticky top-40"
                         >
-                            <div className="mb-10 text-center relative">
-                                <div className="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-5 border border-primary/10 relative overflow-hidden group">
-                                    <span className="text-3xl font-black text-primary relative z-10">
+                            <div className="mb-14 text-center">
+                                <div className="w-24 h-24 bg-primary/5 rounded-[40px] flex items-center justify-center mx-auto mb-6 border border-primary/10 shadow-inner group transition-all duration-500 hover:scale-105 active:scale-95">
+                                    <span className="text-3xl font-black text-primary group-hover:scale-110 transition-transform">
                                         {user?.name?.charAt(0).toUpperCase()}
                                     </span>
-                                    <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </div>
-                                <h3 className="text-xl font-black text-foreground tracking-tight mb-1">{user?.name}</h3>
-                                <p className="text-sm font-medium text-foreground/40">{user?.email}</p>
+                                <h3 className="text-xl font-black text-foreground tracking-tight leading-none mb-2">{user?.name}</h3>
+                                <p className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">{user?.email}</p>
                             </div>
 
-                            <nav className="space-y-2">
+                            <nav className="space-y-3">
                                 {menuItems.map((item) => (
                                     <Link
                                         key={item.path}
                                         to={item.path}
-                                        className={`group flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-bold transition-all duration-300 ${
+                                        className={`group relative flex items-center gap-4 px-6 py-4 rounded-full text-sm font-bold transition-all duration-500 ${
                                             isActive(item.path)
-                                            ? 'bg-primary text-white shadow-[0_10px_20px_-5px_rgba(46,125,50,0.3)]'
-                                            : 'text-foreground/60 hover:bg-primary/5 hover:text-primary'
+                                            ? 'bg-primary text-white shadow-[0_15px_30px_-5px_rgba(46,125,50,0.4)] scale-105'
+                                            : 'text-foreground/50 hover:bg-primary/5 hover:text-primary'
                                         }`}
                                     >
-                                        <item.icon className={`w-5 h-5 transition-transform duration-300 ${isActive(item.path) ? '' : 'group-hover:scale-110'}`} />
-                                        {item.label}
+                                        <item.icon className="w-5 h-5" />
+                                        <span>{item.label}</span>
+                                        {isActive(item.path) && (
+                                            <motion.div 
+                                                layoutId="active-pill"
+                                                className="absolute inset-0 bg-primary rounded-full -z-10"
+                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                            />
+                                        )}
                                     </Link>
                                 ))}
                                 
-                                <div className="pt-8 mt-8 border-t border-primary/5">
+                                <div className="pt-10 mt-10 border-t border-primary/5">
                                     <Button
                                         variant="ghost"
-                                        className="w-full justify-start gap-4 h-auto py-4 px-5 rounded-2xl text-sm font-bold text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-300"
+                                        className="w-full justify-start gap-4 h-14 rounded-full text-sm font-black text-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-300"
                                         onClick={logout}
                                     >
                                         <LogOut className="w-5 h-5" />
@@ -73,18 +88,23 @@ const DashboardLayout = () => {
                         </motion.div>
                     </aside>
 
-                    {/* Content Area */}
-                    <main className="flex-1 min-w-0">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                        >
-                            <Outlet />
-                        </motion.div>
-                    </main>
+                    {/* Content Architecture */}
+                    <div className="flex-1 min-w-0">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={location.pathname}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -30 }}
+                                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                                <Outlet />
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
                 </div>
-            </div>
+            </main>
+
             <Footer />
         </div>
     );

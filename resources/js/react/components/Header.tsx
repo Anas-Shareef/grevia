@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X, ChevronDown } from "lucide-react";
+import { ShoppingCart, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
@@ -23,8 +23,8 @@ const Header = () => {
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "Benefits", href: "/#benefits" },
-    { label: "Sweeteners", href: "/collections/all", hasDropdown: true },
-    { label: "Other Products", href: "/collections/all", hasDropdown: true },
+    { label: "Sweeteners", href: "/collections/all" },
+    { label: "Other Products", href: "/collections/all" },
     { label: "Contact", href: "/contact" },
   ];
 
@@ -48,23 +48,22 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation (Center) */}
+          {/* Desktop Navigation (Center) - Simplified Link Structure */}
           <nav className="hidden lg:flex flex-1 justify-center items-center gap-10" aria-label="Main navigation">
             {navLinks.map((link) => (
               <div key={link.label} className="relative group/nav">
-                {link.hasDropdown ? (
-                  <button className="flex items-center gap-1 text-[15px] font-medium text-foreground/80 hover:text-primary transition-colors py-2">
-                    {link.label}
-                    <ChevronDown className="w-4 h-4 transition-transform group-hover/nav:rotate-180" />
-                  </button>
-                ) : (
-                  <Link 
-                    to={link.href}
-                    className="text-[15px] font-medium text-foreground/80 hover:text-primary transition-colors relative py-2"
-                  >
-                    {link.label}
-                  </Link>
-                )}
+                <Link 
+                  to={link.href}
+                  className="text-[15px] font-bold text-foreground/80 hover:text-primary transition-colors relative py-2"
+                >
+                  {link.label}
+                  {location.pathname === link.href && (
+                    <motion.div 
+                      layoutId="nav-underline"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                    />
+                  )}
+                </Link>
               </div>
             ))}
           </nav>

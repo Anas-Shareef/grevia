@@ -44,7 +44,7 @@ const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 to="/collections/all"
-                className="inline-flex items-center justify-center gap-2 font-black bg-primary text-white rounded-full shadow-lg hover:bg-forest-light hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-16 px-10 group"
+                className="inline-flex items-center justify-center gap-2 font-black bg-primary text-white rounded-full shadow-button hover:bg-forest-light hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-16 px-10 group"
               >
                 Shop Collection
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -68,8 +68,8 @@ const HeroSection = () => {
             <div className="relative max-w-[540px] mx-auto lg:ml-auto lg:mr-0">
               
               {/* Image Container - Horizontal Card Style */}
-              <div className="relative rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(46,125,50,0.12)] bg-white p-2">
-                <div className="aspect-[16/10] overflow-hidden rounded-[24px]">
+              <div className="relative rounded-squircle-lg overflow-hidden shadow-[0_20px_60px_rgba(46,125,50,0.15)] bg-white p-2">
+                <div className="aspect-[16/10] overflow-hidden rounded-squircle">
                   <img 
                     src="/build/assets/hero-bg-D-TWzogc.jpg" 
                     alt="Grevia natural products" 
