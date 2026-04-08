@@ -1,35 +1,52 @@
-/* Grevia 'Natural Premium' - Exact Redesign Design Tokens */
+/* Grevia - Exact Lovable Prototype Design Tokens */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* === BRAND COLORS (Forest & Lime) === */
-  --green-primary:    #2E7D32; /* Deep Forest Green (Exact) */
-  --green-hover:      #3E8E42;
-  --green-accent:     #A3E635; /* Vibrant Lime */
-  --green-mint:       #E8E4D8; /* Soft Cream background */
-  --bg-page:          #F5F2EA; /* Exact Cream BG from reference */
-  --bg-card:          #FFFFFF;
-  
-  /* === NEUTRALS === */
-  --text-heading:     #1A2E1A; /* Dark Green / Charcoal */
-  --text-body:        #1A2E1A;
-  --text-muted:       rgba(26, 46, 26, 0.6);
-  --border-light:     rgba(46, 125, 50, 0.1);
-  
-  /* === SPACING & RADIUS === */
-  --radius-squircle:  1.5rem;   /* 24px */
-  --radius-lg:        2rem;     /* 32px */
-  --radius-xl:        3rem;     /* 48px - Signature Lovable Radius */
-  --radius-2xl:       4rem;     /* 64px */
-  
-  --shadow-button:    0 4px 14px -2px rgba(46, 125, 50, 0.4);
-  --shadow-card:      0 8px 30px -8px rgba(46, 125, 50, 0.12);
-  --shadow-glow:      0 0 40px rgba(163, 230, 53, 0.3);
+  /* === EXACT Lovable HSL Variables === */
+  --background: 100 50% 98%;
+  --foreground: 145 55% 15%;
+  --card: 100 50% 99%;
+  --card-foreground: 145 55% 15%;
+  --popover: 100 50% 99%;
+  --popover-foreground: 145 55% 15%;
+  --primary: 145 55% 24%;
+  --primary-foreground: 60 33% 97%;
+  --secondary: 80 33% 95%;
+  --secondary-foreground: 145 55% 20%;
+  --muted: 80 20% 92%;
+  --muted-foreground: 145 20% 40%;
+  --accent: 100 55% 55%;
+  --accent-foreground: 145 55% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 60 33% 97%;
+  --border: 100 20% 88%;
+  --input: 100 20% 88%;
+  --ring: 145 55% 24%;
+  --radius: 1.5rem;
 
-  /* === TYPOGRAPHY === */
-  --font-main:        'Poppins', 'Inter', sans-serif;
+  /* === Named Brand Tokens === */
+  --forest: 145 55% 24%;
+  --forest-light: 145 45% 35%;
+  --lime: 100 55% 55%;
+  --lime-glow: 100 60% 65%;
+  --cream: 60 33% 97%;
+  --cream-dark: 60 20% 94%;
+
+  /* === Gradients === */
+  --gradient-forest: linear-gradient(135deg, hsl(145 55% 24%), hsl(145 45% 30%));
+  --gradient-lime: linear-gradient(135deg, hsl(100 55% 55%), hsl(100 60% 65%));
+  --gradient-hero: radial-gradient(ellipse at 50% 0%, hsl(100 40% 95%) 0%, hsl(60 33% 97%) 70%);
+
+  /* === Shadows === */
+  --shadow-soft: 0 4px 20px -4px hsl(145 30% 20% / .12);
+  --shadow-card: 0 8px 30px -8px hsl(145 30% 20% / .15);
+  --shadow-glow: 0 0 40px hsl(100 55% 55% / .3);
+  --shadow-button: 0 4px 14px -2px hsl(145 55% 24% / .4);
+
+  /* === Typography === */
+  --font-main: 'Montserrat', sans-serif;
 }
 
 @layer base {
@@ -38,108 +55,108 @@
     font-family: var(--font-main);
   }
   body {
-    @apply bg-[var(--bg-page)] text-[var(--text-body)] antialiased;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-[900] tracking-tighter text-[var(--text-heading)] leading-[1.1];
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-main);
   }
 
-  h1 { @apply text-5xl md:text-7xl lg:text-8xl; }
-  h2 { @apply text-4xl md:text-5xl; }
-  h3 { @apply text-2xl md:text-3xl; }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-black tracking-tight leading-[0.9];
+    color: hsl(var(--foreground));
+    font-family: var(--font-main);
+  }
 }
 
 @layer components {
-  /* Navbar */
-  .navbar {
-    @apply fixed top-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-md z-50 border-b border-[var(--border-light)];
+  /* Squircle Radius System */
+  .rounded-squircle { border-radius: var(--radius); }
+  .rounded-squircle-lg { border-radius: 2rem; }
+  .rounded-squircle-xl { border-radius: 3rem; }
+  .rounded-squircle-2xl { border-radius: 4rem; }
+
+  /* Shadow Utilities */
+  .shadow-button { box-shadow: var(--shadow-button); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+
+  /* === GRADIENT TEXT — "Without" word === */
+  .text-gradient-forest {
+    background: linear-gradient(135deg, hsl(145, 55%, 24%), hsl(145, 45%, 30%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    border: none !important;
+    border-width: 0 !important;
+  }
+
+  /* Hero Background Gradient */
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  /* Radial Grid Pattern (subtle) */
+  .bg-radial-grid {
+    background-image: radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
   /* Buttons */
   .btn-primary {
-    @apply bg-[var(--green-primary)] text-white font-black rounded-full transition-all duration-500 shadow-xl
-           hover:-translate-y-1 hover:shadow-2xl active:scale-95 px-10 py-4 text-sm;
+    @apply bg-primary text-primary-foreground font-black rounded-squircle-lg transition-all duration-300
+           hover:-translate-y-1 hover:shadow-lg active:scale-95 px-10 py-4 text-sm;
+    box-shadow: var(--shadow-button);
   }
 
   .btn-secondary {
-    @apply bg-white text-[var(--green-primary)] font-black rounded-full border-2 border-[var(--green-primary)] transition-all duration-300
-           hover:bg-[var(--green-primary)] hover:text-white hover:-translate-y-1 active:scale-95 shadow-sm px-8 py-3 text-sm;
+    @apply bg-background/80 text-primary font-bold rounded-squircle-lg border-2 border-primary/30
+           hover:border-primary hover:bg-primary/5 transition-all duration-300 px-10 py-4 text-sm;
+    backdrop-filter: blur(8px);
   }
 
-  .btn-lime {
-    @apply text-white font-black rounded-full transition-all duration-300 px-10 py-4;
-    background-color: var(--green-accent);
-    box-shadow: var(--shadow-button);
-    font-size: 14px;
-  }
-
-  .btn-lime:hover {
-    @apply brightness-105 -translate-y-1;
-  }
-
-  .btn-lime:active {
-    @apply scale-95;
-  }
-
-  /* Visual Elements */
-  .eyebrow-badge {
-    @apply inline-flex items-center gap-2 px-4 py-1.5 font-black uppercase tracking-[0.2em] rounded-full mb-8 border;
-    background-color: rgba(46, 125, 50, 0.05);
-    color: var(--green-primary);
-    border-color: rgba(46, 125, 50, 0.1);
-    font-size: 11px;
-  }
-
-  /* Section Styles */
-  .section-header {
-    @apply text-center max-w-3xl mx-auto mb-20 md:mb-24;
-  }
-
-  /* Product Cards */
+  /* Feature / Product Cards */
   .product-card {
-    @apply bg-white rounded-[var(--radius-squircle)] border border-[var(--green-primary)]/5 p-6 transition-all duration-500
-           hover:shadow-[var(--shadow-card)] hover:-translate-y-2 group relative overflow-hidden;
+    @apply bg-card rounded-squircle border border-border/50 p-6 transition-all duration-500
+           hover:shadow-card hover:-translate-y-2 group relative overflow-hidden;
   }
 
-  /* Feature Cards */
   .feature-card {
-    @apply bg-white rounded-[var(--radius-squircle)] p-10 border border-[var(--green-primary)]/5 transition-all 
-           hover:shadow-[var(--shadow-card)] hover:-translate-y-2;
+    @apply bg-card rounded-squircle p-8 border border-border/50 transition-all duration-300
+           hover:shadow-card hover:-translate-y-1;
   }
 
+  /* Eyebrow Badge */
+  .eyebrow-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 font-semibold rounded-squircle text-sm;
+    background: hsl(var(--lime) / 0.15);
+    color: hsl(var(--primary));
+  }
+
+  /* Icon Box */
   .icon-box {
-    @apply w-16 h-16 rounded-2xl bg-[var(--green-primary)]/5 flex items-center justify-center text-3xl mb-8 transition-transform duration-300 group-hover:scale-110;
+    @apply w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110;
+    background: hsl(var(--lime) / 0.2);
+    color: hsl(var(--primary));
   }
 
-  /* Specific Design Elements for Exact Clone */
+  /* Shadow Orb (Background Glow) */
   .shadow-orb {
-    @apply absolute -z-10 rounded-full blur-[100px] opacity-40;
-  }
-
-  /* Lovable Style Squircle Classes */
-  .rounded-squircle { border-radius: var(--radius-squircle); }
-  .rounded-squircle-lg { border-radius: var(--radius-lg); }
-  .rounded-squircle-xl { border-radius: var(--radius-xl); }
-  .rounded-squircle-2xl { border-radius: var(--radius-2xl); }
-
-  .shadow-button { box-shadow: var(--shadow-button); }
-  .shadow-card { box-shadow: var(--shadow-card); }
-  .shadow-glow { box-shadow: var(--shadow-glow); }
-  
-  .text-gradient-forest {
-    @apply text-[var(--green-primary)];
+    @apply absolute -z-10 rounded-full blur-[100px] opacity-30;
   }
 }
 
-/* Animations */
+/* === Animations === */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
 @keyframes float {
-  0% { transform: translateY(0px) rotate(0deg); }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-10px) rotate(2deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+.animate-blob { animation: blob 7s infinite; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }

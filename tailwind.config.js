@@ -20,7 +20,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Poppins", "Inter", "sans-serif"],
+        sans: ["Montserrat", "sans-serif"],
+        display: ["Montserrat", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -29,51 +30,51 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#2E7D32",
-          foreground: "#F5F2EA",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#E8E4D8",
-          foreground: "#2E7D32",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#8E8E8E",
-          foreground: "#1A2E1A",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#A3E635",
-          foreground: "#1A2E1A",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "#FFFFFF",
-          foreground: "#1A2E1A",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
         forest: {
-          DEFAULT: "#2E7D32",
-          light: "#3E8E42",
+          DEFAULT: "hsl(var(--forest))",
+          light: "hsl(var(--forest-light))",
         },
         lime: {
-          DEFAULT: "#A3E635",
-          glow: "#B2F040",
+          DEFAULT: "hsl(var(--lime))",
+          glow: "hsl(var(--lime-glow))",
         },
         cream: {
-          DEFAULT: "#F5F2EA",
-          dark: "#E8E4D8",
+          DEFAULT: "hsl(var(--cream))",
+          dark: "hsl(var(--cream-dark))",
         },
       },
       borderRadius: {
-        lg: "1.5rem",
-        md: "1rem",
-        sm: "0.5rem",
-        squircle: "1.5rem",
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 0.5rem)",
+        sm: "calc(var(--radius) - 1rem)",
+        squircle: "var(--radius)",
         "squircle-sm": "1rem",
         "squircle-lg": "2rem",
         "squircle-xl": "3rem",
@@ -89,18 +90,10 @@ export default {
           to: { height: "0" },
         },
         blob: {
-          "0%": {
-            transform: "translate(0px, 0px) scale(1)",
-          },
-          "33%": {
-            transform: "translate(30px, -50px) scale(1.1)",
-          },
-          "66%": {
-            transform: "translate(-20px, 20px) scale(0.9)",
-          },
-          "100%": {
-            transform: "translate(0px, 0px) scale(1)",
-          },
+          "0%": { transform: "translate(0px, 0px) scale(1)" },
+          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+          "100%": { transform: "translate(0px, 0px) scale(1)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
@@ -117,4 +110,3 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 }
-
