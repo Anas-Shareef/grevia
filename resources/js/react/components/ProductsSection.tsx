@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
-import { Star, ShoppingCart } from "lucide-react";
+import { Star, ShoppingCart, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import { useState } from "react";
 
 const ProductsSection = () => {
   const { addToCart } = useCart();
+  const [wishlist, setWishlist] = useState<number[]>([]);
 
   const products = [
     {
@@ -50,6 +52,13 @@ const ProductsSection = () => {
     toast.success(`${product.title} added to cart!`);
   };
 
+  const toggleWishlist = (id: number) => {
+    setWishlist(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+    toast.success(wishlist.includes(id) ? "Removed from wishlist" : "Added to wishlist");
+  };
+
   return (
     <section id="products" className="py-24 md:py-40 relative bg-white overflow-hidden" aria-labelledby="products-heading">
       
@@ -85,23 +94,35 @@ const ProductsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: index * 0.15 }}
-              className="group flex flex-col bg-white rounded-[24px] shadow-[0_8px_30px_rgba(46,125,50,0.04)] hover:shadow-[0_20_50px_rgba(46,125,50,0.12)] hover:-translate-y-2 transition-all duration-500 border border-primary/5 overflow-hidden"
+              className="group flex flex-col bg-white rounded-[48px] shadow-[0_8px_30px_rgba(46,125,50,0.04)] hover:shadow-[0_20px_50px_rgba(46,125,50,0.12)] hover:-translate-y-2 transition-all duration-700 border border-primary/5 overflow-hidden"
             >
-              {/* Product Image */}
-              <div className="relative aspect-square overflow-hidden bg-[#fdfcf6]">
+              {/* Product Image Section */}
+              <div className="relative aspect-square overflow-hidden bg-[#F5F2EA]">
+                {/* Reference Pill Badge */}
                 {product.badge && (
-                  <div className="absolute top-5 left-5 z-10 bg-accent text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
+                  <div className="absolute top-6 left-6 z-10 bg-primary/10 backdrop-blur-md text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-primary/10">
                     {product.badge}
                   </div>
                 )}
+
+                {/* Wishlist Heart Button */}
+                <button 
+                  onClick={() => toggleWishlist(product.id)}
+                  className="absolute top-6 right-6 z-10 w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300"
+                  aria-label="Toggle wishlist"
+                >
+                  <Heart className={`w-5 h-5 ${wishlist.includes(product.id) ? "fill-red-500 text-red-500" : "text-foreground/40"}`} />
+                </button>
+
+                {/* Product Image with high-fidelity scaling */}
                 <img 
                   src={product.image} 
                   alt={product.title} 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-125 scale-110" 
                 />
                 
                 {/* Hover Add to Cart Overlay */}
-                <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+                <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
                   <button 
                     onClick={() => handleAddToCart(product)}
                     className="w-14 h-14 bg-white text-primary rounded-full shadow-2xl flex items-center justify-center transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-primary hover:text-white"
@@ -113,7 +134,7 @@ const ProductsSection = () => {
               </div>
 
               {/* Product Info */}
-              <div className="p-8 flex flex-col flex-1">
+              <div className="p-8 md:p-10 flex flex-col flex-1">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex items-center gap-1 text-accent">
                     <Star className="w-4 h-4 fill-current" />
@@ -122,18 +143,18 @@ const ProductsSection = () => {
                   <span className="text-xs font-bold text-foreground/30">({product.reviews} reviews)</span>
                 </div>
 
-                <h3 className="text-xl font-extrabold text-foreground mb-2 tracking-tight group-hover:text-primary transition-colors">
+                <h3 className="text-xl md:text-2xl font-extrabold text-foreground mb-3 tracking-tight group-hover:text-primary transition-colors">
                   {product.title}
                 </h3>
-                <p className="text-sm font-medium text-foreground/50 mb-8 flex-1">
+                <p className="text-sm md:text-base font-medium text-foreground/50 mb-8 flex-1 leading-relaxed">
                   {product.description}
                 </p>
 
-                <div className="flex items-center justify-between pt-4 border-t border-primary/5">
-                  <span className="text-2xl font-black text-foreground">₹{product.price}</span>
+                <div className="flex items-center justify-between pt-6 border-t border-primary/5">
+                  <span className="text-2xl md:text-3xl font-black text-foreground">₹{product.price}</span>
                   <Link 
                     to={`/products/${product.id}`}
-                    className="inline-flex items-center justify-center h-10 px-5 border-2 border-primary/10 text-primary text-xs font-bold rounded-full hover:border-primary hover:bg-primary/5 transition-all duration-300"
+                    className="inline-flex items-center justify-center h-12 px-6 border-2 border-primary/10 text-primary text-xs font-bold rounded-full hover:border-primary hover:bg-primary/5 transition-all duration-300"
                   >
                     View Details
                   </Link>
