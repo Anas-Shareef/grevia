@@ -5,85 +5,101 @@ const BenefitsSection = () => {
   const benefits = [
     {
       title: "Zero Glycemic",
-      description: "No impact on blood sugar levels, making it perfect for diabetics.",
-      icon: <Zap className="w-6 h-6 text-primary" />,
+      description:
+        "No impact on blood sugar levels, making it perfect for diabetics and health-conscious individuals.",
+      icon: <Zap className="w-7 h-7 text-primary" />,
     },
     {
       title: "Keto-Friendly",
-      description: "Maintain ketosis without sacrificing sweetness. Zero carbs, zero compromise.",
-      icon: <Heart className="w-6 h-6 text-primary" />,
+      description:
+        "Maintain ketosis without sacrificing sweetness. Zero carbs, zero compromise.",
+      icon: <Heart className="w-7 h-7 text-primary" />,
     },
     {
       title: "Pure Extraction",
-      description: "Carefully extracted from nature's finest plants using clean methods.",
-      icon: <Leaf className="w-6 h-6 text-primary" />,
+      description:
+        "Carefully extracted from nature's finest plants using clean, sustainable methods.",
+      icon: <Leaf className="w-7 h-7 text-primary" />,
     },
     {
       title: "Zero Calories",
-      description: "Enjoy guilt-free sweetness without adding to your daily calorie count.",
-      icon: <Scale className="w-6 h-6 text-primary" />,
+      description:
+        "Enjoy guilt-free sweetness without adding to your daily calorie count.",
+      icon: <Scale className="w-7 h-7 text-primary" />,
     },
     {
       title: "No Aftertaste",
-      description: "Clean, pure sweetness that tastes just like sugar without the bitterness.",
-      icon: <Droplets className="w-6 h-6 text-primary" />,
+      description:
+        "Clean, pure sweetness that tastes just like sugar without the bitter aftertaste.",
+      icon: <Droplets className="w-7 h-7 text-primary" />,
     },
     {
       title: "Dentist Approved",
-      description: "Doesn't contribute to tooth decay. Your smile stays perfect.",
-      icon: <Shield className="w-6 h-6 text-primary" />,
+      description:
+        "Doesn't contribute to tooth decay or cavities. Your smile stays perfect.",
+      icon: <Shield className="w-7 h-7 text-primary" />,
     },
   ];
 
   return (
-    <section id="benefits" className="py-24 md:py-40 relative bg-background/50 overflow-hidden" aria-labelledby="benefits-heading">
-      
-      {/* Structural Airiness - Soft Blurs */}
-      <div className="absolute top-1/4 right-0 w-[30%] h-[30%] bg-primary/3 rounded-full blur-[100px] -z-10" />
-      <div className="absolute bottom-1/4 left-0 w-[20%] h-[20%] bg-primary/2 rounded-full blur-[80px] -z-10" />
+    <section
+      id="benefits"
+      className="py-24 md:py-32 relative overflow-hidden"
+      aria-labelledby="benefits-heading"
+    >
+      {/* Ambient Glow Blobs — visible soft green */}
+      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-lime/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        
-        {/* Section Heading */}
-        <motion.div 
+        {/* Section Header */}
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto mb-20 md:mb-24"
+          className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
         >
-          <span className="inline-block text-[11px] font-black text-primary/60 uppercase tracking-[0.2em] mb-4">Why Choose Us</span>
-          <h2 id="benefits-heading" className="text-4xl md:text-5xl font-black text-foreground leading-tight tracking-tight mb-8">
-            The Sweet Truth<br />
-            <span className="text-primary font-bold">About Health</span>
+          <span className="inline-block text-sm font-bold text-lime uppercase tracking-widest mb-4">
+            Why Choose Us
+          </span>
+          <h2
+            id="benefits-heading"
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-tight mb-6"
+          >
+            The Sweet Truth
+            <br />
+            <span className="text-primary">About Health</span>
           </h2>
-          <p className="text-lg text-foreground/60 leading-relaxed font-medium">
-            Our natural sweeteners deliver pure, clean sweetness backed by science and nature.
+          <p className="text-lg text-muted-foreground">
+            Our natural sweeteners deliver pure, clean sweetness backed by
+            science and nature.
           </p>
         </motion.div>
 
-        {/* Benefits Grid - 2 rows x 3 columns */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 lg:gap-12">
+        {/* Benefits Grid — Exact Lovable structure */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {benefits.map((benefit, index) => (
-            <motion.article 
+            <motion.article
               key={benefit.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group bg-white p-10 rounded-[24px] shadow-[0_8px_30px_rgba(46,125,50,0.04)] hover:shadow-[0_20px_50px_rgba(46,125,50,0.1)] hover:-translate-y-2 transition-all duration-500 border border-primary/5"
+              className="group bg-card rounded-squircle-lg p-8 shadow-soft hover:shadow-card transition-all duration-300 border border-border/50 hover:border-lime/30"
             >
-              <div className="w-16 h-16 bg-primary/5 rounded-[18px] flex items-center justify-center mb-8 group-hover:bg-primary/10 transition-colors duration-300">
+              <div className="w-14 h-14 bg-lime/15 rounded-squircle flex items-center justify-center mb-6 group-hover:bg-lime/25 group-hover:scale-110 transition-all duration-300">
                 {benefit.icon}
               </div>
-              <h3 className="text-xl font-extrabold text-foreground mb-4 tracking-tight">{benefit.title}</h3>
-              <p className="text-[15px] font-medium text-foreground/60 leading-relaxed">
+              <h3 className="text-xl font-bold text-foreground mb-3">
+                {benefit.title}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
                 {benefit.description}
               </p>
             </motion.article>
           ))}
         </div>
-
       </div>
     </section>
   );

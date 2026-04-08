@@ -50,8 +50,10 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  *,
+  ::before,
+  ::after {
+    border-color: transparent;
     font-family: var(--font-main);
   }
   body {
@@ -74,6 +76,7 @@
   .rounded-squircle-2xl { border-radius: 4rem; }
 
   /* Shadow Utilities */
+  .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-button { box-shadow: var(--shadow-button); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
