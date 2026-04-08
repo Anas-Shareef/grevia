@@ -21,7 +21,7 @@ const DashboardLayout = () => {
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#FDFCF6] selection:bg-primary/10 selection:text-primary">
+        <div className="min-h-screen flex flex-col bg-[#F5F2EA] selection:bg-primary/10 selection:text-primary">
             <Header />
             
             {/* Background Aesthetic Blobs - 'The Lovable Touch' */}

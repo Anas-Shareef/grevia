@@ -68,8 +68,8 @@ const HeroSection = () => {
             <div className="relative max-w-[540px] mx-auto lg:ml-auto lg:mr-0">
               
               {/* Image Container - Horizontal Card Style */}
-              <div className="relative rounded-squircle-lg overflow-hidden shadow-[0_20px_60px_rgba(46,125,50,0.15)] bg-white p-2">
-                <div className="aspect-[16/10] overflow-hidden rounded-squircle">
+              <div className="relative rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(46,125,50,0.12)] bg-white p-2">
+                <div className="aspect-[16/10] overflow-hidden rounded-[24px]">
                   <img 
                     src="/build/assets/hero-bg-D-TWzogc.jpg" 
                     alt="Grevia natural products" 

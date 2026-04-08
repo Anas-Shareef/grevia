@@ -9,7 +9,7 @@
   --green-hover:      #3E8E42;
   --green-accent:     #A3E635; /* Vibrant Lime */
   --green-mint:       #E8E4D8; /* Soft Cream background */
-  --bg-page:          #FDFCF6; /* Exact Ultra-Cream BG from reference */
+  --bg-page:          #F5F2EA; /* Exact Cream BG from reference */
   --bg-card:          #FFFFFF;
   
   /* === NEUTRALS === */
@@ -19,10 +19,10 @@
   --border-light:     rgba(46, 125, 50, 0.1);
   
   /* === SPACING & RADIUS === */
-  --radius-squircle:  3rem;     /* 48px - Signature Lovable Radius */
-  --radius-lg:        4rem;     /* 64px */
-  --radius-xl:        5rem;     /* 80px */
-  --radius-2xl:       6rem;     /* 96px */
+  --radius-squircle:  1.5rem;   /* 24px */
+  --radius-lg:        2rem;     /* 32px */
+  --radius-xl:        3rem;     /* 48px - Signature Lovable Radius */
+  --radius-2xl:       4rem;     /* 64px */
   
   --shadow-button:    0 4px 14px -2px rgba(46, 125, 50, 0.4);
   --shadow-card:      0 8px 30px -8px rgba(46, 125, 50, 0.12);

@@ -97,7 +97,7 @@ const ProductsSection = () => {
               className="group flex flex-col bg-white rounded-squircle shadow-[0_8px_30px_rgba(46,125,50,0.04)] hover:shadow-[0_20px_50px_rgba(46,125,50,0.12)] hover:-translate-y-2 transition-all duration-700 border border-primary/5 overflow-hidden"
             >
               {/* Product Image Section */}
-              <div className="relative aspect-square overflow-hidden bg-[#FDFCF6]">
+              <div className="relative aspect-square overflow-hidden bg-[#F5F2EA]">
                 {/* Reference Pill Badge */}
                 {product.badge && (
                   <div className="absolute top-6 left-6 z-10 bg-primary/10 backdrop-blur-md text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-primary/10">

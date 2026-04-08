@@ -235,7 +235,7 @@ const DashboardProfile = () => {
                                         Update Key
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="rounded-[64px] border-none p-16 max-w-xl bg-[#FDFCF6]/95 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(26,46,26,0.15)]">
+                                <DialogContent className="rounded-[64px] border-none p-16 max-w-xl bg-[#F5F2EA]/95 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(26,46,26,0.15)]">
                                     <DialogHeader className="mb-12 text-center">
                                         <DialogTitle className="text-4xl font-black tracking-tighter text-foreground mb-4">Revise Access</DialogTitle>
                                         <DialogDescription className="text-base font-medium text-foreground/50">
