@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShoppingCart, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const BeyondSweetenersSection = () => {
@@ -92,13 +92,18 @@ const BeyondSweetenersSection = () => {
                 <p className="text-white/80 font-medium mb-8 line-clamp-2 max-w-sm leading-relaxed">
                   {cat.description}
                 </p>
-                <Link
-                  to={cat.link}
-                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold rounded-full shadow-lg hover:bg-forest-light hover:shadow-xl hover:translate-x-2 transition-all duration-300 h-14 px-8 text-sm group/btn"
-                >
-                  Explore Products
-                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                </Link>
+                <div className="flex items-center gap-3 mt-4">
+                  <Link
+                    to={cat.link}
+                    className="flex-1 inline-flex items-center justify-center gap-2 bg-lime text-foreground font-bold rounded-full shadow-lg hover:bg-lime-glow hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 h-14 px-8 text-sm"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    Move to Cart
+                  </Link>
+                  <button className="shrink-0 w-14 h-14 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300 shadow-sm hover:shadow-md group/trash">
+                    <Trash2 className="w-5 h-5 group-hover/trash:scale-110 transition-transform" />
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}
