@@ -20,6 +20,19 @@ class RazorpayController extends Controller
         $this->api = new Api(config('razorpay.key_id'), config('razorpay.key_secret'));
     }
 
+    public function ping()
+    {
+        return response()->json([
+            'status' => 'online',
+            'version' => '1.0.1', // My new version
+            'config' => [
+                'key_id_set' => filled(config('razorpay.key_id')),
+                'key_secret_set' => filled(config('razorpay.key_secret')),
+            ],
+            'timestamp' => now()->toDateTimeString()
+        ]);
+    }
+
     public function createOrder(Request $request)
     {
         $request->validate([

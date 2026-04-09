@@ -69,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Checkout & Payment
     Route::prefix('checkout')->group(function () {
+        Route::get('/razorpay/ping', [\App\Http\Controllers\Api\RazorpayController::class, 'ping']);
         Route::post('/razorpay/create-order', [\App\Http\Controllers\Api\RazorpayController::class, 'createOrder']);
         Route::post('/razorpay/verify', [\App\Http\Controllers\Api\RazorpayController::class, 'verifyPayment']);
     });
