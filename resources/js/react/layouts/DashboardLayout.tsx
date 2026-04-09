@@ -48,7 +48,7 @@ const DashboardLayout = () => {
                                     </span>
                                 </div>
                                 <h3 className="text-xl font-black text-foreground tracking-tight leading-none mb-2">{user?.name}</h3>
-                                <p className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">{user?.email}</p>
+                                <p className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest truncate max-w-full text-center px-4">{user?.email}</p>
                             </div>
 
                             <nav className="space-y-3">

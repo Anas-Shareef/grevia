@@ -118,8 +118,8 @@ const DashboardProfile = () => {
                         <UserCircle className="w-3 h-3 lg:w-4 lg:h-4" />
                         Account Center
                     </span>
-                    <h2 className="text-5xl md:text-7xl lg:text-9xl font-black text-foreground tracking-tighter leading-[0.85] mb-8">
-                        My<br />
+                    <h2 className="flex items-center gap-3 whitespace-nowrap text-5xl md:text-7xl font-black text-foreground tracking-tighter leading-[0.85] mb-8">
+                        My
                         <span className="text-primary tracking-[-0.08em]">Profile</span>
                     </h2>
                     <p className="text-lg lg:text-xl font-medium text-foreground/60 max-w-xl leading-relaxed">
