@@ -34,6 +34,8 @@ Route::get('/content/hero-banner', [\App\Http\Controllers\Api\ContentController:
 Route::get('/content/footer', [\App\Http\Controllers\Api\ContentController::class, 'getFooter']);
 Route::get('/content/contact', [\App\Http\Controllers\Api\ContactController::class, 'index']);
 
+Route::get('/checkout/razorpay/ping', [\App\Http\Controllers\Api\RazorpayController::class, 'ping']);
+
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth & Profile
@@ -69,7 +71,6 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Checkout & Payment
     Route::prefix('checkout')->group(function () {
-        Route::get('/razorpay/ping', [\App\Http\Controllers\Api\RazorpayController::class, 'ping']);
         Route::post('/razorpay/create-order', [\App\Http\Controllers\Api\RazorpayController::class, 'createOrder']);
         Route::post('/razorpay/verify', [\App\Http\Controllers\Api\RazorpayController::class, 'verifyPayment']);
     });
