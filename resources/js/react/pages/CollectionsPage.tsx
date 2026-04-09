@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
+import { useProductFilters } from "@/hooks/useProductFilters";
 import { ProductCard } from "@/components/ProductCard";
 
 const CATEGORY_CARDS = [
@@ -72,57 +73,72 @@ const FILTER_GROUPS = [
 type FilterKey = 'type' | 'form' | 'ratio' | 'size';
 
 const CollectionsPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { filters, setFilter, resetFilters } = useProductFilters();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
   const [isSticky, setIsSticky] = useState(false);
 
-  const activeFilters = useMemo(() => ({
-    type: searchParams.get('type') || '',
-    form: searchParams.get('form') || '',
-    ratio: searchParams.get('ratio') || '',
-    size: searchParams.get('size') || '',
-    sort_by: searchParams.get('sort_by') || 'featured',
-  }), [searchParams]);
+  // Sync scroll for sticky bar
+  useEffect(() => {
+    const handler = () => setIsSticky(window.scrollY > 500);
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
 
-  const setFilter = (key: FilterKey | 'sort_by', value: string) => {
-    setSearchParams(prev => {
-      const next = new URLSearchParams(prev);
-      if (!value) next.delete(key); else next.set(key, value);
-      return next;
+  const { data: response, isLoading } = useProducts({
+    ...filters,
+    page: String(currentPage),
+  });
+
+  const products: Product[] = useMemo(() => {
+    const newItems = response?.data || [];
+    if (currentPage === 1) return newItems;
+    // For pagination, merge unique items
+    const combined = [...accumulatedProducts];
+    newItems.forEach((item: Product) => {
+      if (!combined.find(p => p.id === item.id)) combined.push(item);
     });
-  };
+    return combined;
+  }, [response, currentPage, accumulatedProducts]);
 
-  const toggleFilter = (key: FilterKey, value: string) => {
-    const current = searchParams.get(key) || '';
+  useEffect(() => {
+    if (response?.data && currentPage > 1) {
+      setAccumulatedProducts(prev => {
+        const combined = [...prev];
+        response.data.forEach((item: Product) => {
+          if (!combined.find(p => p.id === item.id)) combined.push(item);
+        });
+        return combined;
+      });
+    } else if (response?.data && currentPage === 1) {
+      setAccumulatedProducts(response.data);
+    }
+  }, [response, currentPage]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    setAccumulatedProducts([]);
+  }, [filters.type, filters.form, filters.ratio, filters.sort_by]);
+
+  const toggleFilter = (key: any, value: string) => {
+    const current = (filters as any)[key] || '';
     setFilter(key, current === value ? '' : value);
-  };
-
-  const clearAllFilters = () => {
-    setSearchParams(new URLSearchParams());
   };
 
   const activeChips = FILTER_GROUPS.flatMap(g =>
     g.options.filter(o => {
-      const v = activeFilters[g.key as FilterKey];
+      const v = (filters as any)[g.key];
       return v === o.value;
-    }).map(o => ({ key: g.key as FilterKey, label: o.label, value: o.value }))
+    }).map(o => ({ key: g.key, label: o.label, value: o.value }))
   );
 
-  const { data: response, isLoading } = useProducts({
-    type: activeFilters.type,
-    form: activeFilters.form,
-    ratio: activeFilters.ratio.replace('-', ':') || '',
-    size: activeFilters.size,
-    sort_by: activeFilters.sort_by,
-  });
-  
-  const products: Product[] = Array.isArray(response) ? response : (response as any)?.data || [];
+  const hasMore = response?.meta && response.meta.current_page < response.meta.last_page;
 
-  useEffect(() => {
-    const handler = () => setIsSticky(window.scrollY > 400);
-    window.addEventListener('scroll', handler);
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
+  const loadMore = () => {
+    if (hasMore) setCurrentPage(prev => prev + 1);
+  };
 
   return (
     <div className="bg-background min-h-screen">
@@ -171,36 +187,105 @@ const CollectionsPage = () => {
         </div>
       </section>
 
-      {/* Category Grid */}
-      <section className="pb-24 px-4">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {CATEGORY_CARDS.map(card => (
-              <Link
-                key={card.name}
-                to={`/collections/all?type=${card.type}&form=${card.form}`}
-                className="bg-card rounded-squircle-xl p-10 border border-border/50 group hover:shadow-card hover:-translate-y-2 transition-all duration-500 shadow-soft"
+      {/* Mobile Sticky Filter/Sort Bar */}
+      <div className={`lg:hidden sticky top-[72px] z-40 w-full transition-all duration-300 ${isSticky ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+        <div className="bg-background/80 backdrop-blur-xl border-y border-border/50 px-4 py-3">
+          <div className="container mx-auto flex gap-3">
+            <button 
+              onClick={() => setShowMobileFilters(true)}
+              className="flex-1 flex items-center justify-center gap-3 bg-card border border-border/50 py-3.5 rounded-squircle eyebrow !text-foreground shadow-soft active:scale-95 transition-all"
+            >
+              <SlidersHorizontal className="w-4 h-4 text-primary" />
+              Filter {activeChips.length > 0 && `(${activeChips.length})`}
+            </button>
+            <div className="flex-1 relative">
+              <select
+                value={filters.sort_by}
+                onChange={e => setFilter('sort_by', e.target.value)}
+                className="w-full h-full bg-card border border-border/50 py-3.5 px-4 rounded-squircle eyebrow !text-foreground outline-none appearance-none shadow-soft text-center"
               >
-                <div className={`w-20 h-20 rounded-squircle flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform ${card.bg}`}>
-                  {card.emoji}
-                </div>
-                <h3 className="text-2xl font-black uppercase tracking-tight mb-2">{card.name}</h3>
-                <p className="text-muted-foreground text-sm font-medium mb-6 leading-relaxed">{card.desc}</p>
-                <span className="eyebrow !text-primary !tracking-[0.2em] group-hover:!tracking-[0.3em] transition-all">
-                  Explore Category →
-                </span>
-              </Link>
-            ))}
+                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-40" />
+            </div>
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Filter Drawer */}
+      <AnimatePresence>
+        {showMobileFilters && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobileFilters(false)}
+              className="fixed inset-0 bg-foreground/60 backdrop-blur-sm z-[60]"
+            />
+            <motion.aside
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed bottom-0 left-0 right-0 bg-background rounded-t-[3rem] z-[70] max-h-[85vh] overflow-hidden flex flex-col shadow-2xl lg:hidden"
+            >
+              <div className="p-6 border-b border-border/50 flex justify-between items-center">
+                <span className="eyebrow !text-foreground">Filters</span>
+                <button 
+                  onClick={() => setShowMobileFilters(false)}
+                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-border transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 space-y-12">
+                {FILTER_GROUPS.map(group => (
+                  <div key={group.key}>
+                    <h4 className="sidebar-header">{group.label}</h4>
+                    <div className="space-y-4">
+                      {group.options.map(opt => {
+                        const isChecked = (filters as any)[group.key] === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            onClick={() => toggleFilter(group.key, opt.value)}
+                            className="flex items-center gap-5 w-full group text-left py-2"
+                          >
+                            <div className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-primary border-primary shadow-glow' : 'border-border'}`}>
+                              {isChecked && <X className="w-3.5 h-3.5 text-white" />}
+                            </div>
+                            <span className={`text-sm font-black uppercase tracking-widest transition-colors ${isChecked ? 'text-primary' : 'text-muted-foreground'}`}>
+                              {opt.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-6 border-t border-border/50 bg-background/80 backdrop-blur-md">
+                <button 
+                  onClick={() => setShowMobileFilters(false)}
+                  className="w-full btn-primary h-14"
+                >
+                  Apply Filters {activeChips.length > 0 && `(${activeChips.length})`}
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
       <div className="container mx-auto px-4 pb-32">
         <div className="flex flex-col lg:flex-row gap-12">
           
-          {/* Sidebar */}
-          <aside className="lg:w-64 flex-shrink-0">
+          {/* Sidebar - Desktop Only */}
+          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
             <div className="sticky top-24 space-y-12">
               <div>
                 <p className="eyebrow mb-8">Refine By</p>
@@ -209,11 +294,11 @@ const CollectionsPage = () => {
                     <h4 className="sidebar-header">{group.label}</h4>
                     <div className="space-y-4">
                       {group.options.map(opt => {
-                        const isChecked = activeFilters[group.key as FilterKey] === opt.value;
+                        const isChecked = (filters as any)[group.key] === opt.value;
                         return (
                           <button
                             key={opt.value}
-                            onClick={() => toggleFilter(group.key as FilterKey, opt.value)}
+                            onClick={() => toggleFilter(group.key, opt.value)}
                             className="flex items-center gap-4 w-full group text-left"
                           >
                             <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-primary border-primary shadow-glow' : 'border-border group-hover:border-primary'}`}>
@@ -232,7 +317,7 @@ const CollectionsPage = () => {
               
               {activeChips.length > 0 && (
                 <button 
-                  onClick={clearAllFilters}
+                  onClick={resetFilters}
                   className="w-full py-4 bg-secondary/50 rounded-squircle eyebrow !text-foreground font-bold hover:bg-destructive/10 hover:!text-destructive transition-all active:scale-95"
                 >
                   Clear Active Filters
@@ -243,43 +328,68 @@ const CollectionsPage = () => {
 
           {/* Grid Area */}
           <div className="flex-1">
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-6 mb-12 py-6 border-b border-border/50">
-              <p className="eyebrow">
+            {/* Toolbar - Header & Desktop Sort */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 py-6 border-b border-border/50">
+              <p className="eyebrow text-center md:text-left">
                 Showing {products.length} Premium Essentials
               </p>
-              <div className="flex gap-4 items-center">
+              <div className="hidden lg:flex gap-4 items-center">
                 <span className="eyebrow opacity-40">Sort By</span>
-                <select
-                  value={activeFilters.sort_by}
-                  onChange={e => setFilter('sort_by', e.target.value)}
-                  className="bg-transparent border-none eyebrow !text-foreground outline-none focus:!text-primary transition-colors cursor-pointer"
-                >
-                  {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
+                <div className="relative">
+                  <select
+                    value={filters.sort_by}
+                    onChange={e => setFilter('sort_by', e.target.value)}
+                    className="bg-transparent border-none eyebrow !text-foreground outline-none focus:!text-primary transition-colors cursor-pointer pr-6 appearance-none"
+                  >
+                    {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-40" />
+                </div>
               </div>
             </div>
 
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {isLoading && currentPage === 1 ? (
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="aspect-[4/5] rounded-squircle-xl bg-card animate-pulse border border-border/50 shadow-soft" />
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-32 bg-card rounded-squircle-2xl border border-border/50 shadow-soft">
-                <div className="w-24 h-24 bg-lime/10 rounded-full flex items-center justify-center mx-auto mb-8">
-                  <ShoppingBag className="w-10 h-10 text-primary opacity-20" />
+              <div className="text-center py-32 bg-card rounded-squircle-2xl border border-border/50 shadow-soft px-4">
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-lime/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <ShoppingBag className="w-8 h-8 md:w-10 md:h-10 text-primary opacity-20" />
                 </div>
-                <h3 className="text-3xl font-black tracking-tighter mb-4">No matching products</h3>
+                <h3 className="text-2xl md:text-3xl font-black tracking-tighter mb-4">No matching products</h3>
                 <p className="text-muted-foreground text-sm mb-10 max-w-sm mx-auto leading-relaxed">We couldn't find exactly what you're looking for. Try adjusting your filters or browsing all products.</p>
-                <button onClick={clearAllFilters} className="btn-primary">Browse All Essentials</button>
+                <button onClick={resetFilters} className="btn-primary">Browse All Essentials</button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-                {products.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+              <div className="space-y-16">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
+                  {products.map(product => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+
+                {/* Load More Button */}
+                {hasMore && (
+                  <div className="flex justify-center pt-8">
+                    <button 
+                      onClick={loadMore}
+                      disabled={isLoading}
+                      className="inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground hover:bg-forest-light hover:shadow-glow-primary hover:-translate-y-1 py-5 px-12 rounded-full eyebrow !text-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
+                    >
+                      {isLoading ? (
+                        <div className="w-6 h-6 border-4 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          Explore More Products
+                          <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
