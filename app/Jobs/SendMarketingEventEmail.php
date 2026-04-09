@@ -69,7 +69,7 @@ class SendMarketingEventEmail implements ShouldQueue
             // Send email
             Mail::to($this->user->email)->send(
                 new CampaignEmail(
-                    subject: $this->event->template->subject,
+                    emailSubject: $this->event->template->subject,
                     htmlContent: $this->event->template->html_content,
                     variables: $variables,
                     unsubscribeUrl: $unsubscribeUrl
