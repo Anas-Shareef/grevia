@@ -30,11 +30,11 @@ const DashboardLayout = () => {
                 <div className="absolute bottom-[20%] -right-[10%] w-[40%] h-[40%] bg-accent/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
             </div>
 
-            <main className="flex-grow container mx-auto px-4 md:px-6 pt-44 pb-32">
+            <main className="flex-grow container mx-auto px-4 md:px-6 pt-24 lg:pt-44 pb-32">
                 <div className="flex flex-col lg:flex-row gap-20">
                     
                     {/* Floating Pillar Sidebar Architecture */}
-                    <aside className="w-full lg:w-72 shrink-0">
+                    <aside className="hidden lg:block w-72 shrink-0">
                         <motion.div 
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -87,6 +87,26 @@ const DashboardLayout = () => {
                             </nav>
                         </motion.div>
                     </aside>
+
+                    {/* Mobile Bottom Navigation Bar */}
+                    <nav className="lg:hidden fixed bottom-6 left-4 right-4 z-50 bg-white/90 backdrop-blur-xl border border-white/40 shadow-2xl shadow-primary/10 rounded-3xl p-3 flex justify-between items-center px-4">
+                        {menuItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`flex flex-col items-center gap-1 p-2 transition-all duration-300 w-16 ${
+                                    isActive(item.path)
+                                        ? 'text-primary bg-primary/10 rounded-2xl'
+                                        : 'text-foreground/50 hover:text-primary'
+                                }`}
+                            >
+                                <item.icon strokeWidth={isActive(item.path) ? 2.5 : 2} className="w-5 h-5" />
+                                <span className={`text-[10px] ${isActive(item.path) ? 'font-black' : 'font-bold'}`}>
+                                    {item.label}
+                                </span>
+                            </Link>
+                        ))}
+                    </nav>
 
                     {/* Content Architecture */}
                     <div className="flex-1 min-w-0">
