@@ -147,7 +147,7 @@ const ProductDetailPage = () => {
           {/* Left: Product Images */}
           <div className="flex flex-col gap-4">
             <div className={`aspect-square rounded-[40px] flex items-center justify-center p-12 relative overflow-hidden ${imageBgClass}`}>
-              {product.badge && <div className="product-badge top-6 left-6">{product.badge}</div>}
+              {product.badge && <div className="product-badge top-6 left-6 rounded-squircle">{product.badge}</div>}
               <button 
                 onClick={toggleWishlist}
                 className="absolute top-6 right-6 w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-soft border border-[var(--border-light)] z-10 transition-transform active:scale-90"
