@@ -160,7 +160,7 @@ const CollectionsPage = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               Our Premium Range
             </motion.div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-8 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-8 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
               Sweetness <br />
               Without Sacrifice.
             </h1>
@@ -202,11 +202,13 @@ const CollectionsPage = () => {
               <select
                 value={filters.sort_by}
                 onChange={e => setFilter('sort_by', e.target.value)}
-                className="w-full h-full bg-card border border-border/50 py-3.5 px-4 rounded-squircle eyebrow !text-foreground outline-none appearance-none shadow-soft text-center"
+                className="w-full h-full bg-card border border-border/50 py-3.5 px-6 rounded-squircle eyebrow !text-foreground outline-none appearance-none shadow-soft text-center cursor-pointer hover:border-primary/30 transition-colors"
               >
                 {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-40" />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40">
+                <ChevronDown className="w-4 h-4" />
+              </div>
             </div>
           </div>
         </div>
@@ -339,11 +341,13 @@ const CollectionsPage = () => {
                   <select
                     value={filters.sort_by}
                     onChange={e => setFilter('sort_by', e.target.value)}
-                    className="bg-transparent border-none eyebrow !text-foreground outline-none focus:!text-primary transition-colors cursor-pointer pr-6 appearance-none"
+                    className="bg-transparent border-none eyebrow !text-foreground outline-none focus:!text-primary transition-colors cursor-pointer pr-8 appearance-none"
                   >
                     {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
-                  <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-40" />
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -377,14 +381,14 @@ const CollectionsPage = () => {
                     <button 
                       onClick={loadMore}
                       disabled={isLoading}
-                      className="inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground hover:bg-forest-light hover:shadow-glow-primary hover:-translate-y-1 py-5 px-12 rounded-full eyebrow !text-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
+                      className="inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground hover:bg-forest-light rounded-squircle shadow-button hover:shadow-lg hover:-translate-y-1 h-14 px-10 text-sm md:text-base font-bold transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
                     >
                       {isLoading ? (
-                        <div className="w-6 h-6 border-4 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                       ) : (
                         <>
                           Explore More Products
-                          <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                          <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
                         </>
                       )}
                     </button>

@@ -101,14 +101,15 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       </div>
 
       {/* Content Area */}
-      <div className="p-4 md:p-6">
+      <div className="p-3 md:p-6">
         {/* Rating */}
         <div className="flex items-center gap-2 mb-2 md:mb-3">
           <div className="flex items-center gap-1">
             <Star className="w-3 h-3 md:w-4 md:h-4 fill-lime text-lime" />
             <span className="text-xs md:text-sm font-bold text-foreground">4.9</span>
           </div>
-          <span className="text-xs md:text-sm text-muted-foreground">(128)</span>
+          <span className="text-[10px] md:text-sm text-muted-foreground hidden md:inline-block">(128 reviews)</span>
+          <span className="text-[10px] md:text-sm text-muted-foreground md:hidden">(128)</span>
         </div>
 
         {/* Title */}
@@ -126,13 +127,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
         {/* Size Pills (if variants) */}
         {product.variants && product.variants.length > 1 && (
-          <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-4">
+          <div className="flex flex-wrap gap-1 md:gap-2 mb-3 md:mb-4">
             {Array.from(new Set(product.variants.map((v) => v.weight))).map(
               (weight) => (
                 <button
                   key={weight as string}
                   onClick={() => setSelectedWeight(weight as string)}
-                  className={`px-2 py-0.5 md:px-3 md:py-1 rounded-squircle text-[10px] md:text-xs font-bold transition-all border ${
+                  className={`px-2 py-0.5 md:px-3 md:py-1 rounded-squircle text-[9px] md:text-xs font-bold transition-all border ${
                     selectedWeight === weight
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-transparent text-muted-foreground border-border hover:border-primary"
@@ -146,15 +147,15 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         )}
 
         {/* Price + View Details */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 mt-auto">
           <div>
-            <span className="text-lg md:text-2xl font-black text-foreground">
+            <span className="text-base md:text-2xl font-black text-foreground">
               ₹{displayPrice}
             </span>
           </div>
           <Link
             to={`/products/${product.slug || product.id}`}
-            className="inline-flex items-center justify-center text-[10px] md:text-sm font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground rounded-squircle h-8 md:h-10 px-3 md:px-5 transition-all duration-300"
+            className="inline-flex items-center justify-center text-[10px] md:text-sm font-bold border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground rounded-squircle h-8 md:h-9 px-3 md:px-4 transition-all duration-300"
           >
             <span className="hidden xs:inline">View Details</span>
             <span className="xs:hidden">View</span>
