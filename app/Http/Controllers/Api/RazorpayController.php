@@ -25,7 +25,7 @@ class RazorpayController extends Controller
         $request->validate([
             'items' => 'required|array',
             'shipping_address' => 'required|array',
-            'amount' => 'required|numeric', // Validated from frontend but re-calculated ideally
+            'amount' => 'required|numeric',
         ]);
 
         try {
@@ -33,18 +33,21 @@ class RazorpayController extends Controller
 
             $user = $request->user();
             
-            // Calculate total on server side (mock logic for speed, ideally iterate items)
-            // For this implementation we trust the cart calculation logic is mirrored securely or validated
-            // In a real strict app, re-fetch product prices here.
+            // 1. Calculate amount in paise and ensure it's an integer
+            // Floating point amounts can cause Razorpay API to reject the request
+            $finalAmount = (float) $request->amount;
+            $amountInPaise = (int) round($finalAmount * 100);
+
+            if ($amountInPaise <= 0) {
+                throw new \Exception("Invalid order amount: " . $finalAmount);
+            }
             
-            $finalAmount = $request->amount; 
-            
-            // Create Local Order
+            // 2. Create Local Order Record
             $order = Order::create([
                 'user_id' => $user->id,
                 'status' => 'pending',
-                'subtotal' => $finalAmount, // Simplified for checkout flow focus
-                'shipping' => 0,
+                'subtotal' => $finalAmount,
+                'shipping' => 0, // Should ideally be passed or calculated
                 'discount' => 0,
                 'total' => $finalAmount,
                 'payment_method' => 'razorpay',
@@ -56,21 +59,74 @@ class RazorpayController extends Controller
                 'billing_address' => $request->billing_address ?? $request->shipping_address,
             ]);
 
-            // Create Razorpay Order
+            // 3. Create Order Items & Manage Stock
+            // This was missing in previous implementation
+            foreach ($request->items as $item) {
+                $product = \App\Models\Product::where('slug', $item['product_id'])
+                    ->orWhere('id', $item['product_id'])
+                    ->first();
+            
+                if ($product) {
+                    $variant = null;
+                    $price = $product->price;
+                    $weight = null;
+                    $packSize = null;
+
+                    if (!empty($item['variant_id'])) {
+                        $variant = \App\Models\ProductVariant::find($item['variant_id']);
+                        if ($variant && $variant->product_id == $product->id) {
+                            $price = $variant->effective_price;
+                            $weight = $variant->weight;
+                            $packSize = $variant->pack_size;
+                            
+                            // Deduct stock
+                            $variant->decrement('stock_quantity', $item['quantity']);
+                        }
+                    }
+
+                    $order->orderItems()->create([
+                        'product_id' => $product->id,
+                        'variant_id' => $variant ? $variant->id : null,
+                        'product_name' => $product->name,
+                        'weight' => $weight,
+                        'pack_size' => $packSize,
+                        'price' => $price,
+                        'quantity' => $item['quantity'],
+                        'total' => $price * $item['quantity'],
+                    ]);
+                }
+            }
+
+            // 4. Create Razorpay Order via API
             $rzpOrder = $this->api->order->create([
-                'amount' => $finalAmount * 100, // paise
+                'amount' => $amountInPaise,
                 'currency' => 'INR',
                 'payment_capture' => 1,
             ]);
 
-            // Create Local Payment Record
+            // 5. Create Local Payment Record
             Payment::create([
                 'order_id' => $order->id,
                 'razorpay_order_id' => $rzpOrder->id,
-                'amount' => $finalAmount * 100,
+                'amount' => $amountInPaise,
                 'currency' => 'INR',
                 'status' => 'created',
             ]);
+
+            // 6. Marketing Sync (Moosend)
+            $customerEmail = $order->email;
+            $customerName  = $order->name;
+            if ($customerEmail && class_exists('\App\Services\MoosendService')) {
+                try {
+                    (new \App\Services\MoosendService())->subscribe(
+                        email: $customerEmail,
+                        name:  $customerName,
+                        tags:  ['shopper', 'razorpay-initiated']
+                    );
+                } catch (\Exception $mooEx) {
+                    Log::warning('Moosend checkout sync failed: ' . $mooEx->getMessage());
+                }
+            }
 
             DB::commit();
 
@@ -78,11 +134,11 @@ class RazorpayController extends Controller
                 'success' => true,
                 'data' => [
                     'key_id' => config('razorpay.key_id'),
-                    'order_id' => $rzpOrder->id, // Razorpay Order ID
-                    'local_order_id' => $order->id, // Internal Order ID
-                    'encrypted_order_id' => encrypt($order->id), // Encrypted
+                    'order_id' => $rzpOrder->id,
+                    'local_order_id' => $order->id,
+                    'encrypted_order_id' => encrypt($order->id),
                     'customer_order_number' => $order->customer_order_number,
-                    'amount' => $finalAmount * 100,
+                    'amount' => $amountInPaise,
                     'currency' => 'INR',
                     'name' => "Grevia Foods",
                     'description' => "Order #{$order->order_number}",
@@ -96,8 +152,16 @@ class RazorpayController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Razorpay Create Order Failed: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to initiate payment', 'error' => $e->getMessage()], 500);
+            Log::error('Razorpay Create Order Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => $request->user()?->id,
+                'payload' => $request->all()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate payment', 
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
