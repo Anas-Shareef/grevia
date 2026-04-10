@@ -110,62 +110,55 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                 <motion.article
                   key={product.id}
                   variants={itemVariants}
-                  className="group relative h-[420px] bg-[#f8f6f0] rounded-squircle-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-700 border border-border/50"
+                  className="group bg-card rounded-squircle-xl overflow-hidden shadow-soft border border-border/50 hover:border-lime/30 transition-all duration-300"
                 >
-                  {/* Badge - Positioned to the Right */}
-                  {product.badge && (
-                    <div className="absolute top-4 right-4 z-20 bg-lime text-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
-                      {product.badge}
-                    </div>
-                  )}
+                  {/* Image */}
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="block relative aspect-square overflow-hidden bg-secondary/30"
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {product.badge && (
+                      <div className="absolute top-3 left-3 bg-lime text-foreground text-xs font-bold px-3 py-1 rounded-squircle">
+                        {product.badge}
+                      </div>
+                    )}
+                  </Link>
 
-                  {/* Fully Visible Product Image */}
-                  <div className="absolute inset-0 p-10 flex items-center justify-center">
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="block w-full h-full"
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
-                      />
+                  {/* Content */}
+                  <div className="p-4">
+                    <Link to={`/product/${product.id}`}>
+                      <h3 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                        {product.name}
+                      </h3>
                     </Link>
-                  </div>
+                    <p className="text-xl font-black text-foreground mb-4">
+                      ₹{product.price}
+                    </p>
 
-                  {/* High-Readability Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
-
-                  {/* Content Overlayed at Bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-10">
-                    <div className="mb-4">
-                      <Link to={`/product/${product.id}`}>
-                        <h3 className="text-xl md:text-2xl font-black text-white mb-1 tracking-tight line-clamp-2 leading-tight drop-shadow-sm group-hover:text-lime transition-colors">
-                          {product.name}
-                        </h3>
-                      </Link>
-                      <p className="text-white font-bold text-xl drop-shadow-sm">
-                        ₹{product.price}
-                      </p>
-                    </div>
-
-                    {/* Actions Area */}
-                    <div className="flex items-center gap-3">
+                    {/* Actions */}
+                    <div className="flex gap-2">
                       <Button
                         variant="lime"
-                        className="flex-1 h-14 rounded-full font-bold shadow-lg hover:bg-lime-glow hover:shadow-glow hover:-translate-y-0.5 transition-all duration-300 text-sm"
+                        size="sm"
+                        className="flex-1"
                         onClick={() => handleMoveToCart(product)}
                       >
-                        <ShoppingCart className="w-5 h-5 mr-1" />
+                        <ShoppingCart className="w-4 h-4 mr-1" />
                         Move to Cart
                       </Button>
-                      <button
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleRemove(product)}
-                        className="shrink-0 w-14 h-14 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md group/trash"
-                        aria-label="Remove from wishlist"
+                        className="px-3"
                       >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </motion.article>
