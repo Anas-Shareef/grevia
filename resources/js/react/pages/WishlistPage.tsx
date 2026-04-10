@@ -110,43 +110,43 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                 <motion.article
                   key={product.id}
                   variants={itemVariants}
-                  className="flex flex-col bg-card rounded-[32px] border border-border/50 shadow-soft hover:shadow-card transition-all duration-500 overflow-hidden w-full group"
+                  className="group relative h-[450px] bg-card rounded-squircle-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-700 border border-border/50"
                 >
-                  {/* Image Area */}
-                  <figure className="relative bg-[#f8f6f0] p-8 flex items-center justify-center aspect-square overflow-hidden">
-                    {product.badge && (
-                      <div className="absolute top-4 left-4 z-10 bg-lime text-foreground font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
-                        {product.badge}
-                      </div>
-                    )}
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="block w-full h-full"
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
-                      />
-                    </Link>
-                  </figure>
+                  {/* Background Image */}
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  />
 
-                  {/* Content Area */}
-                  <div className="p-6 bg-white flex-1 flex flex-col">
-                    <Link to={`/product/${product.id}`}>
-                      <h3 className="text-xl font-bold text-foreground mb-2 mt-1 tracking-tight group-hover:text-primary transition-colors line-clamp-1">
-                        {product.name}
-                      </h3>
-                    </Link>
-                    <p className="text-2xl font-black text-foreground mb-6">
-                      ₹{product.price}
-                    </p>
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/20 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100"></div>
+
+                  {/* Content (Overlayed at bottom) */}
+                  <div className="absolute bottom-0 left-0 right-0 p-8">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1 mr-4">
+                        <Link to={`/product/${product.id}`}>
+                          <h3 className="text-2xl md:text-3xl font-black text-white mb-2 tracking-tight line-clamp-2 leading-tight">
+                            {product.name}
+                          </h3>
+                        </Link>
+                        <p className="text-white font-black text-2xl">
+                          ₹{product.price}
+                        </p>
+                      </div>
+                      {product.badge && (
+                        <div className="shrink-0 bg-lime text-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-squircle shadow-sm">
+                          {product.badge}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Actions Area */}
-                    <div className="flex items-center gap-3 mt-auto">
+                    <div className="flex items-center gap-2 md:gap-3">
                       <Button
                         variant="lime"
-                        className="flex-1 h-12 rounded-full font-bold shadow-button hover:bg-lime-glow hover:-translate-y-0.5 transition-all duration-300 text-sm"
+                        className="flex-1 h-14 rounded-full font-bold shadow-lg hover:bg-lime-glow hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 text-sm"
                         onClick={() => handleMoveToCart(product)}
                       >
                         <ShoppingCart className="w-5 h-5 mr-1" />
@@ -154,7 +154,7 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                       </Button>
                       <button
                         onClick={() => handleRemove(product)}
-                        className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md group/trash"
+                        className="shrink-0 w-14 h-14 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md group/trash"
                         aria-label="Remove from wishlist"
                       >
                         <Trash2 className="w-5 h-5 group-hover/trash:scale-110 transition-transform" />
