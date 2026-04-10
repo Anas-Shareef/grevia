@@ -110,43 +110,43 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                 <motion.article
                   key={product.id}
                   variants={itemVariants}
-                  className="flex flex-col bg-white rounded-[32px] border border-border/50 shadow-sm hover:shadow-md transition-shadow overflow-hidden min-h-[380px] group"
+                  className="group relative h-[450px] bg-card rounded-squircle-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-700 border border-border/50"
                 >
-                  {/* Top Section (Image Wrapper) */}
-                  <div className="relative w-full h-48 md:h-56 bg-secondary/20 p-6 flex items-center justify-center">
-                    {product.badge && (
-                      <div className="absolute top-4 left-4 z-10 bg-[#71ce50] text-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
-                        {product.badge}
+                  {/* Background Image with Zoom Effect */}
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  />
+
+                  {/* Sophisticated Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/30 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
+
+                  {/* Content Overlayed at Bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1 mr-4">
+                        <Link to={`/product/${product.id}`}>
+                          <h3 className="text-2xl md:text-3xl font-black text-white mb-2 tracking-tight line-clamp-2 leading-tight group-hover:text-lime transition-colors">
+                            {product.name}
+                          </h3>
+                        </Link>
+                        <p className="text-white font-bold text-xl md:text-2xl opacity-90">
+                          ₹{product.price}
+                        </p>
                       </div>
-                    )}
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="block w-full h-full"
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </Link>
-                  </div>
+                      {product.badge && (
+                        <div className="shrink-0 bg-lime text-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-squircle shadow-sm">
+                          {product.badge}
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Bottom Section (Details & Buttons) */}
-                  <div className="p-5 lg:p-6 flex-1 flex flex-col bg-white">
-                    <Link to={`/product/${product.id}`}>
-                      <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-2 hover:text-primary transition-colors">
-                        {product.name}
-                      </h3>
-                    </Link>
-                    <p className="text-2xl font-black text-foreground mb-6">
-                      ₹{product.price}
-                    </p>
-
-                    {/* Action Row */}
-                    <div className="mt-auto flex items-center gap-3 w-full">
+                    {/* Actions Area */}
+                    <div className="flex items-center gap-3">
                       <Button
                         variant="lime"
-                        className="flex-1 bg-[#71ce50] hover:bg-[#85e064] text-foreground font-bold rounded-full h-12 inline-flex items-center justify-center gap-2 transition-all duration-300 border-none shadow-none"
+                        className="flex-1 h-14 rounded-full font-bold shadow-lg hover:bg-lime-glow hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 text-sm"
                         onClick={() => handleMoveToCart(product)}
                       >
                         <ShoppingCart className="w-5 h-5 mr-1" />
@@ -154,10 +154,10 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                       </Button>
                       <button
                         onClick={() => handleRemove(product)}
-                        className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm"
+                        className="shrink-0 w-14 h-14 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md group/trash"
                         aria-label="Remove from wishlist"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-5 h-5 group-hover/trash:scale-110 transition-transform" />
                       </button>
                     </div>
                   </div>
