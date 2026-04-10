@@ -110,55 +110,55 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                 <motion.article
                   key={product.id}
                   variants={itemVariants}
-                  className="group bg-card rounded-squircle-xl overflow-hidden shadow-soft border border-border/50 hover:border-lime/30 transition-all duration-300"
+                  className="flex flex-col bg-card rounded-[32px] border border-border/50 shadow-soft hover:shadow-card transition-all duration-500 overflow-hidden w-full group"
                 >
-                  {/* Image */}
-                  <Link
-                    to={`/product/${product.id}`}
-                    className="block relative aspect-square overflow-hidden bg-secondary/30"
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                  {/* Image Area */}
+                  <figure className="relative bg-[#f8f6f0] p-8 flex items-center justify-center aspect-square overflow-hidden">
                     {product.badge && (
-                      <div className="absolute top-3 left-3 bg-lime text-foreground text-xs font-bold px-3 py-1 rounded-squircle">
+                      <div className="absolute top-4 left-4 z-10 bg-lime text-foreground font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
                         {product.badge}
                       </div>
                     )}
-                  </Link>
+                    <Link
+                      to={`/product/${product.id}`}
+                      className="block w-full h-full"
+                    >
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
+                      />
+                    </Link>
+                  </figure>
 
-                  {/* Content */}
-                  <div className="p-4">
+                  {/* Content Area */}
+                  <div className="p-6 bg-white flex-1 flex flex-col">
                     <Link to={`/product/${product.id}`}>
-                      <h3 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                      <h3 className="text-xl font-bold text-foreground mb-2 mt-1 tracking-tight group-hover:text-primary transition-colors line-clamp-1">
                         {product.name}
                       </h3>
                     </Link>
-                    <p className="text-xl font-black text-foreground mb-4">
+                    <p className="text-2xl font-black text-foreground mb-6">
                       ₹{product.price}
                     </p>
 
-                    {/* Actions */}
-                    <div className="flex gap-2">
+                    {/* Actions Area */}
+                    <div className="flex items-center gap-3 mt-auto">
                       <Button
                         variant="lime"
-                        size="sm"
-                        className="flex-1"
+                        className="flex-1 h-12 rounded-full font-bold shadow-button hover:bg-lime-glow hover:-translate-y-0.5 transition-all duration-300 text-sm"
                         onClick={() => handleMoveToCart(product)}
                       >
-                        <ShoppingCart className="w-4 h-4 mr-1" />
+                        <ShoppingCart className="w-5 h-5 mr-1" />
                         Move to Cart
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
                         onClick={() => handleRemove(product)}
-                        className="px-3"
+                        className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md group/trash"
+                        aria-label="Remove from wishlist"
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                        <Trash2 className="w-5 h-5 group-hover/trash:scale-110 transition-transform" />
+                      </button>
                     </div>
                   </div>
                 </motion.article>
