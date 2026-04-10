@@ -110,43 +110,50 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                 <motion.article
                   key={product.id}
                   variants={itemVariants}
-                  className="group relative h-[450px] bg-card rounded-squircle-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-700 border border-border/50"
+                  className="group relative h-[420px] bg-[#f8f6f0] rounded-squircle-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-700 border border-border/50"
                 >
-                  {/* Background Image with Zoom Effect */}
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                  />
+                  {/* Badge - Positioned to the Right */}
+                  {product.badge && (
+                    <div className="absolute top-4 right-4 z-20 bg-lime text-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                      {product.badge}
+                    </div>
+                  )}
 
-                  {/* Sophisticated Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/30 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
+                  {/* Fully Visible Product Image */}
+                  <div className="absolute inset-0 p-10 flex items-center justify-center">
+                    <Link
+                      to={`/product/${product.id}`}
+                      className="block w-full h-full"
+                    >
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
+                      />
+                    </Link>
+                  </div>
+
+                  {/* High-Readability Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
 
                   {/* Content Overlayed at Bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1 mr-4">
-                        <Link to={`/product/${product.id}`}>
-                          <h3 className="text-2xl md:text-3xl font-black text-white mb-2 tracking-tight line-clamp-2 leading-tight group-hover:text-lime transition-colors">
-                            {product.name}
-                          </h3>
-                        </Link>
-                        <p className="text-white font-bold text-xl md:text-2xl opacity-90">
-                          ₹{product.price}
-                        </p>
-                      </div>
-                      {product.badge && (
-                        <div className="shrink-0 bg-lime text-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-squircle shadow-sm">
-                          {product.badge}
-                        </div>
-                      )}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-10">
+                    <div className="mb-4">
+                      <Link to={`/product/${product.id}`}>
+                        <h3 className="text-xl md:text-2xl font-black text-white mb-1 tracking-tight line-clamp-2 leading-tight drop-shadow-sm group-hover:text-lime transition-colors">
+                          {product.name}
+                        </h3>
+                      </Link>
+                      <p className="text-white font-bold text-xl drop-shadow-sm">
+                        ₹{product.price}
+                      </p>
                     </div>
 
                     {/* Actions Area */}
                     <div className="flex items-center gap-3">
                       <Button
                         variant="lime"
-                        className="flex-1 h-14 rounded-full font-bold shadow-lg hover:bg-lime-glow hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 text-sm"
+                        className="flex-1 h-14 rounded-full font-bold shadow-lg hover:bg-lime-glow hover:shadow-glow hover:-translate-y-0.5 transition-all duration-300 text-sm"
                         onClick={() => handleMoveToCart(product)}
                       >
                         <ShoppingCart className="w-5 h-5 mr-1" />
@@ -157,7 +164,7 @@ const WishlistPage = ({ isDashboard = false }: WishlistPageProps) => {
                         className="shrink-0 w-14 h-14 flex items-center justify-center rounded-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md group/trash"
                         aria-label="Remove from wishlist"
                       >
-                        <Trash2 className="w-5 h-5 group-hover/trash:scale-110 transition-transform" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
