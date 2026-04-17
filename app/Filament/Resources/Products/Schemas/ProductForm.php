@@ -19,9 +19,6 @@ class ProductForm
     {
         return $schema
             ->components([
-                \Filament\Forms\Components\Split::make([
-                    \Filament\Forms\Components\Grid::make(1)
-                        ->schema([
                 Section::make('General Information')
                     ->columns(2)
                     ->components([
@@ -231,23 +228,19 @@ class ProductForm
                             ]),
                     ])
                     ->columns(2),
-                        ]),
-                    \Filament\Forms\Components\Section::make('Live Preview & Tools')
-                        ->grow(false)
-                        ->components([
-                            \Filament\Forms\Components\Placeholder::make('preview_card')
-                                ->label('Store View')
-                                ->content(fn ($get) => view('filament.products.preview-card', [
-                                    'getState' => fn () => $get(['name', 'price', 'badge']),
-                                    'getRecord' => fn () => $schema->getModelInstance(),
-                                ])),
-                            \Filament\Forms\Components\Placeholder::make('meta_info')
-                                ->label('Metadata')
-                                ->content(fn ($record) => $record ? "Created: " . $record->created_at->format('M d, Y') : "New Product"),
-                        ]),
-                ])
-                ->from('md')
-                ->columnSpanFull(),
+                Section::make('Live Preview & Tools')
+                    ->collapsed()
+                    ->components([
+                        \Filament\Forms\Components\Placeholder::make('preview_card')
+                            ->label('Store View')
+                            ->content(fn ($get) => view('filament.products.preview-card', [
+                                'getState' => fn () => $get(['name', 'price', 'badge']),
+                                'getRecord' => fn () => $schema->getModelInstance(),
+                            ])),
+                        \Filament\Forms\Components\Placeholder::make('meta_info')
+                            ->label('Metadata')
+                            ->content(fn ($record) => $record ? "Created: " . $record->created_at->format('M d, Y') : "New Product"),
+                    ]),
             ]);
     }
 }
