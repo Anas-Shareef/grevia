@@ -237,7 +237,11 @@ class ProductForm
                         Placeholder::make('preview_card')
                             ->label('Store View')
                             ->content(fn ($get) => view('filament.products.preview-card', [
-                                'getState' => fn () => $get(['name', 'price', 'badge']),
+                                'getState' => fn () => [
+                                    'name' => $get('name'),
+                                    'price' => $get('price'),
+                                    'badge' => $get('badge'),
+                                ],
                                 'getRecord' => fn () => $schema->getModelInstance(),
                             ])),
                         Placeholder::make('meta_info')
