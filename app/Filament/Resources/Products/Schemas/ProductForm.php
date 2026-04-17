@@ -12,6 +12,8 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Schema;
 
 class ProductForm
@@ -88,7 +90,7 @@ class ProductForm
                 Section::make('Product Gallery')
                     ->description('Manage main and additional photos for this product.')
                     ->components([
-                        \Filament\Forms\Components\Repeater::make('gallery')
+                        Repeater::make('gallery')
                             ->relationship('gallery')
                             ->schema([
                                 FileUpload::make('image_path')
@@ -118,7 +120,7 @@ class ProductForm
                 Section::make('Product Variants')
                     ->description('Manage weight/pack variants for this product. If variants exist, they will override the base price/stock on the frontend.')
                     ->components([
-                        \Filament\Forms\Components\Repeater::make('variants')
+                        Repeater::make('variants')
                             ->relationship()
                             ->schema([
                                 TextInput::make('weight')
@@ -154,7 +156,7 @@ class ProductForm
                                     ])
                                     ->default('active')
                                     ->required(),
-                                \Filament\Forms\Components\Repeater::make('variantImages')
+                                Repeater::make('variantImages')
                                     ->relationship('variantImages')
                                     ->schema([
                                         FileUpload::make('image_path')
@@ -232,13 +234,13 @@ class ProductForm
                 Section::make('Live Preview & Tools')
                     ->collapsed()
                     ->components([
-                        \Filament\Forms\Components\Placeholder::make('preview_card')
+                        Placeholder::make('preview_card')
                             ->label('Store View')
                             ->content(fn ($get) => view('filament.products.preview-card', [
                                 'getState' => fn () => $get(['name', 'price', 'badge']),
                                 'getRecord' => fn () => $schema->getModelInstance(),
                             ])),
-                        \Filament\Forms\Components\Placeholder::make('meta_info')
+                        Placeholder::make('meta_info')
                             ->label('Metadata')
                             ->content(fn ($record) => $record ? "Created: " . $record->created_at->format('M d, Y') : "New Product"),
                     ]),
