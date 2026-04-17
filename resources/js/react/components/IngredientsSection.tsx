@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import heroBg from "@/assets/hero-bg.jpg";
+
 
 const IngredientsSection = () => {
   const ingredients = [
@@ -8,7 +10,7 @@ const IngredientsSection = () => {
       title: "Stevia",
       description:
         "Extracted from the leaves of the Stevia rebaudiana plant, native to South America. Used for centuries as a natural sweetener.",
-      image: "/build/assets/hero-bg-D-TWzogc.jpg",
+      image: heroBg,
       sweetness: "200-300x sweeter than sugar",
       origin: "South America",
       benefits: [
@@ -22,7 +24,7 @@ const IngredientsSection = () => {
       title: "Monkfruit",
       description:
         "Also known as Luo Han Guo, this small melon has been used in traditional Chinese medicine for centuries.",
-      image: "/build/assets/hero-bg-D-TWzogc.jpg",
+      image: heroBg,
       sweetness: "150-250x sweeter than sugar",
       origin: "Southeast Asia",
       benefits: [

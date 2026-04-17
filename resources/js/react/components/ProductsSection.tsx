@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Product } from "@/types";
+import heroBg from "@/assets/hero-bg.jpg";
+
 
 const ProductsSection = () => {
   const { addToCart } = useCart();
@@ -17,7 +19,7 @@ const ProductsSection = () => {
       rating: 4.9,
       reviews: 128,
       badge: "Best Seller",
-      image: "/build/assets/hero-bg-D-TWzogc.jpg",
+      image: heroBg,
     },
     {
       id: 2,
@@ -27,7 +29,7 @@ const ProductsSection = () => {
       rating: 4.8,
       reviews: 96,
       badge: "New",
-      image: "/build/assets/hero-bg-D-TWzogc.jpg",
+      image: heroBg,
     },
     {
       id: 3,
@@ -37,7 +39,7 @@ const ProductsSection = () => {
       rating: 4.7,
       reviews: 74,
       badge: null,
-      image: "/build/assets/hero-bg-D-TWzogc.jpg",
+      image: heroBg,
     },
   ];
 

@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Sparkles, Award, Heart, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import heroBg from "@/assets/hero-bg.jpg";
+
 
 const HeroSection = () => {
   return (
@@ -92,7 +94,7 @@ const HeroSection = () => {
               {/* Image - NO border, NO padding, flush with container */}
               <div className="relative rounded-squircle-xl overflow-hidden shadow-card">
                 <img
-                  src="/build/assets/hero-bg-D-TWzogc.jpg"
+                  src={heroBg}
                   alt="Grevia premium stevia and monkfruit organic sweetener products"
                   className="w-full h-full object-cover"
                 />

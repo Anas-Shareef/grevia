@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ShoppingCart, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import heroBg from "@/assets/hero-bg.jpg";
+
 
 const BeyondSweetenersSection = () => {
   const categories = [
@@ -8,7 +10,7 @@ const BeyondSweetenersSection = () => {
       title: "Bakery Items",
       description:
         "Freshly prepared baked goods made for everyday indulgence without the sugar spike.",
-      image: "/build/assets/hero-bg-D-TWzogc.jpg",
+      image: heroBg,
       link: "/collections/bakery",
       delay: 0.1,
     },
@@ -16,7 +18,7 @@ const BeyondSweetenersSection = () => {
       title: "Pickles & Preserves",
       description:
         "Traditional recipes crafted with natural ingredients and no artificial preservatives.",
-      image: "/build/assets/hero-bg-D-TWzogc.jpg",
+      image: heroBg,
       link: "/collections/pickles",
       delay: 0.2,
     },
