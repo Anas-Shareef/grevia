@@ -44,11 +44,18 @@ class ProductForm
                             ->required(),
                         RichEditor::make('long_description')
                             ->columnSpanFull(),
+                        TagsInput::make('ingredients')
+                            ->placeholder('Add ingredient')
+                            ->helperText('Press enter after each ingredient')
+                            ->columnSpanFull(),
+                        TagsInput::make('tags')
+                            ->placeholder('Add tag')
+                            ->helperText('Product tags for searching/filtering')
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Pricing & Inventory (Default)')
                     ->description('These values serve as defaults if no variants are specified.')
                     ->columns(3)
-                    ->collapsed()
                     ->components([
                         TextInput::make('price')
                             ->numeric()
@@ -209,6 +216,19 @@ class ProductForm
                             ->placeholder('Comma-separated slugs, e.g. stevia-powder-1-10-100g,stevia-drops-1-10-50g')
                             ->helperText('Exact slugs of the products to show in the "You may also like" row.')
                             ->columnSpanFull(),
+                        \Filament\Forms\Components\Grid::make(2)
+                            ->schema([
+                                TextInput::make('rating')
+                                    ->numeric()
+                                    ->step(0.1)
+                                    ->readOnly()
+                                    ->helperText('Managed by customer reviews'),
+                                TextInput::make('reviews')
+                                    ->label('Reviews Count')
+                                    ->numeric()
+                                    ->readOnly()
+                                    ->helperText('Managed by customer reviews'),
+                            ]),
                     ])
                     ->columns(2),
                         ]),
