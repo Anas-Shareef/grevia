@@ -20,6 +20,21 @@ class Category extends Model
         'order',
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+        
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        return \Illuminate\Support\Facades\Storage::url($this->image);
+    }
+
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');

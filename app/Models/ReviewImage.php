@@ -15,6 +15,13 @@ class ReviewImage extends Model
         'image_path',
     ];
 
+    protected $appends = ['url'];
+
+    public function getUrlAttribute(): string
+    {
+        return \Illuminate\Support\Facades\Storage::url($this->image_path);
+    }
+
     public function review()
     {
         return $this->belongsTo(ProductReview::class, 'review_id');
