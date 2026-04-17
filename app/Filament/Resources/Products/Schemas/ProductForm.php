@@ -6,6 +6,7 @@ use App\Models\Product;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -213,7 +214,7 @@ class ProductForm
                             ->placeholder('Comma-separated slugs, e.g. stevia-powder-1-10-100g,stevia-drops-1-10-50g')
                             ->helperText('Exact slugs of the products to show in the "You may also like" row.')
                             ->columnSpanFull(),
-                        \Filament\Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('rating')
                                     ->numeric()
