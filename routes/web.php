@@ -256,6 +256,43 @@ Route::get('/setup-email-campaigns', function () {
         . '</pre>');
 });
 
+// Emergency Database Fix: Direct SQL execution
+Route::get('/emergency-db-fix', function () {
+    try {
+        $results = [];
+        
+        // 1. Check/Add nutrition_facts
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('products', 'nutrition_facts')) {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE `products` ADD COLUMN `nutrition_facts` TEXT NULL AFTER `use_case` ");
+            $results[] = "✅ Added nutrition_facts";
+        } else {
+            $results[] = "ℹ️ nutrition_facts already exists";
+        }
+
+        // 2. Check/Add usage_instructions
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('products', 'usage_instructions')) {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE `products` ADD COLUMN `usage_instructions` TEXT NULL AFTER `nutrition_facts` ");
+            $results[] = "✅ Added usage_instructions";
+        } else {
+            $results[] = "ℹ️ usage_instructions already exists";
+        }
+
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        $results[] = "⚡ Cache cleared";
+
+        return '<h2>🛠️ Emergency Fix Results</h2><ul><li>' . implode('</li><li>', $results) . '</li></ul>'
+             . '<p><a href="/admin/products">→ Back to Products</a></p>';
+    } catch (\Exception $e) {
+        return '<h2 style="color:red">❌ Emergency Fix Failed</h2><pre>' . $e->getMessage() . '</pre>';
+    }
+});
+
+// Debug: List columns in products table
+Route::get('/debug-columns', function () {
+    $columns = \Illuminate\Support\Facades\Schema::getColumnListing('products');
+    return ['products_table_columns' => $columns];
+});
+
 // One-click setup: runs product attribute migrations
 Route::get('/setup-product-attributes', function () {
     try {
