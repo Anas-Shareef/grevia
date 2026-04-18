@@ -256,6 +256,21 @@ Route::get('/setup-email-campaigns', function () {
         . '</pre>');
 });
 
+// One-click setup: runs product attribute migrations
+Route::get('/setup-product-attributes', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', [
+            '--path' => "database/migrations/2026_04_18_074500_add_content_tabs_to_products_table.php",
+            '--force' => true,
+        ]);
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        return '<h2 style="color:green">✅ Success! Product attributes added.</h2>
+                <p>Go to <a href="/admin/products">Admin → Products</a> to edit Nutrition and Usage info.</p>';
+    } catch (\Exception $e) {
+        return '<h2 style="color:red">❌ Error</h2><pre>' . $e->getMessage() . '</pre>';
+    }
+});
+
 // Admin Excel/CSV Export Routes (no auth guard needed - admin middleware handles it via session)
 Route::prefix('admin/export')->group(function () {
     Route::get('/users',            [\App\Http\Controllers\Admin\AdminExportController::class, 'users'])->name('admin.export.users');

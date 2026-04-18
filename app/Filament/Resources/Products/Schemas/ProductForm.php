@@ -211,6 +211,14 @@ class ProductForm
                             ->label('Ideal Use Case')
                             ->placeholder('e.g. tea, coffee, smoothies')
                             ->columnSpanFull(),
+                        RichEditor::make('usage_instructions')
+                            ->label('Usage Instructions (How to Use)')
+                            ->placeholder('Step by step guide on how to use this product...')
+                            ->columnSpanFull(),
+                        RichEditor::make('nutrition_facts')
+                            ->label('Nutrition Facts')
+                            ->placeholder('Nutrition details, vitamins, etc...')
+                            ->columnSpanFull(),
                         TextInput::make('related_products')
                             ->label('Related Products (You may also like)')
                             ->placeholder('Comma-separated slugs, e.g. stevia-powder-1-10-100g,stevia-drops-1-10-50g')

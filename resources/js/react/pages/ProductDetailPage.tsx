@@ -91,9 +91,13 @@ const ProductDetailPage = () => {
     );
   }
 
-  const isMonk = product.type === 'monk-fruit';
+  const isMonk = product.type?.toLowerCase().includes('monk') || product.name.toLowerCase().includes('monk');
   const imageBgClass = isMonk ? 'monk-bg' : 'stevia-bg';
-  const ratioGuide = RATIO_GUIDES[selectedRatio] || RATIO_GUIDES['1:10'];
+  
+  const ratioGuide = product.sweetness_description 
+    ? { detail: product.sweetness_description }
+    : (RATIO_GUIDES[selectedRatio] || RATIO_GUIDES['1:10']);
+
   const displayPrice = getPriceForSize(product.price, product.size_label || '50g', selectedSize);
   const wishlisted = isInWishlist(String(product.id));
 
@@ -118,14 +122,24 @@ const ProductDetailPage = () => {
     }
   };
 
+  // Dynamically determine which specs to show
   const specs = [
-    { label: 'Type', value: isMonk ? 'Monk Fruit' : 'Stevia' },
+    { label: 'Type', value: product.type || (isMonk ? 'Monk Fruit' : 'Stevia') },
     { label: 'Ratio', value: selectedRatio || 'N/A' },
     { label: 'Size', value: selectedSize },
+    product.use_case && { label: 'Best For', value: product.use_case },
     { label: 'Calories', value: '0 kcal' },
-    { label: 'Sweetness', value: isMonk ? '250x Sugar' : '300x Sugar' },
     { label: 'Shelf Life', value: '18 Months' },
-  ];
+  ].filter(Boolean) as { label: string; value: string }[];
+
+  // Determine related products based on the slug list in the database
+  const relatedSlugs = product.related_products 
+    ? product.related_products.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+  
+  const relatedProducts = relatedSlugs.length > 0
+    ? allProducts.filter(p => relatedSlugs.includes(p.slug || ""))
+    : allProducts.filter(p => p.id !== product.id).slice(0, 4);
 
   return (
     <div className="bg-[var(--bg-page)] min-h-screen">
@@ -193,34 +207,36 @@ const ProductDetailPage = () => {
                 ))}
               </div>
               <span className="text-sm font-bold">{product.rating.toFixed(1)} / 5.0</span>
-              <span className="text-sm text-[var(--text-muted)]">({product.reviews_count} reviews)</span>
+              <span className="text-sm text-[var(--text-muted)]">({product.reviews_count || 0} reviews)</span>
             </div>
 
             <p className="text-lg text-[var(--text-muted)] font-medium mb-8 leading-relaxed">
               {product.description || "Experience the pure taste of nature with Grevia's premium sweetener. Zero calories, zero insulin spike, and zero bitter aftertaste."}
             </p>
 
-            {/* Ratio Select */}
-            <div className="mb-8">
-              <label className="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-50">Strength Ratio</label>
-              <div className="size-pills">
-                {['1:10', '1:50'].map(r => (
-                  <button
-                    key={r}
-                    onClick={() => setSelectedRatio(r)}
-                    className={`size-pill !px-6 !py-3 ${selectedRatio === r ? 'active' : ''}`}
-                  >
-                    {r} {r === '1:10' ? '(Medium)' : '(Extra)'}
-                  </button>
-                ))}
+            {/* Ratio Select - Only show if ratio is actually defined in DB or it's a sweetener */}
+            {(product.ratio || product.category?.includes('sweetener')) && (
+              <div className="mb-8">
+                <label className="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-50">Strength Ratio</label>
+                <div className="size-pills">
+                  {['1:10', '1:50'].map(r => (
+                    <button
+                      key={r}
+                      onClick={() => setSelectedRatio(r)}
+                      className={`size-pill !px-6 !py-3 ${selectedRatio === r ? 'active' : ''}`}
+                    >
+                      {r} {r === '1:10' ? '(Medium)' : '(Extra)'}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-4 p-5 rounded-3xl bg-[var(--green-pale)] border border-[var(--green-mint)]/30 flex gap-4">
+                  <Info className="w-5 h-5 text-[var(--green-primary)] flex-shrink-0" />
+                  <p className="text-xs font-bold text-[var(--green-primary)] leading-relaxed">
+                    {ratioGuide.detail}
+                  </p>
+                </div>
               </div>
-              <div className="mt-4 p-5 rounded-3xl bg-[var(--green-pale)] border border-[var(--green-mint)]/30 flex gap-4">
-                <Info className="w-5 h-5 text-[var(--green-primary)] flex-shrink-0" />
-                <p className="text-xs font-bold text-[var(--green-primary)] leading-relaxed">
-                  {ratioGuide.detail}
-                </p>
-              </div>
-            </div>
+            )}
 
             {/* Size Select */}
             <div className="mb-10">
@@ -274,13 +290,18 @@ const ProductDetailPage = () => {
         {/* Info Tabs */}
         <div className="pt-12 border-t border-[var(--border-light)]">
           <div className="flex gap-8 mb-10 overflow-x-auto pb-2">
-            {['details', 'nutrition', 'how', 'reviews'].map(t => (
+            {[
+              { id: 'details', label: 'details' },
+              product.nutrition_facts && { id: 'nutrition', label: 'nutrition' },
+              product.usage_instructions && { id: 'how', label: 'how to use' },
+              { id: 'reviews', label: 'reviews' }
+            ].filter(Boolean).map((t: any) => (
               <button
-                key={t}
-                onClick={() => setActiveTab(t as any)}
-                className={`text-sm font-black uppercase tracking-widest whitespace-nowrap transition-all pb-3 border-b-2 ${activeTab === t ? 'text-[var(--green-primary)] border-[var(--green-primary)]' : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text-heading)]'}`}
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                className={`text-sm font-black uppercase tracking-widest whitespace-nowrap transition-all pb-3 border-b-2 ${activeTab === t.id ? 'text-[var(--green-primary)] border-[var(--green-primary)]' : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text-heading)]'}`}
               >
-                {t}
+                {t.label}
               </button>
             ))}
           </div>
@@ -295,54 +316,32 @@ const ProductDetailPage = () => {
                 transition={{ duration: 0.3 }}
               >
                 {activeTab === 'details' && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                    {specs.map(s => (
-                      <div key={s.label} className="benefit-card !p-6 !mb-0 text-center">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">{s.label}</p>
-                        <p className="text-sm font-black text-[var(--text-heading)]">{s.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                
-                {activeTab === 'nutrition' && (
-                  <div className="max-w-md bg-white rounded-[40px] border border-[var(--border-light)] p-8 shadow-soft">
-                    <h3 className="text-xl font-bold mb-6">Nutrition Facts</h3>
-                    <div className="space-y-4">
-                      {[
-                        { l: "Calories", v: "0 kcal" },
-                        { l: "Total Carbohydrates", v: "0.5g" },
-                        { l: "Dietary Fiber", v: "0.3g" },
-                        { l: "Protein", v: "0g" },
-                        { l: "Sodium", v: "0mg" }
-                      ].map(row => (
-                        <div key={row.l} className="flex justify-between items-center py-3 border-b border-[var(--bg-page)]">
-                          <span className="font-medium text-[var(--text-muted)]">{row.l}</span>
-                          <span className="font-black">{row.v}</span>
+                  <div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
+                      {specs.map(s => (
+                        <div key={s.label} className="benefit-card !p-6 !mb-0 text-center">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">{s.label}</p>
+                          <p className="text-sm font-black text-[var(--text-heading)]">{s.value}</p>
                         </div>
                       ))}
                     </div>
+                    {product.longDescription && (
+                      <div className="prose max-w-none text-[var(--text-muted)] font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: product.longDescription }} />
+                    )}
                   </div>
                 )}
+                
+                {activeTab === 'nutrition' && product.nutrition_facts && (
+                   <div className="max-w-2xl bg-white rounded-[40px] border border-[var(--border-light)] p-8 shadow-soft">
+                     <h3 className="text-xl font-bold mb-6">Nutrition Facts</h3>
+                     <div className="prose max-w-none font-medium text-[var(--text-muted)]" dangerouslySetInnerHTML={{ __html: product.nutrition_facts }} />
+                   </div>
+                )}
 
-                {activeTab === 'how' && (
-                  <div className="grid md:grid-cols-2 gap-12">
-                    <div className="space-y-8">
-                      <h3 className="text-2xl font-bold">Recommended Usage</h3>
-                      <div className="space-y-6">
-                        <div className="flex gap-4">
-                          <div className="w-10 h-10 rounded-2xl bg-[var(--green-mint)] flex items-center justify-center font-black text-[var(--green-primary)] flex-shrink-0">1</div>
-                          <p className="text-[var(--text-muted)] font-medium leading-relaxed">Start small. Grevia is much sweeter than sugar, so a pinch is often enough for a cup of tea or coffee.</p>
-                        </div>
-                        <div className="flex gap-4">
-                          <div className="w-10 h-10 rounded-2xl bg-[var(--green-mint)] flex items-center justify-center font-black text-[var(--green-primary)] flex-shrink-0">2</div>
-                          <p className="text-[var(--text-muted)] font-medium leading-relaxed">For baking, use our 1:50 ratio for large batches and 1:10 for smaller recipes like cookies.</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="aspect-video rounded-[40px] bg-[var(--bg-page)] flex items-center justify-center border border-[var(--border-light)]">
-                      <span className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest">Recipe Video Placeholder</span>
-                    </div>
+                {activeTab === 'how' && product.usage_instructions && (
+                  <div className="max-w-4xl">
+                    <h3 className="text-2xl font-bold mb-8">Recommended Usage</h3>
+                    <div className="prose max-w-none font-medium text-[var(--text-muted)]" dangerouslySetInnerHTML={{ __html: product.usage_instructions }} />
                   </div>
                 )}
 
@@ -361,7 +360,7 @@ const ProductDetailPage = () => {
             <h2 className="section-title">Complete Your Wellness Routine</h2>
           </div>
           <div className="products-grid">
-            {allProducts.filter(p => p.id !== product.id).slice(0, 4).map(p => (
+            {relatedProducts.map(p => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

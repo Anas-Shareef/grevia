@@ -34,6 +34,8 @@ class Product extends Model
         'sweetness_description',
         'use_case',
         'related_products',
+        'nutrition_facts',
+        'usage_instructions',
     ];
 
     protected $casts = [
