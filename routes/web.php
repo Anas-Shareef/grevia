@@ -259,15 +259,38 @@ Route::get('/setup-email-campaigns', function () {
 // One-click setup: runs product attribute migrations
 Route::get('/setup-product-attributes', function () {
     try {
+        $hasNutrition = \Illuminate\Support\Facades\Schema::hasColumn('products', 'nutrition_facts');
+        $hasUsage = \Illuminate\Support\Facades\Schema::hasColumn('products', 'usage_instructions');
+
+        if ($hasNutrition && $hasUsage) {
+            return '<h2 style="color:blue">ℹ️ Information: Columns already exist.</h2>
+                    <p>Database is already up to date. Go to <a href="/admin/products">Admin → Products</a>.</p>';
+        }
+
         \Illuminate\Support\Facades\Artisan::call('migrate', [
             '--path' => "database/migrations/2026_04_18_074500_add_content_tabs_to_products_table.php",
             '--force' => true,
         ]);
+        
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        
         return '<h2 style="color:green">✅ Success! Product attributes added.</h2>
-                <p>Go to <a href="/admin/products">Admin → Products</a> to edit Nutrition and Usage info.</p>';
+                <p>The cache has been cleared. Go to <a href="/admin/products">Admin → Products</a> to edit Nutrition and Usage info.</p>';
     } catch (\Exception $e) {
-        return '<h2 style="color:red">❌ Error</h2><pre>' . $e->getMessage() . '</pre>';
+        // Fallback: If Artisan call fails, try direct statement
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('products', 'nutrition_facts')) {
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE `products` ADD COLUMN `nutrition_facts` TEXT NULL AFTER `use_case` ");
+            }
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('products', 'usage_instructions')) {
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE `products` ADD COLUMN `usage_instructions` TEXT NULL AFTER `nutrition_facts` ");
+            }
+            \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+            return '<h2 style="color:orange">⚠️ Manual Fix Applied</h2>
+                    <p>Columns were added via direct SQL because the migration command failed. You can now use <a href="/admin/products">Admin → Products</a>.</p>';
+        } catch (\Exception $e2) {
+            return '<h2 style="color:red">❌ Error</h2><pre>' . $e->getMessage() . "\n\n" . $e2->getMessage() . '</pre>';
+        }
     }
 });
 
