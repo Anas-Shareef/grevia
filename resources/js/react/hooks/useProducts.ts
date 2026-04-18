@@ -90,6 +90,7 @@ const transformProduct = (data: any): Product => {
         related_products: data.related_products,
         nutrition_facts: data.nutrition_facts,
         usage_instructions: data.usage_instructions,
+        tags: Array.isArray(data.tags) ? data.tags : [],
     };
 };
 

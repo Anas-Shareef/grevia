@@ -44,8 +44,7 @@ const ProductDetailPage = () => {
 
   const [selectedRatio, setSelectedRatio] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('50g');
-  const [selectedThumb, setSelectedThumb] = useState(0);
-  const [activeTab, setActiveTab] = useState<'details' | 'nutrition' | 'how' | 'reviews'>('details');
+  const [selectedThumb, setSelectedThumb] = useState(0)  const [activeTab, setActiveTab] = useState<'details' | 'ingredients' | 'nutrition' | 'how' | 'reviews'>('details');
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -125,6 +124,7 @@ const ProductDetailPage = () => {
   // Dynamically determine which specs to show
   const specs = [
     { label: 'Type', value: product.type || (isMonk ? 'Monk Fruit' : 'Stevia') },
+    product.form && { label: 'Form', value: product.form },
     { label: 'Ratio', value: selectedRatio || 'N/A' },
     { label: 'Size', value: selectedSize },
     product.use_case && { label: 'Best For', value: product.use_case },
@@ -193,9 +193,16 @@ const ProductDetailPage = () => {
 
           {/* Right: Product Info */}
           <div className="flex flex-col">
-            <div className="eyebrow-badge mb-6 self-start">
-              <span className="dot" />
-              100% Natural Choice
+            <div className="flex items-center gap-3 mb-6">
+              <div className="eyebrow-badge !mb-0 self-start">
+                <span className="dot" />
+                {product.subcategory || '100% Natural Choice'}
+              </div>
+              {product.form && (
+                <div className="px-3 py-1 rounded-full bg-[var(--green-primary)]/10 text-[var(--green-primary)] text-[10px] font-black uppercase tracking-widest leading-none">
+                  {product.form}
+                </div>
+              )}
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl mb-4">{product.name}</h1>
@@ -215,7 +222,7 @@ const ProductDetailPage = () => {
             </p>
 
             {/* Ratio Select - Only show if ratio is actually defined in DB or it's a sweetener */}
-            {(product.ratio || product.category?.includes('sweetener')) && (
+            {(product.ratio || product.category?.toString().includes('sweetener')) && (
               <div className="mb-8">
                 <label className="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-50">Strength Ratio</label>
                 <div className="size-pills">
@@ -292,6 +299,7 @@ const ProductDetailPage = () => {
           <div className="flex gap-8 mb-10 overflow-x-auto pb-2">
             {[
               { id: 'details', label: 'details' },
+              product.ingredients && product.ingredients.length > 0 && { id: 'ingredients', label: 'ingredients' },
               product.nutrition_facts && { id: 'nutrition', label: 'nutrition' },
               product.usage_instructions && { id: 'how', label: 'how to use' },
               { id: 'reviews', label: 'reviews' }
@@ -327,6 +335,34 @@ const ProductDetailPage = () => {
                     </div>
                     {product.longDescription && (
                       <div className="prose max-w-none text-[var(--text-muted)] font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: product.longDescription }} />
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'ingredients' && product.ingredients && (
+                  <div className="max-w-4xl">
+                    <h3 className="text-2xl font-bold mb-8">What's Inside</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {product.ingredients.map((ing, idx) => (
+                        <div key={idx} className="flex items-center gap-4 p-5 rounded-3xl bg-white border border-[var(--border-light)] shadow-soft group hover:border-[var(--green-primary)] transition-all">
+                          <div className="w-10 h-10 rounded-2xl bg-[var(--green-mint)] flex items-center justify-center text-[var(--green-primary)] font-black group-hover:scale-110 transition-transform">
+                            {idx + 1}
+                          </div>
+                          <span className="font-bold text-[var(--text-heading)]">{ing}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {product.tags && product.tags.length > 0 && (
+                      <div className="mt-12">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-4">Certifications & Tags</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {product.tags.map(tag => (
+                            <span key={tag} className="px-3 py-1 rounded-full bg-white border border-[var(--border-light)] text-[10px] font-bold text-[var(--text-muted)]">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
                 )}

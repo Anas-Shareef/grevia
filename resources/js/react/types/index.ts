@@ -38,6 +38,7 @@ export interface Review {
     created_at: string;
     user?: User;
     images?: { id: number; image_path: string }[];
+    product?: Product;
 }
 
 export interface OrderItem {
@@ -114,6 +115,7 @@ export interface Product {
   description: string;
   longDescription?: string;
   ingredients?: string[];
+  tags?: string[];
   price: number;
   originalPrice?: number;
   rating: number;
@@ -143,4 +145,6 @@ export interface Product {
   use_case?: string;
   sweetness_description?: string;
   related_products?: string;
+  nutrition_facts?: string;
+  usage_instructions?: string;
 }
