@@ -214,10 +214,12 @@ class ProductForm
                         RichEditor::make('usage_instructions')
                             ->label('Usage Instructions (How to Use)')
                             ->placeholder('Step by step guide on how to use this product...')
+                            ->visible(fn () => \Illuminate\Support\Facades\Schema::hasColumn('products', 'usage_instructions'))
                             ->columnSpanFull(),
                         RichEditor::make('nutrition_facts')
                             ->label('Nutrition Facts')
                             ->placeholder('Nutrition details, vitamins, etc...')
+                            ->visible(fn () => \Illuminate\Support\Facades\Schema::hasColumn('products', 'nutrition_facts'))
                             ->columnSpanFull(),
                         TextInput::make('related_products')
                             ->label('Related Products (You may also like)')
