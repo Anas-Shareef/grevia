@@ -92,8 +92,8 @@ export interface ProductVariant {
   product_id: number;
   weight: string;
   pack_size: number;
-  price: number | string;
-  discount_price?: number | string;
+  price: number;
+  discount_price?: number;
   stock_quantity: number;
   sku: string;
   status: 'active' | 'inactive';

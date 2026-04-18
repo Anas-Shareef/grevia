@@ -12,24 +12,6 @@ import { useState, useEffect } from "react";
 import ReviewsSection from "@/components/ReviewsSection";
 import { ProductCard } from "@/components/ProductCard";
 
-// Ratio guides from previous implementation
-const RATIO_GUIDES: Record<string, { one_line: string; detail: string }> = {
-  '1:10': {
-    one_line: '1g replaces 10g of sugar. Mild sweetness, great for everyday drinks.',
-    detail:   '1:10 means 1g of Grevia Stevia replaces 10g of sugar. Great for tea, coffee, and smoothies. For baking with large quantities, try 1:50.',
-  },
-  '1:50': {
-    one_line: '1g replaces 50g of sugar. Very concentrated — use just a pinch.',
-    detail:   '1:50 means 1g of Grevia replaces 50g of sugar. Ideal for large-batch baking and cooking where you need very little sweetener.',
-  },
-};
-
-function getPriceForSize(basePrice: number, baseSize: string, targetSize: string): number {
-  if (baseSize === targetSize) return basePrice;
-  if (baseSize === '50g' && targetSize === '100g') return Math.round(basePrice * 1.67);
-  if (baseSize === '100g' && targetSize === '50g') return Math.round(basePrice * 0.6);
-  return basePrice;
-}
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,14 +25,17 @@ const ProductDetailPage = () => {
     : (allProductsResponse as any)?.data || [];
 
   const [selectedRatio, setSelectedRatio] = useState<string>('');
-  const [selectedSize, setSelectedSize] = useState<string>('50g');
-  const [selectedThumb, setSelectedThumb] = useState(0)  const [activeTab, setActiveTab] = useState<'details' | 'ingredients' | 'nutrition' | 'how' | 'reviews'>('details');
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [selectedThumb, setSelectedThumb] = useState(0);
+  const [activeTab, setActiveTab] = useState<'details' | 'ingredients' | 'nutrition' | 'how' | 'reviews'>('details');
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (product) {
       if (product.ratio) setSelectedRatio(product.ratio);
-      if (product.size_label) setSelectedSize(product.size_label);
+      if (product.variants && product.variants.length > 0) {
+        setSelectedVariant(product.variants[0]);
+      }
     }
   }, [product]);
 
@@ -95,19 +80,25 @@ const ProductDetailPage = () => {
   
   const ratioGuide = product.sweetness_description 
     ? { detail: product.sweetness_description }
-    : (RATIO_GUIDES[selectedRatio] || RATIO_GUIDES['1:10']);
+    : { detail: '1g replaces 10g of sugar. Mild sweetness, great for everyday drinks.' };
 
-  const displayPrice = getPriceForSize(product.price, product.size_label || '50g', selectedSize);
+  const displayPrice = selectedVariant ? selectedVariant.price : product.price;
   const wishlisted = isInWishlist(String(product.id));
 
-  // Gallery images logic
-  const galleryImages = product.gallery && product.gallery.length > 0
-    ? product.gallery.map(g => g.url)
-    : [product.image, product.image, product.image].filter(Boolean);
+  // Gallery images logic - merge variant images if variant is selected
+  const variantGallery = selectedVariant?.gallery || [];
+  const baseGallery = product.gallery || [];
+  const galleryImages = variantGallery.length > 0
+    ? variantGallery.map((g: any) => g.url)
+    : baseGallery.length > 0
+      ? baseGallery.map(g => g.url)
+      : [product.image].filter(Boolean);
+  
   const mainImageUrl = galleryImages[selectedThumb] || product.image;
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) addToCart(product, 1, product.variants?.[0]?.id);
+    const variantId = selectedVariant?.id || product.variants?.[0]?.id;
+    for (let i = 0; i < quantity; i++) addToCart(product, 1, variantId);
     toast.success(`${product.name} Added!`, { duration: 2000, icon: <ShoppingCart className="w-4 h-4 text-[var(--green-primary)]" /> });
   };
 
@@ -124,9 +115,9 @@ const ProductDetailPage = () => {
   // Dynamically determine which specs to show
   const specs = [
     { label: 'Type', value: product.type || (isMonk ? 'Monk Fruit' : 'Stevia') },
-    product.form && { label: 'Form', value: product.form },
+    (selectedVariant?.form || product.form) && { label: 'Form', value: selectedVariant?.form || product.form },
     { label: 'Ratio', value: selectedRatio || 'N/A' },
-    { label: 'Size', value: selectedSize },
+    { label: 'Size', value: selectedVariant?.weight || product.size_label || 'Standard' },
     product.use_case && { label: 'Best For', value: product.use_case },
     { label: 'Calories', value: '0 kcal' },
     { label: 'Shelf Life', value: '18 Months' },
@@ -245,22 +236,27 @@ const ProductDetailPage = () => {
               </div>
             )}
 
-            {/* Size Select */}
-            <div className="mb-10">
-              <label className="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-50">Choose Size</label>
-              <div className="grid grid-cols-2 gap-4">
-                {['50g', '100g'].map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setSelectedSize(s)}
-                    className={`size-pill !py-4 !block !w-full ${selectedSize === s ? 'active' : ''}`}
-                  >
-                    {s} Pack
-                    {s === '100g' && <span className="block text-[9px] text-[var(--green-primary)] mt-1">Best Value</span>}
-                  </button>
-                ))}
+            {/* Size Select - Dynamic Variants */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="mb-10">
+                <label className="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-50">Choose Variant</label>
+                <div className="grid grid-cols-2 gap-4">
+                  {product.variants.map(v => (
+                    <button
+                      key={v.id}
+                      onClick={() => {
+                        setSelectedVariant(v);
+                        setSelectedThumb(0);
+                      }}
+                      className={`size-pill !py-4 !block !w-full ${selectedVariant?.id === v.id ? 'active' : ''}`}
+                    >
+                      {v.weight} {v.pack_size > 1 ? `(Pack of ${v.pack_size})` : 'Pack'}
+                      {v.discount_price && <span className="block text-[9px] text-[var(--green-primary)] mt-1">Special Discount</span>}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Footer / ATC */}
             <div className="flex items-center gap-6 mt-auto pt-8 border-t border-[var(--border-light)]">
