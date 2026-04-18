@@ -236,17 +236,17 @@ class ProductForm
                     ->components([
                         Placeholder::make('preview_card')
                             ->label('Store View')
-                            ->content(fn ($get) => view('filament.products.preview-card', [
+                            ->content(fn ($get, $record) => view('filament.products.preview-card', [
                                 'getState' => fn () => [
                                     'name' => $get('name'),
                                     'price' => $get('price'),
                                     'badge' => $get('badge'),
                                 ],
-                                'getRecord' => fn () => $schema->getModelInstance(),
+                                'getRecord' => fn () => $record ?? $schema->getModelInstance(),
                             ])),
                         Placeholder::make('meta_info')
                             ->label('Metadata')
-                            ->content(fn ($record) => $record ? "Created: " . $record->created_at->format('M d, Y') : "New Product"),
+                            ->content(fn ($record) => $record ? "Created: " . $record?->created_at?->format('M d, Y') : "New Product"),
                     ]),
             ]);
     }
