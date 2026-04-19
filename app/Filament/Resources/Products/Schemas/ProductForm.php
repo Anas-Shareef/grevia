@@ -48,9 +48,17 @@ class ProductForm
                             ->placeholder('Add ingredient')
                             ->helperText('Press enter after each ingredient')
                             ->columnSpanFull(),
-                        TagsInput::make('tags')
-                            ->placeholder('Add tag')
-                            ->helperText('Product tags for searching/filtering')
+                        \Filament\Forms\Components\CheckboxList::make('tags')
+                            ->label('Dietary Focus & Tags')
+                            ->options([
+                                'zero-calorie' => 'Zero Calorie',
+                                'keto-friendly' => 'Keto-Friendly',
+                                'diabetic-friendly' => 'Diabetic-Friendly',
+                                'vegan' => 'Vegan',
+                            ])
+                            ->columns(2)
+                            ->gridDirection('row')
+                            ->helperText('Select all applicable dietary tags')
                             ->columnSpanFull(),
                     ]),
                 Section::make('Pricing & Inventory (Default)')
@@ -191,12 +199,22 @@ class ProductForm
                 Section::make('Sweetener Specific Attributes')
                     ->description('Data specific to sweetener products like ratio, form, and use cases.')
                     ->components([
-                        TextInput::make('type')
-                            ->label('Type')
-                            ->placeholder('e.g. stevia, monk-fruit'),
-                        TextInput::make('form')
-                            ->label('Form')
-                            ->placeholder('e.g. powder, drops'),
+                        Select::make('type')
+                            ->label('Sweetener Type')
+                            ->options([
+                                'stevia' => 'Stevia',
+                                'monk-fruit' => 'Monk Fruit',
+                                'blends' => 'Blends',
+                            ])
+                            ->placeholder('Select Base'),
+                        Select::make('form')
+                            ->label('Product Form')
+                            ->options([
+                                'liquid-drops' => 'Liquid Drops',
+                                'powder' => 'Powder',
+                                'sachets' => 'Sachets / Packets',
+                            ])
+                            ->placeholder('Select Form'),
                         TextInput::make('ratio')
                             ->label('Ratio')
                             ->placeholder('e.g. 1:10, 1:50'),
