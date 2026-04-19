@@ -12,12 +12,14 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class CategoriesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->withCount(['products', 'childProducts']))
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
@@ -30,6 +32,16 @@ class CategoriesTable
                 TextColumn::make('parent.name')
                     ->label('Parent')
                     ->sortable(),
+                TextColumn::make('total_products_count')
+                    ->label('Products')
+                    ->state(function (\App\Models\Category $record): int {
+                        return ((int) $record->products_count) + ((int) $record->child_products_count);
+                    })
+                    ->color(fn (int $state): ?string => $state === 0 ? 'danger' : null)
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        return $query->orderByRaw('(COALESCE(products_count, 0) + COALESCE(child_products_count, 0)) ' . $direction);
+                    })
+                    ->url(fn (\App\Models\Category $record): string => '/admin/products?tableFilters[category_id][value]=' . $record->id),
                 IconColumn::make('status')
                     ->label('Active')
                     ->boolean()
