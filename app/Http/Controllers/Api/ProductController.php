@@ -73,14 +73,12 @@ class ProductController extends Controller
              $query->where('rating', '>=', $request->rating);
         }
 
-        // 5. Dietary/Tags (Inclusive OR Filtering)
+        // 5. Tags (JSON column 'ingredients' or 'tags'?)
         if ($request->filled('tags')) {
              $tags = is_array($request->tags) ? $request->tags : explode(',', $request->tags);
-             $query->where(function ($q) use ($tags) {
-                 foreach ($tags as $tag) {
-                     $q->orWhereJsonContains('tags', $tag);
-                 }
-             });
+             foreach ($tags as $tag) {
+                 $query->whereJsonContains('tags', $tag);
+             }
         }
 
         // 6. Specialized Sweetener Filters (Using New Dedicated Columns)

@@ -1,14 +1,40 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronDown, SlidersHorizontal, ShoppingBag, Leaf, Globe, Grid2X2, List } from "lucide-react";
+import { X, ChevronDown, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { ProductCard } from "@/components/ProductCard";
-import { Slider } from "@/components/ui/slider";
+
+const CATEGORY_CARDS = [
+  {
+    emoji: '🌿',
+    name: 'Stevia Powder',
+    desc: 'Zero-calorie, plant-based powder — perfect for everyday use.',
+    type: 'stevia',
+    form: 'powder',
+    bg: 'bg-secondary/30',
+  },
+  {
+    emoji: '💧',
+    name: 'Stevia Drops',
+    desc: 'Liquid stevia — add a drop to any beverage instantly.',
+    type: 'stevia',
+    form: 'drops',
+    bg: 'bg-secondary/20',
+  },
+  {
+    emoji: '🍈',
+    name: 'Monk Fruit',
+    desc: 'Premium monk fruit sweetener with a smooth taste.',
+    type: 'monk-fruit',
+    form: 'powder',
+    bg: 'bg-secondary/30',
+  },
+];
 
 const SORT_OPTIONS = [
   { label: 'Featured Selection', value: 'featured' },
@@ -19,34 +45,32 @@ const SORT_OPTIONS = [
 
 const FILTER_GROUPS = [
   {
-    key: 'tags' as const,
-    label: 'Dietary Focus',
-    options: [
-      { label: 'Zero Calorie', value: 'zero-calorie' },
-      { label: 'Keto-Friendly', value: 'keto-friendly' },
-      { label: 'Diabetic-Friendly', value: 'diabetic-friendly' },
-      { label: 'Vegan', value: 'vegan' },
-    ],
-  },
-  {
     key: 'type' as const,
     label: 'Sweetener Type',
     options: [
-      { label: 'Stevia', value: 'stevia' },
-      { label: 'Monk Fruit', value: 'monk-fruit' },
-      { label: 'Blends', value: 'blends' },
+      { label: 'Pure Stevia', value: 'stevia', count: 6 },
+      { label: 'Monk Fruit', value: 'monk-fruit', count: 2 },
     ],
   },
   {
     key: 'form' as const,
     label: 'Format',
     options: [
-      { label: 'Liquid Drops', value: 'liquid-drops' },
-      { label: 'Powder', value: 'powder' },
-      { label: 'Sachets', value: 'sachets' },
+      { label: 'Fine Powder', value: 'powder', count: 6 },
+      { label: 'Concentrated Drops', value: 'drops', count: 2 },
+    ],
+  },
+  {
+    key: 'ratio' as const,
+    label: 'Sweetness Ratio',
+    options: [
+      { label: '1:10 Ratio', value: '1-10', count: 6 },
+      { label: '1:50 Ratio', value: '1-50', count: 2 },
     ],
   },
 ];
+
+type FilterKey = 'type' | 'form' | 'ratio' | 'size';
 
 const CollectionsPage = () => {
   const { filters, setFilter, resetFilters } = useProductFilters();
@@ -55,24 +79,6 @@ const CollectionsPage = () => {
   const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
   const [isSticky, setIsSticky] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  // Handle Dual Slider Logic Local State before committing to URL
-  const [priceRange, setPriceRange] = useState([
-      filters.min_price ? parseInt(filters.min_price) : 0, 
-      filters.max_price ? parseInt(filters.max_price) : 2000
-  ]);
-
-  useEffect(() => {
-    setPriceRange([
-        filters.min_price ? parseInt(filters.min_price) : 0, 
-        filters.max_price ? parseInt(filters.max_price) : 2000
-    ]);
-  }, [filters.min_price, filters.max_price]);
-
-  const handlePriceCommit = (values: number[]) => {
-      setFilter('min_price', values[0].toString());
-      setFilter('max_price', values[1].toString());
-  };
 
   // Sync scroll for sticky bar
   useEffect(() => {
@@ -89,6 +95,7 @@ const CollectionsPage = () => {
   const products: Product[] = useMemo(() => {
     const newItems = response?.data || [];
     if (currentPage === 1) return newItems;
+    // For pagination, merge unique items
     const combined = [...accumulatedProducts];
     newItems.forEach((item: Product) => {
       if (!combined.find(p => p.id === item.id)) combined.push(item);
@@ -114,35 +121,21 @@ const CollectionsPage = () => {
   useEffect(() => {
     setCurrentPage(1);
     setAccumulatedProducts([]);
-  }, [filters.type, filters.form, filters.tags, filters.min_price, filters.max_price, filters.sort_by]);
+  }, [filters.type, filters.form, filters.ratio, filters.sort_by]);
 
   const toggleFilter = (key: any, value: string) => {
-    if (key === 'tags') {
-        const currentTags = [...filters.tags];
-        if (currentTags.includes(value)) {
-            setFilter('tags', currentTags.filter(t => t !== value));
-        } else {
-            setFilter('tags', [...currentTags, value]);
-        }
-    } else {
-        const current = (filters as any)[key] || '';
-        setFilter(key, current === value ? '' : value);
-    }
+    const current = (filters as any)[key] || '';
+    setFilter(key, current === value ? '' : value);
   };
 
-  const removeFilter = (key: string, value: string) => {
-      toggleFilter(key, value);
-  };
-
-  const activeChips = [
-      ...filters.tags.map(t => ({ key: 'tags', label: FILTER_GROUPS.find(g=>g.key==='tags')?.options.find(o=>o.value===t)?.label || t, value: t })),
-      ...(filters.type ? [{ key: 'type', label: FILTER_GROUPS.find(g=>g.key==='type')?.options.find(o=>o.value===filters.type)?.label || filters.type, value: filters.type }] : []),
-      ...(filters.form ? [{ key: 'form', label: FILTER_GROUPS.find(g=>g.key==='form')?.options.find(o=>o.value===filters.form)?.label || filters.form, value: filters.form }] : []),
-      ...(filters.min_price || filters.max_price ? [{ key: 'price', label: `₹${priceRange[0]} - ₹${priceRange[1]}`, value: 'price' }] : [])
-  ];
+  const activeChips = FILTER_GROUPS.flatMap(g =>
+    g.options.filter(o => {
+      const v = (filters as any)[g.key];
+      return v === o.value;
+    }).map(o => ({ key: g.key, label: o.label, value: o.value }))
+  );
 
   const hasMore = response?.meta && response.meta.current_page < response.meta.last_page;
-  const totalCount = response?.meta?.total || 0;
 
   const loadMore = () => {
     if (hasMore) setCurrentPage(prev => prev + 1);
@@ -153,14 +146,45 @@ const CollectionsPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 relative overflow-hidden bg-secondary/10">
-        <div className="container mx-auto px-4 relative z-10 text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter mb-6 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Shop Natural Sweeteners
+      <section className="pt-32 pb-16 relative overflow-hidden">
+        {/* Ambient Blobs */}
+        <div className="absolute top-1/2 left-0 w-72 h-72 bg-lime/10 rounded-full blur-3xl -translate-y-1/2" />
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="eyebrow-badge mb-8 inline-flex"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              Our Premium Range
+            </motion.div>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-8 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+              Sweetness <br />
+              Without Sacrifice.
             </h1>
-            <p className="text-muted-foreground text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto">
-              Zero calories. Zero spike. 100% natural. Filter by your dietary needs and format below.
+            <p className="text-muted-foreground text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-12">
+              Discover nature's finest sweeteners, meticulously extracted for pure health and uncompromising taste.
             </p>
+            
+            {/* Quick Stats */}
+            <div className="flex flex-wrap justify-center gap-10 opacity-60">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-primary shadow-soft border border-border/50">
+                  <Leaf className="w-5 h-5"/>
+                </div>
+                <span className="eyebrow !text-foreground">100% Plant-Based</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-primary shadow-soft border border-border/50">
+                  <Globe className="w-5 h-5"/>
+                </div>
+                <span className="eyebrow !text-foreground">Global Purity Standards</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -194,23 +218,23 @@ const CollectionsPage = () => {
       {/* Filter Drawer */}
       <AnimatePresence>
         {showMobileFilters && (
-          <div className="fixed inset-0 z-[60] lg:hidden">
+          <>
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowMobileFilters(false)}
-              className="absolute inset-0 bg-foreground/60 backdrop-blur-sm"
+              className="fixed inset-0 bg-foreground/60 backdrop-blur-sm z-[60]"
             />
             <motion.aside
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute bottom-0 left-0 right-0 bg-background rounded-t-[3rem] z-[70] max-h-[85vh] overflow-hidden flex flex-col shadow-2xl"
+              className="fixed bottom-0 left-0 right-0 bg-background rounded-t-[3rem] z-[70] max-h-[85vh] overflow-hidden flex flex-col shadow-2xl lg:hidden"
             >
               <div className="p-6 border-b border-border/50 flex justify-between items-center">
-                <span className="eyebrow !text-foreground">Filter & Sort</span>
+                <span className="eyebrow !text-foreground">Filters</span>
                 <button 
                   onClick={() => setShowMobileFilters(false)}
                   className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-border transition-colors"
@@ -220,30 +244,12 @@ const CollectionsPage = () => {
               </div>
 
               <div className="flex-1 overflow-y-auto p-8 space-y-12">
-                {/* Mobile Price Slider */}
-                <div>
-                   <h4 className="sidebar-header mb-6">Price Range</h4>
-                   <Slider
-                       min={0} max={2000} step={50}
-                       value={priceRange}
-                       onValueChange={setPriceRange}
-                       onValueCommit={handlePriceCommit}
-                       className="mb-6"
-                   />
-                   <div className="flex justify-between items-center text-sm font-bold opacity-70">
-                       <span>₹{priceRange[0]}</span>
-                       <span>₹{priceRange[1]}</span>
-                   </div>
-                </div>
-
                 {FILTER_GROUPS.map(group => (
                   <div key={group.key}>
-                    <h4 className="sidebar-header mb-4">{group.label}</h4>
+                    <h4 className="sidebar-header">{group.label}</h4>
                     <div className="space-y-4">
                       {group.options.map(opt => {
-                        const isChecked = group.key === 'tags' 
-                            ? filters.tags.includes(opt.value)
-                            : (filters as any)[group.key] === opt.value;
+                        const isChecked = (filters as any)[group.key] === opt.value;
                         return (
                           <button
                             key={opt.value}
@@ -264,64 +270,34 @@ const CollectionsPage = () => {
                 ))}
               </div>
 
-              <div className="p-6 border-t border-border/50 bg-background flex flex-col gap-3">
-                 {activeChips.length > 0 && (
-                     <button onClick={resetFilters} className="text-sm font-bold text-destructive text-center mb-2">Clear All</button>
-                 )}
+              <div className="p-6 border-t border-border/50 bg-background/80 backdrop-blur-md">
                 <button 
                   onClick={() => setShowMobileFilters(false)}
                   className="w-full btn-primary h-14"
                 >
-                  Apply & Show {totalCount} Results
+                  Apply Filters {activeChips.length > 0 && `(${activeChips.length})`}
                 </button>
               </div>
             </motion.aside>
-          </div>
+          </>
         )}
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <div className="container mx-auto px-4 pb-32 pt-8">
+      <div className="container mx-auto px-4 pb-32">
         <div className="flex flex-col lg:flex-row gap-12">
           
           {/* Sidebar - Desktop Only */}
-          <aside className="hidden lg:block lg:w-1/4 flex-shrink-0">
-            <div className="sticky top-28 space-y-12">
+          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
+            <div className="sticky top-24 space-y-12">
               <div>
-                <p className="eyebrow mb-8 text-muted-foreground">Refine By</p>
-                
-                {/* Desktop Price Slider component */}
-                <div className="mb-10 pb-10 border-b border-border/50">
-                    <h4 className="sidebar-header mb-8">Price Range</h4>
-                    <div className="px-2">
-                        <Slider
-                            min={0} max={2000} step={50}
-                            value={priceRange}
-                            onValueChange={setPriceRange}
-                            onValueCommit={handlePriceCommit}
-                            className="mb-8"
-                        />
-                        <div className="flex items-center gap-4">
-                            <div className="flex-1 bg-card border border-border/50 rounded-xl px-4 py-2 shadow-inner">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground">Min (₹)</span>
-                                <div className="font-bold">{priceRange[0]}</div>
-                            </div>
-                            <div className="flex-1 bg-card border border-border/50 rounded-xl px-4 py-2 shadow-inner">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground">Max (₹)</span>
-                                <div className="font-bold">{priceRange[1]}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <p className="eyebrow mb-8">Refine By</p>
                 {FILTER_GROUPS.map(group => (
                   <div key={group.key} className="mb-10">
-                    <h4 className="sidebar-header mb-6">{group.label}</h4>
+                    <h4 className="sidebar-header">{group.label}</h4>
                     <div className="space-y-4">
                       {group.options.map(opt => {
-                        const isChecked = group.key === 'tags' 
-                            ? filters.tags.includes(opt.value)
-                            : (filters as any)[group.key] === opt.value;
+                        const isChecked = (filters as any)[group.key] === opt.value;
                         return (
                           <button
                             key={opt.value}
@@ -341,111 +317,95 @@ const CollectionsPage = () => {
                   </div>
                 ))}
               </div>
+              
+              {activeChips.length > 0 && (
+                <button 
+                  onClick={resetFilters}
+                  className="w-full py-4 bg-secondary/50 rounded-squircle eyebrow !text-foreground font-bold hover:bg-destructive/10 hover:!text-destructive transition-all active:scale-95"
+                >
+                  Clear Active Filters
+                </button>
+              )}
             </div>
           </aside>
 
           {/* Grid Area */}
-          <div className="flex-1 lg:w-3/4">
-            
-            {/* Toolbar - Active Pills & View Toggle */}
-            <div className="flex flex-col gap-6 mb-8 mt-2 lg:mt-0">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-border/50">
-                    <h2 className="text-xl md:text-2xl font-black">
-                        {totalCount} Results
-                    </h2>
-                    
-                    <div className="flex items-center gap-6 w-full md:w-auto overflow-x-auto pb-4 md:pb-0 hide-scrollbar">
-                        <div className="flex items-center rounded-xl bg-card border border-border/50 p-1 flex-shrink-0">
-                            <button 
-                                onClick={() => setViewMode('grid')}
-                                className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${viewMode === 'grid' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-secondary'}`}
-                            >
-                                <Grid2X2 className="w-5 h-5" />
-                            </button>
-                            <button 
-                                onClick={() => setViewMode('list')}
-                                className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${viewMode === 'list' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-secondary'}`}
-                            >
-                                <List className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="hidden md:flex items-center gap-3">
-                            <span className="text-sm font-bold text-muted-foreground">Sort:</span>
-                            <select
-                                value={filters.sort_by}
-                                onChange={e => setFilter('sort_by', e.target.value)}
-                                className="bg-transparent border-none text-sm font-bold outline-none focus:text-primary transition-colors cursor-pointer"
-                            >
-                                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                            </select>
-                        </div>
-                    </div>
+          <div className="flex-1">
+            {/* Toolbar - Header & Desktop Sort */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 py-6 border-b border-border/50">
+              <p className="eyebrow text-center md:text-left">
+                Showing {products.length} Premium Essentials
+              </p>
+              <div className="hidden lg:flex gap-4 items-center">
+                <div className="flex bg-secondary/50 rounded-lg p-1 mr-4">
+                  <button 
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    aria-label="Grid view"
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    aria-label="List view"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
                 </div>
-
-                {/* Active Pills */}
-                {activeChips.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-3 animate-in fade-in slide-in-from-top-4">
-                        {activeChips.map((chip, idx) => (
-                            <button 
-                                key={`${chip.key}-${idx}`}
-                                onClick={() => chip.key === 'price' ? (setFilter('min_price', ''), setFilter('max_price', '')) : removeFilter(chip.key, chip.value)}
-                                className="inline-flex items-center gap-2 bg-secondary/50 border border-border hover:border-destructive hover:bg-destructive/10 text-xs font-bold px-4 py-2 rounded-full transition-all group"
-                            >
-                                {chip.label}
-                                <X className="w-3 h-3 text-muted-foreground group-hover:text-destructive transition-colors" />
-                            </button>
-                        ))}
-                        <button 
-                            onClick={resetFilters}
-                            className="text-xs font-bold text-muted-foreground hover:text-destructive underline decoration-dotted underline-offset-4 ml-2"
-                        >
-                            Clear All
-                        </button>
-                    </div>
-                )}
+                <span className="eyebrow opacity-40">Sort By</span>
+                <div className="relative">
+                  <select
+                    value={filters.sort_by}
+                    onChange={e => setFilter('sort_by', e.target.value)}
+                    className="bg-transparent border-none eyebrow !text-foreground outline-none focus:!text-primary transition-colors cursor-pointer pr-8 appearance-none"
+                  >
+                    {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {products.length === 0 && !isLoading ? (
-              <div className="text-center py-32 bg-card rounded-[3rem] border border-border/50 shadow-soft px-4">
-                <div className="w-20 h-20 bg-lime/10 rounded-full flex items-center justify-center mx-auto mb-8">
-                  <ShoppingBag className="w-10 h-10 text-primary opacity-50" />
+            {isLoading && currentPage === 1 ? (
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="aspect-[4/5] rounded-squircle-xl bg-card animate-pulse border border-border/50 shadow-soft" />
+                ))}
+              </div>
+            ) : products.length === 0 ? (
+              <div className="text-center py-32 bg-card rounded-squircle-2xl border border-border/50 shadow-soft px-4">
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-lime/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <ShoppingBag className="w-8 h-8 md:w-10 md:h-10 text-primary opacity-20" />
                 </div>
-                <h3 className="text-2xl font-black mb-4">No exact matches found</h3>
-                <p className="text-muted-foreground text-sm mb-10">Try adjusting or clearing some of your filters.</p>
-                <button onClick={resetFilters} className="btn-primary">Clear Filters</button>
+                <h3 className="text-2xl md:text-3xl font-black tracking-tighter mb-4">No matching products</h3>
+                <p className="text-muted-foreground text-sm mb-10 max-w-sm mx-auto leading-relaxed">We couldn't find exactly what you're looking for. Try adjusting your filters or browsing all products.</p>
+                <button onClick={resetFilters} className="btn-primary">Browse All Essentials</button>
               </div>
             ) : (
               <div className="space-y-16">
-                <div className={`transition-all duration-300 ${isLoading && currentPage === 1 ? 'opacity-50 pointer-events-none blur-sm' : 'opacity-100'} 
-                  ${viewMode === 'grid' 
-                    ? 'grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8' 
-                    : 'flex flex-col gap-6'
-                  }`}
-                >
+                <div className={viewMode === 'grid' ? "grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10" : "flex flex-col gap-0"}>
                   {products.map(product => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                  
-                  {/* Loading Skeletons */}
-                  {isLoading && currentPage === 1 && products.length === 0 && [...Array(6)].map((_, i) => (
-                    <div key={i} className="aspect-[4/5] rounded-squircle-xl bg-secondary/30 animate-pulse" />
+                    <ProductCard key={product.id} product={product} viewMode={viewMode as any} />
                   ))}
                 </div>
 
                 {/* Load More Button */}
                 {hasMore && (
-                  <div className="flex justify-center pt-8 border-t border-border/50">
+                  <div className="flex justify-center pt-8">
                     <button 
                       onClick={loadMore}
                       disabled={isLoading}
-                      className="inline-flex items-center justify-center gap-3 bg-secondary hover:bg-black hover:text-white rounded-squircle shadow-soft h-14 px-12 font-bold transition-all disabled:opacity-50 group"
+                      className="inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground hover:bg-forest-light rounded-squircle shadow-button hover:shadow-lg hover:-translate-y-1 h-14 px-10 text-sm md:text-base font-bold transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
                     >
                       {isLoading ? (
                         <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                       ) : (
                         <>
-                          Load More Products
+                          Explore More Products
+                          <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
                         </>
                       )}
                     </button>
@@ -454,8 +414,10 @@ const CollectionsPage = () => {
               </div>
             )}
           </div>
+
         </div>
       </div>
+
       <Footer />
     </div>
   );
