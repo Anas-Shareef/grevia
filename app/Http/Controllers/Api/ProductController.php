@@ -36,11 +36,42 @@ class ProductController extends Controller
             $cat = \App\Models\Category::where('slug', $categorySlug)->first();
             
             if ($cat) {
-                // Get this category ID AND all its children IDs
-                $childIds = \App\Models\Category::where('parent_id', $cat->id)->pluck('id')->toArray();
-                $allIds = array_merge([$cat->id], $childIds);
-                
-                $query->whereIn('category_id', $allIds);
+                if ($cat->is_smart && !empty($cat->rules)) {
+                    // Smart Category Engine Mapping
+                    $query->where(function($q) use ($cat) {
+                        foreach ($cat->rules as $rule) {
+                            $field = $rule['field'] ?? null;
+                            $operator = $rule['operator'] ?? null;
+                            $value = $rule['value'] ?? null;
+
+                            if (!$field || !$operator || $value === null) continue;
+
+                            switch ($operator) {
+                                case 'contains':
+                                    if ($field === 'tags') {
+                                        $q->whereJsonContains('tags', $value);
+                                    } else {
+                                        $q->where($field, 'like', "%{$value}%");
+                                    }
+                                    break;
+                                case 'equals':
+                                    $q->where($field, $value);
+                                    break;
+                                case '>=':
+                                    $q->where($field, '>=', $value);
+                                    break;
+                                case '<=':
+                                    $q->where($field, '<=', $value);
+                                    break;
+                            }
+                        }
+                    });
+                } else {
+                    // Standard Category Hierarchy lookup
+                    $childIds = \App\Models\Category::where('parent_id', $cat->id)->pluck('id')->toArray();
+                    $allIds = array_merge([$cat->id], $childIds);
+                    $query->whereIn('category_id', $allIds);
+                }
             } else {
                 // Fallback: mostly for 'search' strings if the frontend still sends weird text
                 $query->whereHas('category', function($q) use ($categorySlug) {

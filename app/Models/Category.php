@@ -18,6 +18,17 @@ class Category extends Model
         'status',
         'show_in_filter',
         'order',
+        'is_smart',
+        'rules',
+        'seo_title',
+        'seo_description'
+    ];
+
+    protected $casts = [
+        'is_smart' => 'boolean',
+        'rules' => 'array',
+        'show_in_filter' => 'boolean',
+        'status' => 'boolean'
     ];
 
     protected $appends = ['image_url'];

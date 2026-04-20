@@ -16,6 +16,7 @@ import BenefitsPage from "./pages/BenefitsPage";
 import ContactPage from "./pages/ContactPage";
 import WishlistPage from "./pages/WishlistPage";
 import CollectionsPage from "./pages/CollectionsPage";
+import CollectionsIndex from "./pages/CollectionsIndex";
 import CartDrawer from "./components/CartDrawer";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoginPage from "@/pages/LoginPage";
@@ -84,7 +85,7 @@ const App = () => {
                   <Route path="wishlist" element={<WishlistPage isDashboard={true} />} />
                 </Route>
 
-                <Route path="/collections" element={<CollectionsPage />} />
+                <Route path="/collections" element={<CollectionsIndex />} />
                 <Route path="/collections/all" element={<CollectionsPage />} />
                 <Route path="/collections/:category" element={<CollectionsPage />} />
                 <Route path="/collections/:category/:subcategory" element={<CollectionsPage />} />

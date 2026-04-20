@@ -49,24 +49,18 @@ const Header = () => {
 
   const navLinks: NavLink[] = [
     { label: "Home", href: "/" },
+    { label: "Collections", href: "/collections" },
+    {
+      label: "Shop By Category",
+      href: "/collections",
+      dropdown: [
+        { label: "Stevia Products", href: "/collections/stevia-products" },
+        { label: "Monk Fruit Products", href: "/collections/monk-fruit-products" },
+        { label: "Healthy Snacks & Pantry", href: "/collections/healthy-snacks-pantry" },
+      ],
+    },
     { label: "Benefits", href: "/benefits" },
-    {
-      label: "Sweeteners",
-      href: "/collections/all",
-      dropdown: [
-        { label: "Stevia Sweeteners", href: "/collections/stevia" },
-        { label: "Monkfruit Sweeteners", href: "/collections/monk-fruit" },
-      ],
-    },
-    {
-      label: "Other Products",
-      href: "/collections/all",
-      dropdown: [
-        { label: "Bakery Items", href: "/collections/bakery" },
-        { label: "Pickles & Preserves", href: "/collections/pickles" },
-      ],
-    },
-    { label: "Contact Us", href: "/contact" },
+    { label: "Contact", href: "/contact" },
   ];
 
   return (
