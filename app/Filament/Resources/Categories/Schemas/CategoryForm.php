@@ -84,7 +84,7 @@ class CategoryForm
                             ])
                             ->columns(3)
                             ->columnSpanFull()
-                            ->visible(fn (\Filament\Forms\Get $get): bool => $get('is_smart') === true)
+                            ->visible(fn ($get): bool => (bool) $get('is_smart') === true)
                             ->addActionLabel('Add New Automation Rule')
                     ]),
 
