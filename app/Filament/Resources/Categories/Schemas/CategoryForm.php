@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Categories\Schemas;
 
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,7 +20,7 @@ class CategoryForm
         return $schema
             ->components([
                 Section::make('General Details')
-                    ->schema([
+                    ->components([
                         TextInput::make('name')
                             ->required()
                             ->live(onBlur: true)
@@ -54,7 +54,7 @@ class CategoryForm
 
                 Section::make('Smart Collection Engine')
                     ->description('Automatically categorize products dynamically based on tag or naming logic instead of manual assignments.')
-                    ->schema([
+                    ->components([
                         Toggle::make('is_smart')
                             ->label('Enable Smart Rule-Based Engine')
                             ->live()
@@ -90,7 +90,7 @@ class CategoryForm
 
                 Section::make('SEO Details')
                     ->description('Control how this collection lands inside Google & organic searches.')
-                    ->schema([
+                    ->components([
                         TextInput::make('seo_title')
                             ->label('SEO Indexing Title')
                             ->maxLength(70),
