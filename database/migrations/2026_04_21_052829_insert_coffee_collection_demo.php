@@ -39,6 +39,12 @@ return new class extends Migration
             ]
         );
 
+        // Ensure we fulfill the strict category_id constraint using a base category
+        $baseCategory = \App\Models\Category::where('slug', '!=', 'coffee-collection')->first();
+        if (!$baseCategory) {
+            $baseCategory = \App\Models\Category::create(['name' => 'General Store', 'slug' => 'general-store', 'status' => 1, 'order' => 99]);
+        }
+
         // 2. Create the Coffee Product
         $productName = 'Premium Vanilla Coffee Enhancer Drops';
         \App\Models\Product::updateOrCreate(
@@ -52,7 +58,7 @@ return new class extends Migration
                 'rating' => 4.8,
                 'in_stock' => true,
                 'is_featured' => true,
-                'category_id' => null, 
+                'category_id' => $baseCategory->id, // Bound to a completely different category to prove smart logic works!
                 'form' => 'drops',
                 'type' => 'stevia',
                 'tags' => ['coffee', 'breakfast', 'vanilla'],
