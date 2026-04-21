@@ -16,6 +16,8 @@ export type FilterState = {
     form?: string;
     ratio?: string;
     size?: string;
+    certification?: string;
+    use_case?: string;
 };
 
 export const useProductFilters = () => {
@@ -36,6 +38,8 @@ export const useProductFilters = () => {
             form: searchParams.get("form") || "",
             ratio: searchParams.get("ratio") || "",
             size: searchParams.get("size") || "",
+            certification: searchParams.get("certification") || "",
+            use_case: searchParams.get("use_case") || "",
         };
     }, [searchParams]);
 

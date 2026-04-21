@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { X, ChevronDown, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List, Droplets, Wind, Grape, Sparkles, Package } from "lucide-react";
+import { X, ChevronDown, ChevronRight, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List, Droplets, Wind, Grape, Sparkles, Package, Shield } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
@@ -9,35 +9,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { ProductCard } from "@/components/ProductCard";
 
-
-
-const CATEGORY_CARDS = [
-  {
-    emoji: '🌿',
-    name: 'Stevia Powder',
-    desc: 'Zero-calorie, plant-based powder — perfect for everyday use.',
-    type: 'stevia',
-    form: 'powder',
-    bg: 'bg-secondary/30',
-  },
-  {
-    emoji: '💧',
-    name: 'Stevia Drops',
-    desc: 'Liquid stevia — add a drop to any beverage instantly.',
-    type: 'stevia',
-    form: 'drops',
-    bg: 'bg-secondary/20',
-  },
-  {
-    emoji: '🍈',
-    name: 'Monk Fruit',
-    desc: 'Premium monk fruit sweetener with a smooth taste.',
-    type: 'monk-fruit',
-    form: 'powder',
-    bg: 'bg-secondary/30',
-  },
-];
-
+// Sort options — use normalized values accepted by ProductController
 const SORT_OPTIONS = [
   { label: 'Featured Selection', value: 'featured' },
   { label: 'Price: Low to High', value: 'price_asc' },
@@ -60,27 +32,55 @@ const CollectionsPage = () => {
 
   const FILTER_GROUPS = useMemo(() => [
     {
+      // Category / Origin: shows top-level + children from API
       key: 'category' as const,
-      label: 'Origin',
+      label: 'Sweetener Type',
       options: (response?.filters?.categories || []).flatMap((cat: any) => [
-        { label: cat.name, value: cat.slug, count: 0 },
-        ...(cat.children || []).map((child: any) => ({ label: child.name, value: child.slug, count: 0 }))
+        { label: cat.name, value: cat.slug, count: cat.products_count ?? 0 },
+        ...(cat.children || []).map((child: any) => ({
+          label: '↳ ' + child.name,
+          value: child.slug,
+          count: child.products_count ?? 0,
+        }))
       ]),
     },
     {
+      // Form factor (Powder / Drops)
       key: 'form' as const,
       label: 'Format',
-      options: (response?.filters?.forms || []).map((f: any) => ({ label: f.label.charAt(0).toUpperCase() + f.label.slice(1), value: f.label, count: f.count })),
+      options: (response?.filters?.forms || []).map((f: any) => ({
+        label: f.display || (f.label.charAt(0).toUpperCase() + f.label.slice(1)),
+        value: f.label,
+        count: f.count,
+      })),
     },
     {
+      // Concentration ratio
       key: 'ratio' as const,
-      label: 'Concentration (Ratio)',
-      options: (response?.filters?.ratios || []).map((r: any) => ({ label: r.label, value: r.label, count: r.count })),
+      label: 'Concentration',
+      options: (response?.filters?.ratios || [])
+        .filter((r: any) => r.count > 0)
+        .map((r: any) => ({
+          label: r.display || r.label,
+          value: r.label,
+          count: r.count,
+        })),
     },
     {
+      // Pack size (from size_label column and variant options)
       key: 'size' as const,
       label: 'Pack Size',
-      options: (response?.filters?.sizes || []).map((s: any) => ({ label: s.label, value: s.label, count: s.count })),
+      options: (response?.filters?.sizes || [])
+        .filter((s: any) => s.count > 0)
+        .map((s: any) => ({ label: s.label, value: s.label, count: s.count })),
+    },
+    {
+      // Certifications (cert-* normalized tags)
+      key: 'certification' as const,
+      label: 'Certifications',
+      options: (response?.filters?.certifications || [])
+        .filter((c: any) => c.count > 0)
+        .map((c: any) => ({ label: c.display, value: c.label, count: c.count })),
     },
   ], [response]);
 
@@ -125,7 +125,7 @@ const CollectionsPage = () => {
   useEffect(() => {
     setCurrentPage(1);
     setAccumulatedProducts([]);
-  }, [filters.category, filters.form, filters.ratio, filters.sort_by, filters.search]);
+  }, [filters.category, filters.form, filters.ratio, filters.sort_by, filters.search, filters.size, filters.certification, filters.use_case]);
 
   const toggleFilter = (key: any, value: string) => {
     const current = (filters as any)[key] || '';
@@ -215,26 +215,48 @@ const CollectionsPage = () => {
               {currentCategory?.description || "Experience uncompromising taste without the calories. Meticulously extracted, plant-based sweetness for your daily ritual."}
             </p>
 
-            {/* Catalog Discovery Tabs (Horizontal Scroll) */}
+            {/* Catalog Discovery Tabs — Dynamic from API */}
             <div className="flex overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:gap-8 justify-start md:justify-center">
-              {[
-                { label: 'All Sweeteners', value: '', icon: Sparkles, color: 'bg-primary/5 text-primary' },
-                { label: 'Stevia Products', value: 'stevia', icon: Leaf, color: 'bg-green-50 text-green-700' },
-                { label: 'Monk Fruit', value: 'monk-fruit', icon: Grape, color: 'bg-purple-50 text-purple-700' },
-              ].map((item) => (
+              {/* Shop All */}
+              <button
+                onClick={() => resetFilters()}
+                className="flex-shrink-0 flex flex-col items-center gap-3 transition-all hover:-translate-y-1 group"
+              >
+                <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 border border-white/50 ${
+                  !filters.category ? 'bg-primary text-white' : 'bg-primary/5 text-primary'
+                }`}>
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <span className={`text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap ${
+                  !filters.category ? 'text-primary' : 'text-foreground/50 group-hover:text-primary'
+                }`}>
+                  All Products
+                </span>
+              </button>
+
+              {/* Dynamic category tabs from API */}
+              {(response?.filters?.categories || []).flatMap((cat: any) => [
+                cat,
+                ...(cat.children || []),
+              ]).map((item: any) => (
                 <button
-                  key={item.label}
-                  onClick={() => {
-                    if (item.value === '') resetFilters();
-                    else setFilter('category', item.value);
-                  }}
+                  key={item.slug}
+                  onClick={() => setFilter('category', item.slug)}
                   className="flex-shrink-0 flex flex-col items-center gap-3 transition-all hover:-translate-y-1 group"
                 >
-                  <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl ${item.color} flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 border border-white/50`}>
-                    <item.icon className="w-6 h-6" />
+                  <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 border border-white/50 overflow-hidden ${
+                    filters.category === item.slug ? 'bg-primary text-white border-primary' : 'bg-secondary/30 text-foreground/60'
+                  }`}>
+                    {item.icon_url ? (
+                      <img src={item.icon_url} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Leaf className="w-6 h-6" />
+                    )}
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-foreground/50 group-hover:text-primary transition-colors whitespace-nowrap">
-                    {item.label}
+                  <span className={`text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap max-w-[80px] text-center ${
+                    filters.category === item.slug ? 'text-primary' : 'text-foreground/50 group-hover:text-primary'
+                  }`}>
+                    {item.name}
                   </span>
                 </button>
               ))}

@@ -78,32 +78,47 @@ const Header = () => {
     dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 300);
   };
 
-  const shopItem = {
-    label: "Shop By Category",
-    href: "/collections",
-    megaMenu: categories.map(cat => ({
+  const buildShopMegaMenu = (): MegaMenuColumn[] => {
+    // Column 1: Shop All + top-level category links
+    const shopAllColumn: MegaMenuColumn = {
+      title: 'Browse',
+      items: [
+        { label: 'Shop All Products', href: '/collections', icon: Package },
+        ...categories.map(cat => ({
+          label: cat.name,
+          href: `/collections?category=${cat.slug}`,
+          icon: cat.icon_url ? undefined : Leaf,
+          imageUrl: cat.icon_url,
+        })),
+      ],
+    };
+
+    // Columns 2+: each top-level category becomes a column showing its children
+    const categoryColumns: MegaMenuColumn[] = categories.map(cat => ({
       title: cat.name,
       items: (cat.children || []).map(child => ({
         label: child.name,
         href: `/collections?category=${child.slug}`,
-        icon: child.icon_url ? undefined : (cat.slug === 'stevia' ? Leaf : Grape),
-        imageUrl: child.icon_url
-      }))
-    }))
+        icon: child.icon_url ? undefined : (cat.slug?.includes('stevia') ? Leaf : Grape),
+        imageUrl: child.icon_url,
+      })),
+    })).filter(col => col.items.length > 0);
+
+    return [shopAllColumn, ...categoryColumns];
   };
 
-  // If we have no categories yet, use fallback or empty
+  const shopItem = {
+    label: 'Shop by Category',
+    href: '/collections',
+    megaMenu: buildShopMegaMenu(),
+  };
+
+  // Rebuild megaMenu when categories load
   const navLinks: NavLink[] = [
-    { label: "Home", href: "/" },
-    shopItem.megaMenu.length > 0 ? shopItem : {
-      label: "Shop By Category",
-      href: "/collections",
-      megaMenu: [
-        { title: "Sweeteners", items: [{ label: "All Collections", href: "/collections" }] }
-      ]
-    },
-    { label: "Benefits", href: "/benefits" },
-    { label: "Contact", href: "/contact" },
+    { label: 'Home', href: '/' },
+    shopItem,
+    { label: 'Benefits', href: '/benefits' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -137,11 +152,11 @@ const Header = () => {
                 key={link.label}
                 className="relative"
                 onMouseEnter={() =>
-                  link.dropdown && handleMouseEnter(link.label)
+                  (link.dropdown || link.megaMenu) && handleMouseEnter(link.label)
                 }
-                onMouseLeave={() => link.dropdown && handleMouseLeave()}
+                onMouseLeave={() => (link.dropdown || link.megaMenu) && handleMouseLeave()}
               >
-                {link.dropdown ? (
+                {(link.dropdown || link.megaMenu) ? (
                   <>
                     <button
                       className={`flex items-center gap-1 text-[15px] font-medium transition-colors py-2 ${
