@@ -1,4 +1,27 @@
+import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingCart, Menu, X, ChevronDown, Heart, User, Leaf, Grape, Gift, Library, Package, Sparkles } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+
+type DropdownItem = {
+  label: string;
+  href: string;
+};
+
+type MegaMenuColumn = {
+  title: string;
+  items: { label: string; href: string; icon?: any; imageUrl?: string }[];
+};
+
+type NavLink = {
+  label: string;
+  href: string;
+  dropdown?: DropdownItem[];
+  megaMenu?: MegaMenuColumn[];
+};
 
 type Category = {
   id: number;
