@@ -81,13 +81,13 @@ const Header = () => {
   const buildShopMegaMenu = (): MegaMenuColumn[] => {
     // Column 1: Shop All + top-level category links
     const shopAllColumn: MegaMenuColumn = {
-      title: 'Browse',
+      title: 'Shop All',
       items: [
-        { label: 'Shop All Products', href: '/collections', icon: Package },
+        { label: 'Browse All Products', href: '/collections', icon: Package },
         ...categories.map(cat => ({
           label: cat.name,
           href: `/collections?category=${cat.slug}`,
-          icon: cat.icon_url ? undefined : Leaf,
+          icon: cat.icon_url ? undefined : Sparkles,
           imageUrl: cat.icon_url,
         })),
       ],
@@ -113,7 +113,6 @@ const Header = () => {
     megaMenu: buildShopMegaMenu(),
   };
 
-  // Rebuild megaMenu when categories load
   const navLinks: NavLink[] = [
     { label: 'Home', href: '/' },
     shopItem,
@@ -157,60 +156,74 @@ const Header = () => {
                 onMouseLeave={() => (link.dropdown || link.megaMenu) && handleMouseLeave()}
               >
                 {(link.dropdown || link.megaMenu) ? (
-                  <>
+                  <div className="group">
                     <button
-                      className={`flex items-center gap-1 text-[15px] font-medium transition-colors py-2 ${
+                      className={`flex items-center gap-1.5 text-[15px] font-bold transition-all py-2 tracking-tight ${
                         openDropdown === link.label
-                          ? "text-primary"
+                          ? "text-primary scale-105"
                           : "text-foreground/70 hover:text-primary"
                       }`}
                     >
                       {link.label}
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform duration-200 ${
-                          openDropdown === link.label ? "rotate-180" : ""
+                        className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                          openDropdown === link.label ? "rotate-180 text-primary" : "text-foreground/30"
                         }`}
                       />
                     </button>
 
-                    {/* Dropdown Menu */}
+                    {/* Dropdown/Mega Menu Panel */}
                     <AnimatePresence>
                       {openDropdown === link.label && (
                         <motion.div
-                          initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                          initial={{ opacity: 0, y: 15, scale: 0.98 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                          transition={{ duration: 0.15 }}
-                          className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white rounded-[20px] shadow-2xl border border-gray-100 py-6 z-50 ${
-                            link.megaMenu ? "min-w-[700px] px-8" : "min-w-[200px] px-2"
+                          exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                          transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+                          className={`fixed top-[72px] left-1/2 -translate-x-1/2 mt-1 z-50 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100/50 backdrop-blur-xl rounded-[32px] overflow-visible border-border/40 ${
+                            link.megaMenu 
+                              ? "w-[95vw] max-w-7xl p-10" 
+                              : "min-w-[240px] p-2"
                           }`}
                         >
+                          {/* Pointer Arrow */}
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-l border-t border-gray-100/50" />
+
                           {link.megaMenu ? (
-                            <div className="grid grid-cols-3 gap-8">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-12 gap-y-16">
                               {link.megaMenu.map((column) => (
-                                <div key={column.title} className="space-y-4">
-                                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50 pb-2">
-                                    {column.title}
-                                  </h4>
-                                  <div className="space-y-1">
+                                <div key={column.title} className="space-y-6">
+                                  {/* Column Header with Icon */}
+                                  <div className="flex items-center gap-3 pb-3 border-b border-gray-50">
+                                    <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center text-primary italic font-serif">
+                                       G
+                                    </div>
+                                    <h4 className="text-[13px] font-black uppercase tracking-[0.2em] text-foreground">
+                                      {column.title}
+                                    </h4>
+                                  </div>
+
+                                  <div className="space-y-3">
                                     {column.items.map((item) => (
                                       <Link
                                         key={item.label}
                                         to={item.href}
-                                        className="group flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-primary/5 transition-all duration-300"
+                                        className="group flex items-center gap-3 transition-all duration-200"
                                       >
-                                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors overflow-hidden border border-gray-100">
+                                        <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors overflow-hidden border border-gray-100/50 group-hover:border-primary/20 group-hover:shadow-sm">
                                           {item.imageUrl ? (
                                             <img src={item.imageUrl} alt={item.label} className="w-full h-full object-contain p-1" />
                                           ) : (
-                                            item.icon && <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary" />
+                                            item.icon && <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
                                           )}
                                         </div>
                                         <div className="flex flex-col">
-                                          <span className="text-sm font-bold text-gray-600 group-hover:text-primary">
+                                          <span className="text-[13px] font-bold text-gray-600 group-hover:text-primary transition-colors">
                                             {item.label}
                                           </span>
-                                          <span className="text-[10px] font-medium text-gray-400">Pure Plant-Based</span>
+                                          <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 group-hover:text-primary/50 transition-colors">
+                                            Plant-Based
+                                          </span>
                                         </div>
                                       </Link>
                                     ))}
@@ -219,26 +232,28 @@ const Header = () => {
                               ))}
                             </div>
                           ) : (
-                            link.dropdown?.map((item) => (
-                              <Link
-                                key={item.label}
-                                to={item.href}
-                                className="block px-4 py-2.5 text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 transition-colors"
-                              >
-                                {item.label}
-                              </Link>
-                            ))
+                            <div className="flex flex-col py-1">
+                              {link.dropdown?.map((item) => (
+                                <Link
+                                  key={item.label}
+                                  to={item.href}
+                                  className="block px-6 py-3 text-[14px] font-bold text-gray-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                                >
+                                  {item.label}
+                                </Link>
+                              ))}
+                            </div>
                           )}
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </>
+                  </div>
                 ) : (
                   <Link
                     to={link.href}
-                    className={`text-[15px] font-medium transition-colors py-2 ${
+                    className={`text-[15px] font-bold transition-all py-2 tracking-tight ${
                       location.pathname === link.href
-                        ? "text-primary"
+                        ? "text-primary scale-105"
                         : "text-foreground/70 hover:text-primary"
                     }`}
                   >
@@ -254,7 +269,7 @@ const Header = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="p-2 text-foreground/60 hover:text-primary transition-colors"
+              className="p-2 text-foreground/60 hover:text-primary hover:bg-primary/5 rounded-full transition-all"
               aria-label="Wishlist"
             >
               <Heart className="w-5 h-5" />
@@ -263,7 +278,7 @@ const Header = () => {
             {/* User / Auth */}
             <Link
               to={user ? "/dashboard/profile" : "/login"}
-              className="p-2 text-foreground/60 hover:text-primary transition-colors"
+              className="p-2 text-foreground/60 hover:text-primary hover:bg-primary/5 rounded-full transition-all"
               aria-label={user ? "My Account" : "Login"}
             >
               <User className="w-5 h-5" />
@@ -272,12 +287,12 @@ const Header = () => {
             {/* Cart */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 text-foreground/60 hover:text-primary transition-colors"
+              className="relative p-2 text-foreground/60 hover:text-primary hover:bg-primary/5 rounded-full transition-all"
               aria-label="Shopping cart"
             >
               <ShoppingCart className="w-5 h-5" />
               {getCartCount() > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-primary text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-glow ring-2 ring-white">
                   {getCartCount()}
                 </span>
               )}
@@ -286,7 +301,7 @@ const Header = () => {
             {/* Shop Now CTA */}
             <Link
               to="/collections/all"
-              className="inline-flex items-center justify-center bg-primary text-white font-semibold rounded-full hover:bg-primary/90 transition-all duration-300 h-10 px-6 text-sm shadow-md hover:shadow-lg"
+              className="inline-flex items-center justify-center bg-primary text-white font-black uppercase tracking-widest rounded-full hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-300 h-11 px-8 text-[11px] shadow-[0_10px_20px_-5px_rgba(46,77,49,0.3)]"
             >
               Shop Now
             </Link>
@@ -329,7 +344,7 @@ const Header = () => {
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6 border-2 border-primary/20 rounded-full p-1" />
               ) : (
                 <Menu className="w-6 h-6" />
               )}
@@ -342,15 +357,15 @@ const Header = () => {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="absolute top-full left-4 right-4 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden lg:hidden"
+            initial={{ opacity: 0, y: -20, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -20, height: 0 }}
+            className="absolute top-full left-4 right-4 mt-2 bg-white rounded-[32px] shadow-2xl border border-gray-100 overflow-hidden lg:hidden"
           >
-            <div className="p-5 flex flex-col">
+            <div className="p-6 flex flex-col">
               {navLinks.map((link) => (
                 <div key={link.label}>
-                  {link.dropdown ? (
+                  {(link.dropdown || link.megaMenu) ? (
                     <>
                       <button
                         onClick={() =>
@@ -358,12 +373,14 @@ const Header = () => {
                             mobileExpanded === link.label ? null : link.label
                           )
                         }
-                        className="flex items-center justify-between w-full text-base font-semibold text-foreground/80 hover:text-primary transition-colors py-3 border-b border-gray-50"
+                        className="flex items-center justify-between w-full py-4 border-b border-gray-50 group"
                       >
-                        {link.label}
+                         <span className={`text-[15px] font-black uppercase tracking-widest transition-colors ${mobileExpanded === link.label ? "text-primary" : "text-foreground/70"}`}>
+                           {link.label}
+                         </span>
                         <ChevronDown
-                          className={`w-4 h-4 transition-transform duration-200 ${
-                            mobileExpanded === link.label ? "rotate-180" : ""
+                          className={`w-5 h-5 transition-transform duration-300 ${
+                            mobileExpanded === link.label ? "rotate-180 text-primary" : "text-foreground/20"
                           }`}
                         />
                       </button>
@@ -373,16 +390,35 @@ const Header = () => {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden"
+                            className="bg-gray-50/50 rounded-2xl my-2 overflow-hidden px-4"
                           >
-                            {link.dropdown.map((item) => (
-                              <Link
-                                key={item.label}
-                                to={item.href}
-                                className="block pl-4 py-2.5 text-sm font-medium text-foreground/60 hover:text-primary transition-colors"
-                              >
-                                {item.label}
-                              </Link>
+                            {(link.megaMenu || link.dropdown)?.map((section: any) => (
+                              <div key={section.title || section.label} className="py-2">
+                                {section.items ? (
+                                  <>
+                                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40 p-2">
+                                      {section.title}
+                                    </h5>
+                                    {section.items.map((item: any) => (
+                                      <Link
+                                        key={item.label}
+                                        to={item.href}
+                                        className="block py-3 pl-2 text-sm font-bold text-foreground/60 active:text-primary transition-colors"
+                                      >
+                                        {item.label}
+                                      </Link>
+                                    ))}
+                                  </>
+                                ) : (
+                                  <Link
+                                    key={section.label}
+                                    to={section.href}
+                                    className="block py-3 pl-2 text-sm font-bold text-foreground/60"
+                                  >
+                                    {section.label}
+                                  </Link>
+                                )}
+                              </div>
                             ))}
                           </motion.div>
                         )}
@@ -391,25 +427,26 @@ const Header = () => {
                   ) : (
                     <Link
                       to={link.href}
-                      className="block text-base font-semibold text-foreground/80 hover:text-primary transition-colors py-3 border-b border-gray-50 last:border-0"
+                      className="block py-4 border-b border-gray-50 text-[15px] font-black uppercase tracking-widest text-foreground/70 active:text-primary transition-colors last:border-0"
                     >
                       {link.label}
                     </Link>
                   )}
                 </div>
               ))}
-              <div className="pt-4 flex gap-3">
+              
+              <div className="mt-8 flex gap-4">
                 {!user && (
                   <Link
                     to="/login"
-                    className="flex-1 flex items-center justify-center h-12 border border-primary text-primary rounded-xl font-semibold transition-all active:scale-95"
+                    className="flex-1 flex items-center justify-center h-14 border-2 border-primary text-primary rounded-full font-black uppercase tracking-widest text-xs transition-all active:scale-95"
                   >
                     Login
                   </Link>
                 )}
                 <Link
                   to="/collections/all"
-                  className="flex-1 flex items-center justify-center h-12 bg-primary text-white rounded-xl font-semibold transition-all active:scale-95 shadow-md"
+                  className="flex-1 flex items-center justify-center h-14 bg-primary text-white rounded-full font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-lg"
                 >
                   Shop Now
                 </Link>
