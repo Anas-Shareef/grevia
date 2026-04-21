@@ -24,6 +24,12 @@ const COLLECTIONS = [
     comingSoon: false,
   },
   {
+    title: "Coffee Collection",
+    slug: "coffee-collection", 
+    image: "https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=800&auto=format&fit=crop",
+    comingSoon: false,
+  },
+  {
     title: "Superfood Powders",
     slug: "#", 
     image: "https://grevia.in/storage/categories/superfood-mockup.png",
