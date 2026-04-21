@@ -8,31 +8,8 @@ import { Product } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { ProductCard } from "@/components/ProductCard";
-import { QuickCompareBar } from "@/components/QuickCompareBar";
 
-const RecipeCard = () => (
-  <motion.article
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    className="group bg-forest rounded-squircle-xl overflow-hidden shadow-soft text-forest-light border border-forest-light/30 flex flex-col justify-between relative col-span-1"
-  >
-    <div className="absolute inset-0 bg-black/20 z-0"></div>
-    <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-700 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1495147466023-af5c1f0bfc34?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')" }}></div>
-    
-    <div className="relative z-10 p-6 pt-10">
-      <span className="eyebrow !text-cream/80 mb-2 block">The Ritual</span>
-      <h3 className="text-3xl font-display font-black text-white leading-tight">Bake sugar-free brownies with pure plant sweetness.</h3>
-    </div>
-    
-    <div className="relative z-10 p-6 mt-auto">
-      <Link to="#" className="inline-flex items-center gap-2 text-white font-bold hover:text-lime transition-colors group/link pb-1 border-b border-lime/30 hover:border-lime">
-        Read the Recipe
-        <ChevronDown className="w-4 h-4 -rotate-90 group-hover/link:translate-x-1 transition-transform" />
-      </Link>
-    </div>
-  </motion.article>
-);
+
 
 const CATEGORY_CARDS = [
   {
@@ -467,8 +444,7 @@ const CollectionsPage = () => {
                 <div className={viewMode === 'grid' ? "grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10" : "flex flex-col gap-0"}>
                   {products.map((product, i) => (
                     <div key={product.id} className="contents">
-                      {/* Inject Recipe Card at specific index in grid mode */}
-                      {i === 4 && viewMode === 'grid' && <RecipeCard key={`recipe-${i}`} />}
+
                       <ProductCard product={product} viewMode={viewMode as any} />
                     </div>
                   ))}
@@ -500,7 +476,7 @@ const CollectionsPage = () => {
         </div>
       </div>
 
-      <QuickCompareBar />
+
       <Footer />
       {/* Back to Top */}
       <motion.button 
