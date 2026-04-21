@@ -27,54 +27,52 @@ class CategoryForm
                             ->afterStateUpdated(fn (string $operation, $state, $set) => $set('slug', str($state)->slug())),
                         TextInput::make('slug')
                             ->required()
-                            ->unique(Category::class, 'slug', ignoreRecord: true)
-                            ->helperText('Auto-generated from name. Used in URLs (e.g. stevia-powder).'),
+                            ->unique(Category::class, 'slug', ignoreRecord: true),
+                        Textarea::make('description')
+                            ->columnSpanFull(),
+                        FileUpload::make('image')
+                            ->image()
+                            ->disk('public')
+                            ->directory('categories'),
                         Select::make('parent_id')
                             ->label('Parent Category')
                             ->relationship('parent', 'name')
                             ->searchable()
-                            ->preload()
-                            ->placeholder('— None (Top-level category) —'),
-                        TextInput::make('order')
-                            ->required()
-                            ->numeric()
-                            ->default(0)
-                            ->helperText('Lower number = appears first.'),
-                        Textarea::make('description')
-                            ->columnSpanFull(),
+                            ->placeholder('Select a parent category'),
                         Toggle::make('status')
                             ->label('Active')
                             ->default(true),
                         Toggle::make('show_in_filter')
-                            ->label('Show in Filter Sidebar')
-                            ->helperText('Enable to show this category in the shop dropdown and filter panel.')
+                            ->label('Show in Filter')
+                            ->helperText('Enable this to show the category in the shop dropdown filters.')
                             ->default(true),
+                        TextInput::make('order')
+                            ->required()
+                            ->numeric()
+                            ->default(0),
                     ])->columns(2),
 
                 Section::make('Visual Branding')
-                    ->description('Upload high-resolution banners and menu icons. These are shown automatically when a customer visits this category.')
+                    ->description('Upload high-resolution banners and menu icons for this collection.')
                     ->components([
                         FileUpload::make('image')
                             ->label('Grid Thumbnail')
-                            ->helperText('Recommended: 400×400px square. Shown on the collections landing page tile.')
+                            ->helperText('Shown in product cards or listing grids.')
                             ->image()
                             ->disk('public')
-                            ->directory('categories')
-                            ->imagePreviewHeight('160'),
+                            ->directory('categories'),
                         FileUpload::make('icon')
-                            ->label('Navbar Menu Icon')
-                            ->helperText('Recommended: 80×80px PNG/SVG. Shown in the navigation mega-menu next to the category name.')
+                            ->label('Menu Icon (SVG/PNG)')
+                            ->helperText('Shown in the navigation mega-menu.')
                             ->image()
                             ->disk('public')
-                            ->directory('categories/icons')
-                            ->imagePreviewHeight('160'),
+                            ->directory('categories/icons'),
                         FileUpload::make('hero_banner')
-                            ->label('Collection Hero Banner')
-                            ->helperText('Recommended: 1600×500px. This image appears as the full-width header at the top of the collection page when a customer clicks this category.')
+                            ->label('Hero Banner (Desktop)')
+                            ->helperText('The large header image shown at the top of the collection page.')
                             ->image()
                             ->disk('public')
                             ->directory('categories/banners')
-                            ->imagePreviewHeight('200')
                             ->columnSpanFull(),
                     ])->columns(2),
 

@@ -189,37 +189,20 @@ class ProductForm
                             ->collapsible(),
                     ]),
                 Section::make('Sweetener Specific Attributes')
-                    ->description('Data specific to sweetener products. Use the dropdowns — correct values are critical for filters to work.')
+                    ->description('Data specific to sweetener products like ratio, form, and use cases.')
                     ->components([
-                        Select::make('type')
-                            ->label('Sweetener Type')
-                            ->options([
-                                'stevia'     => '🌿 Stevia',
-                                'monk-fruit' => '🍈 Monk Fruit',
-                            ])
-                            ->searchable()
-                            ->placeholder('Select type'),
-                        Select::make('form')
-                            ->label('Form Factor')
-                            ->options([
-                                'powder'  => '🫙 Powder',
-                                'drops'   => '💧 Drops / Liquid',
-                                'tablets' => '💊 Tablets / Sachets',
-                            ])
-                            ->searchable()
-                            ->placeholder('Select form'),
-                        Select::make('ratio')
-                            ->label('Concentration Ratio')
-                            ->options([
-                                '1:10'  => '1:10 — High Potency (1g replaces 10g sugar)',
-                                '1:50'  => '1:50 — Medium Potency',
-                                '1:100' => '1:100 — Mild Potency',
-                            ])
-                            ->searchable()
-                            ->placeholder('Select ratio'),
+                        TextInput::make('type')
+                            ->label('Type')
+                            ->placeholder('e.g. stevia, monk-fruit'),
+                        TextInput::make('form')
+                            ->label('Form')
+                            ->placeholder('e.g. powder, drops'),
+                        TextInput::make('ratio')
+                            ->label('Ratio')
+                            ->placeholder('e.g. 1:10, 1:50'),
                         TextInput::make('size_label')
                             ->label('Size Label')
-                            ->placeholder('e.g. 50g, 100g, 250ml'),
+                            ->placeholder('e.g. 50g, 100g'),
                         TextInput::make('sweetness_description')
                             ->label('Sweetness Description')
                             ->placeholder('e.g. 1g replaces 10g of sugar')
