@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { X, ChevronDown, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,6 +8,31 @@ import { Product } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { ProductCard } from "@/components/ProductCard";
+import { QuickCompareBar } from "@/components/QuickCompareBar";
+
+const RecipeCard = () => (
+  <motion.article
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    className="group bg-forest rounded-squircle-xl overflow-hidden shadow-soft text-forest-light border border-forest-light/30 flex flex-col justify-between relative col-span-1"
+  >
+    <div className="absolute inset-0 bg-black/20 z-0"></div>
+    <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-700 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1495147466023-af5c1f0bfc34?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')" }}></div>
+    
+    <div className="relative z-10 p-6 pt-10">
+      <span className="eyebrow !text-cream/80 mb-2 block">The Ritual</span>
+      <h3 className="text-3xl font-display font-black text-white leading-tight">Bake sugar-free brownies with pure plant sweetness.</h3>
+    </div>
+    
+    <div className="relative z-10 p-6 mt-auto">
+      <Link to="#" className="inline-flex items-center gap-2 text-white font-bold hover:text-lime transition-colors group/link pb-1 border-b border-lime/30 hover:border-lime">
+        Read the Recipe
+        <ChevronDown className="w-4 h-4 -rotate-90 group-hover/link:translate-x-1 transition-transform" />
+      </Link>
+    </div>
+  </motion.article>
+);
 
 const CATEGORY_CARDS = [
   {
@@ -80,7 +105,12 @@ const CollectionsPage = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Sync scroll for sticky bar
+  // Sync scroll for sticky bar & Parallax
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 500], [0, 150]);
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.4]);
+  const backToTopOpacity = useTransform(scrollY, [0, 400], [0, 1]);
+
   useEffect(() => {
     const handler = () => setIsSticky(window.scrollY > 500);
     window.addEventListener('scroll', handler);
@@ -146,44 +176,33 @@ const CollectionsPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 relative overflow-hidden">
-        {/* Ambient Blobs */}
-        <div className="absolute top-1/2 left-0 w-72 h-72 bg-lime/10 rounded-full blur-3xl -translate-y-1/2" />
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <section className="pt-40 pb-24 relative overflow-hidden flex items-center justify-center min-h-[450px]">
+        {/* Ambient Blobs & Parallax Image */}
+        <motion.div 
+          style={{ y: heroY, opacity: heroOpacity }} 
+          className="absolute inset-0 z-0"
+        >
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=2000&auto=format&fit=crop')" }} />
+          <div className="absolute inset-0 bg-black/40" />
+        </motion.div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="eyebrow-badge mb-8 inline-flex"
+              className="eyebrow flex items-center gap-2 mb-8 inline-flex text-cream bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              Our Premium Range
+              <Leaf className="w-4 h-4 text-lime" />
+              <span>Plant-Based Sweetness</span>
             </motion.div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-8 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-black leading-tight tracking-tight mb-8 text-white drop-shadow-lg">
               Sweetness <br />
-              Without Sacrifice.
+              <span className="italic font-light">Without Sacrifice.</span>
             </h1>
-            <p className="text-muted-foreground text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-12">
+            <p className="text-cream/90 text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-12 drop-shadow-md">
               Discover nature's finest sweeteners, meticulously extracted for pure health and uncompromising taste.
             </p>
-            
-            {/* Quick Stats */}
-            <div className="flex flex-wrap justify-center gap-10 opacity-60">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-primary shadow-soft border border-border/50">
-                  <Leaf className="w-5 h-5"/>
-                </div>
-                <span className="eyebrow !text-foreground">100% Plant-Based</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-primary shadow-soft border border-border/50">
-                  <Globe className="w-5 h-5"/>
-                </div>
-                <span className="eyebrow !text-foreground">Global Purity Standards</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -387,8 +406,12 @@ const CollectionsPage = () => {
             ) : (
               <div className="space-y-16">
                 <div className={viewMode === 'grid' ? "grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10" : "flex flex-col gap-0"}>
-                  {products.map(product => (
-                    <ProductCard key={product.id} product={product} viewMode={viewMode as any} />
+                  {products.map((product, i) => (
+                    <div key={product.id} className="contents">
+                      {/* Inject Recipe Card at specific index in grid mode */}
+                      {i === 4 && viewMode === 'grid' && <RecipeCard key={`recipe-${i}`} />}
+                      <ProductCard product={product} viewMode={viewMode as any} />
+                    </div>
                   ))}
                 </div>
 
@@ -418,7 +441,16 @@ const CollectionsPage = () => {
         </div>
       </div>
 
+      <QuickCompareBar />
       <Footer />
+      {/* Back to Top */}
+      <motion.button 
+        style={{ opacity: backToTopOpacity }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-[100] w-14 h-14 rounded-full bg-forest text-cream shadow-button hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex items-center justify-center border-2 border-background pointer-events-auto"
+      >
+        <Leaf className="w-6 h-6" />
+      </motion.button>
     </div>
   );
 };

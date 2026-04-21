@@ -61,9 +61,9 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         ? "w-full md:w-1/3 lg:w-1/4 relative overflow-hidden aspect-square rounded-xl bg-secondary/30 flex-shrink-0"
         : "relative aspect-square overflow-hidden bg-secondary/30"
       }>
-        {/* Badge */}
+        {/* Organic Badge */}
         {product.badge && (
-          <div className="absolute top-4 left-4 z-10 bg-lime text-foreground eyebrow !tracking-widest !text-[10px] px-3 py-1.5 shadow-sm rounded-squircle">
+          <div className="absolute top-4 left-4 z-30 bg-lime text-forest font-black uppercase tracking-widest text-[10px] px-3 py-1 shadow-sm rounded-t-xl rounded-bl-xl rounded-br-sm border border-lime-glow">
             {product.badge}
           </div>
         )}
@@ -71,7 +71,7 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         {/* Wishlist Heart */}
         <button
           onClick={toggleWishlist}
-          className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+          className="absolute top-4 right-4 z-30 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
           aria-label="Toggle wishlist"
         >
           <Heart
@@ -86,7 +86,7 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         {/* Product Image */}
         <Link
           to={`/products/${product.slug || product.id}`}
-          className="block w-full h-full"
+          className="block w-full h-full relative z-10"
         >
           <img
             src={product.image}
@@ -94,15 +94,21 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
         </Link>
+        
+        {/* Hover Source Botanical Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-10" 
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=600&auto=format&fit=crop')` }} 
+        />
 
-        {/* Hover Overlay with Add to Cart */}
-        <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        {/* Hover Overlay with Quick Add */}
+        <div className="absolute inset-0 bg-forest/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
           <button
             onClick={handleAddToCart}
-            className="inline-flex items-center justify-center gap-2 bg-lime text-foreground hover:bg-lime-glow rounded-squircle shadow-glow hover:shadow-lg hover:-translate-y-0.5 font-extrabold h-14 px-8 text-sm translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
+            className="inline-flex items-center justify-center gap-2 bg-lime text-forest hover:bg-cream hover:text-forest rounded-squircle shadow-glow hover:shadow-lg font-extrabold h-12 px-6 text-sm translate-y-4 group-hover:translate-y-0 transition-all duration-500"
           >
-            <ShoppingCart className="w-5 h-5 mr-2" />
-            Add to Cart
+            <ShoppingCart className="w-4 h-4" />
+            Quick Add
           </button>
         </div>
       </div>

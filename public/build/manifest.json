@@ -1,11 +1,18 @@
 {
+  "resources/js/react/assets/hero-bg.jpg": {
+    "file": "assets/hero-bg-D-TWzogc.jpg",
+    "src": "resources/js/react/assets/hero-bg.jpg"
+  },
   "resources/js/react/main.tsx": {
-    "file": "assets/main-DbZToXRn.js",
+    "file": "assets/main-h7gbI-Cq.js",
     "name": "main",
     "src": "resources/js/react/main.tsx",
     "isEntry": true,
     "css": [
-      "assets/main-Ca7QqjSx.css"
+      "assets/main-CePmdeQ4.css"
+    ],
+    "assets": [
+      "assets/hero-bg-D-TWzogc.jpg"
     ]
   }
 }

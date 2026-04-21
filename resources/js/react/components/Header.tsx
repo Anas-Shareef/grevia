@@ -51,12 +51,21 @@ const Header = () => {
     { label: "Home", href: "/" },
     { label: "Collections", href: "/collections" },
     {
-      label: "Shop By Category",
+      label: "Shop By Concern",
+      href: "/collections",
+      dropdown: [
+        { label: "Weight Management", href: "/collections/weight-management" },
+        { label: "Diabetes-Friendly", href: "/collections/diabetes-friendly" },
+        { label: "Keto Recipes", href: "/collections/keto-friendly" },
+      ],
+    },
+    {
+      label: "Category",
       href: "/collections",
       dropdown: [
         { label: "Stevia Products", href: "/collections/stevia-products" },
-        { label: "Monk Fruit Products", href: "/collections/monk-fruit-products" },
-        { label: "Healthy Snacks & Pantry", href: "/collections/healthy-snacks-pantry" },
+        { label: "Monk Fruit", href: "/collections/monk-fruit-products" },
+        { label: "Healthy Snacks", href: "/collections/healthy-snacks-pantry" },
       ],
     },
     { label: "Benefits", href: "/benefits" },
