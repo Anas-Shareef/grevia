@@ -14,6 +14,8 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'hero_banner',
+        'icon',
         'parent_id',
         'status',
         'show_in_filter',
@@ -31,7 +33,7 @@ class Category extends Model
         'status' => 'boolean'
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'hero_banner_url', 'icon_url'];
 
     public function getImageUrlAttribute()
     {
@@ -44,6 +46,32 @@ class Category extends Model
         }
 
         return \Illuminate\Support\Facades\Storage::url($this->image);
+    }
+
+    public function getHeroBannerUrlAttribute()
+    {
+        if (!$this->hero_banner) {
+            return null;
+        }
+        
+        if (str_starts_with($this->hero_banner, 'http://') || str_starts_with($this->hero_banner, 'https://')) {
+            return $this->hero_banner;
+        }
+
+        return \Illuminate\Support\Facades\Storage::url($this->hero_banner);
+    }
+
+    public function getIconUrlAttribute()
+    {
+        if (!$this->icon) {
+            return null;
+        }
+        
+        if (str_starts_with($this->icon, 'http://') || str_starts_with($this->icon, 'https://')) {
+            return $this->icon;
+        }
+
+        return \Illuminate\Support\Facades\Storage::url($this->icon);
     }
 
     public function parent()

@@ -36,54 +36,24 @@ class ProductController extends Controller
             $cat = \App\Models\Category::where('slug', $categorySlug)->first();
             
             if ($cat) {
-                if ($cat->is_smart && !empty($cat->rules)) {
-                    // Smart Category Engine Mapping
-                    $query->where(function($q) use ($cat) {
-                        foreach ($cat->rules as $rule) {
-                            $field = $rule['field'] ?? null;
-                            $operator = $rule['operator'] ?? null;
-                            $value = $rule['value'] ?? null;
+                // Determine recursive category IDs (this cat + all children)
+                $categoryIds = collect([$cat->id]);
+                
+                // Fetch all children recursively
+                $getChildren = function($category) use (&$getChildren, &$categoryIds) {
+                    foreach ($category->children as $child) {
+                        $categoryIds->push($child->id);
+                        $getChildren($child);
+                    }
+                };
+                $getChildren($cat);
 
-                            if (!$field || !$operator || $value === null) continue;
-
-                            switch ($operator) {
-                                case 'contains':
-                                    if ($field === 'tags') {
-                                        $q->whereJsonContains('tags', $value);
-                                    } else {
-                                        $q->where($field, 'like', "%{$value}%");
-                                    }
-                                    break;
-                                case 'not_contains':
-                                case 'exclude':
-                                    if ($field === 'tags') {
-                                        $q->whereJsonDoesntContain('tags', $value);
-                                    } else {
-                                        $q->where($field, 'not like', "%{$value}%");
-                                    }
-                                    break;
-                                case 'equals':
-                                    $q->where($field, $value);
-                                    break;
-                                case '>=':
-                                    $q->where($field, '>=', $value);
-                                    break;
-                                case '<=':
-                                    $q->where($field, '<=', $value);
-                                    break;
-                            }
-                        }
-                    });
-                } else {
-                    // Standard Category Hierarchy lookup
-                    $childIds = \App\Models\Category::where('parent_id', $cat->id)->pluck('id')->toArray();
-                    $allIds = array_merge([$cat->id], $childIds);
-                    $query->whereIn('category_id', $allIds);
-                }
+                $query->whereIn('category_id', $categoryIds->unique()->toArray());
             } else {
-                // Fallback: mostly for 'search' strings if the frontend still sends weird text
-                $query->whereHas('category', function($q) use ($categorySlug) {
-                    $q->where('slug', 'like', "%{$categorySlug}%");
+                // Fallback: stay on 'tags' or 'subcategory' search if slug doesn't match a real category ID
+                $query->where(function($q) use ($categorySlug) {
+                    $q->where('subcategory', 'like', "%{$categorySlug}%")
+                      ->orWhereJsonContains('tags', $categorySlug);
                 });
             }
         }
@@ -181,6 +151,7 @@ class ProductController extends Controller
                 'total' => $products->total(),
                 'per_page' => $products->perPage(),
             ],
+            'current_category' => isset($cat) ? $cat->load('parent') : null,
             'filters' => [
                 'price' => [
                     'min' => (float)$minPrice,
@@ -189,10 +160,10 @@ class ProductController extends Controller
                 'categories' => \App\Models\Category::where('show_in_filter', true)
                     ->whereNull('parent_id')
                     ->with(['children' => function($q) {
-                        $q->where('show_in_filter', true)->select('id', 'name', 'slug', 'parent_id')->orderBy('order');
+                        $q->where('show_in_filter', true)->select('id', 'name', 'slug', 'parent_id', 'icon', 'hero_banner')->orderBy('order');
                     }])
                     ->orderBy('order')
-                    ->select('id', 'name', 'slug')
+                    ->select('id', 'name', 'slug', 'icon', 'hero_banner')
                     ->get(),
                 'types' => [
                     ['label' => 'stevia', 'count' => Product::where('type', 'stevia')->count()],

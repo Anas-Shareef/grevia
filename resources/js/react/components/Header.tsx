@@ -1,29 +1,15 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X, ChevronDown, Heart, User, Leaf, Grape, Gift, Library, Package, Sparkles } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { api } from "@/lib/api";
 
-type DropdownItem = {
-  label: string;
-  href: string;
-};
-
-type MegaMenuColumn = {
-  title: string;
-  items: { label: string; href: string; icon?: any }[];
-};
-
-type NavLink = {
-  label: string;
-  href: string;
-  dropdown?: DropdownItem[];
-  megaMenu?: MegaMenuColumn[];
+type Category = {
+  id: number;
+  name: string;
+  slug: string;
+  icon_url?: string;
+  children?: Category[];
 };
 
 const Header = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -32,6 +18,18 @@ const Header = () => {
   const { user } = useAuth();
   const location = useLocation();
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await api.get('/categories');
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -47,7 +45,6 @@ const Header = () => {
 
   const handleMouseEnter = (label: string) => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-    // 200ms delay to prevent accidental opening
     dropdownTimeout.current = setTimeout(() => {
       setOpenDropdown(label);
     }, 200);
@@ -58,36 +55,28 @@ const Header = () => {
     dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 300);
   };
 
+  const shopItem = {
+    label: "Shop By Category",
+    href: "/collections",
+    megaMenu: categories.map(cat => ({
+      title: cat.name,
+      items: (cat.children || []).map(child => ({
+        label: child.name,
+        href: `/collections?category=${child.slug}`,
+        icon: child.icon_url ? undefined : (cat.slug === 'stevia' ? Leaf : Grape),
+        imageUrl: child.icon_url
+      }))
+    }))
+  };
+
+  // If we have no categories yet, use fallback or empty
   const navLinks: NavLink[] = [
     { label: "Home", href: "/" },
-    {
+    shopItem.megaMenu.length > 0 ? shopItem : {
       label: "Shop By Category",
       href: "/collections",
       megaMenu: [
-        {
-          title: "Natural Sweeteners",
-          items: [
-            { label: "Pure Stevia", href: "/collections?type=stevia", icon: Leaf },
-            { label: "Monk Fruit", href: "/collections?type=monk-fruit", icon: Grape },
-            { label: "Erythritol", href: "/collections?type=erythritol", icon: Sparkles },
-          ]
-        },
-        {
-          title: "Shop By Form",
-          items: [
-            { label: "Fine Powder", href: "/collections?form=powder", icon: Package },
-            { label: "Liquid Drops", href: "/collections?form=drops", icon: Sparkles },
-            { label: "Practical Sachets", href: "/collections?form=sachets", icon: Gift },
-          ]
-        },
-        {
-          title: "Discovery",
-          items: [
-            { label: "Best Sellers", href: "/collections?tags=BestSeller", icon: Heart },
-            { label: "New Arrivals", href: "/collections?tags=NewArrival", icon: Sparkles },
-            { label: "Combo Packs", href: "/collections?tags=Combo", icon: Package },
-          ]
-        }
+        { title: "Sweeteners", items: [{ label: "All Collections", href: "/collections" }] }
       ]
     },
     { label: "Benefits", href: "/benefits" },
@@ -173,8 +162,8 @@ const Header = () => {
                                         className="group flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-primary/5 transition-all duration-300"
                                       >
                                         <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors overflow-hidden border border-gray-100">
-                                          {column.title === "Discovery" ? (
-                                            <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=100&auto=format&fit=crop')` }} />
+                                          {item.imageUrl ? (
+                                            <img src={item.imageUrl} alt={item.label} className="w-full h-full object-contain p-1" />
                                           ) : (
                                             item.icon && <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary" />
                                           )}
@@ -183,9 +172,7 @@ const Header = () => {
                                           <span className="text-sm font-bold text-gray-600 group-hover:text-primary">
                                             {item.label}
                                           </span>
-                                          {column.title === "Discovery" && (
-                                            <span className="text-[10px] font-medium text-gray-400">Pure Plant-Based</span>
-                                          )}
+                                          <span className="text-[10px] font-medium text-gray-400">Pure Plant-Based</span>
                                         </div>
                                       </Link>
                                     ))}

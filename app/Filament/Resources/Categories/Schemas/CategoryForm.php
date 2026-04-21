@@ -52,41 +52,29 @@ class CategoryForm
                             ->default(0),
                     ])->columns(2),
 
-                Section::make('Smart Collection Engine')
-                    ->description('Automatically categorize products dynamically based on tag or naming logic instead of manual assignments.')
+                Section::make('Visual Branding')
+                    ->description('Upload high-resolution banners and menu icons for this collection.')
                     ->components([
-                        Toggle::make('is_smart')
-                            ->label('Enable Smart Rule-Based Engine')
-                            ->live()
+                        FileUpload::make('image')
+                            ->label('Grid Thumbnail')
+                            ->helperText('Shown in product cards or listing grids.')
+                            ->image()
+                            ->disk('public')
+                            ->directory('categories'),
+                        FileUpload::make('icon')
+                            ->label('Menu Icon (SVG/PNG)')
+                            ->helperText('Shown in the navigation mega-menu.')
+                            ->image()
+                            ->disk('public')
+                            ->directory('categories/icons'),
+                        FileUpload::make('hero_banner')
+                            ->label('Hero Banner (Desktop)')
+                            ->helperText('The large header image shown at the top of the collection page.')
+                            ->image()
+                            ->disk('public')
+                            ->directory('categories/banners')
                             ->columnSpanFull(),
-                        
-                        Repeater::make('rules')
-                            ->schema([
-                                Select::make('field')
-                                    ->options([
-                                        'tags' => 'Product Tags',
-                                        'name' => 'Product Title',
-                                        'price' => 'Price',
-                                        'form' => 'Form (drops, powder)',
-                                        'type' => 'Type (stevia, monk-fruit)'
-                                    ])
-                                    ->required(),
-                                Select::make('operator')
-                                    ->options([
-                                        'contains' => 'Contains',
-                                        'equals' => 'Equals Exactly',
-                                        '>=' => 'Greater Than or Equal',
-                                        '<=' => 'Less Than or Equal',
-                                    ])
-                                    ->required(),
-                                TextInput::make('value')
-                                    ->required()
-                            ])
-                            ->columns(3)
-                            ->columnSpanFull()
-                            ->visible(fn ($get): bool => (bool) $get('is_smart') === true)
-                            ->addActionLabel('Add New Automation Rule')
-                    ]),
+                    ])->columns(2),
 
                 Section::make('SEO Details')
                     ->description('Control how this collection lands inside Google & organic searches.')

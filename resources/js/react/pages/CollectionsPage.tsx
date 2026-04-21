@@ -68,35 +68,6 @@ const SORT_OPTIONS = [
   { label: 'Recently Added', value: 'newest' },
 ];
 
-const FILTER_GROUPS = [
-  {
-    key: 'type' as const,
-    label: 'Sweetener Type',
-    options: [
-      { label: 'Pure Stevia', value: 'stevia', count: 6 },
-      { label: 'Monk Fruit', value: 'monk-fruit', count: 2 },
-    ],
-  },
-  {
-    key: 'form' as const,
-    label: 'Format',
-    options: [
-      { label: 'Fine Powder', value: 'powder', count: 6 },
-      { label: 'Concentrated Drops', value: 'drops', count: 2 },
-    ],
-  },
-  {
-    key: 'ratio' as const,
-    label: 'Sweetness Ratio',
-    options: [
-      { label: '1:10 Ratio', value: '1-10', count: 6 },
-      { label: '1:50 Ratio', value: '1-50', count: 2 },
-    ],
-  },
-];
-
-type FilterKey = 'type' | 'form' | 'ratio' | 'size';
-
 const CollectionsPage = () => {
   const { filters, setFilter, resetFilters } = useProductFilters();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -104,6 +75,37 @@ const CollectionsPage = () => {
   const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
   const [isSticky, setIsSticky] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  const { data: response, isLoading } = useProducts({
+    ...filters,
+    page: String(currentPage),
+  });
+
+  const FILTER_GROUPS = useMemo(() => [
+    {
+      key: 'category' as const,
+      label: 'Origin',
+      options: (response?.filters?.categories || []).flatMap((cat: any) => [
+        { label: cat.name, value: cat.slug, count: 0 },
+        ...(cat.children || []).map((child: any) => ({ label: child.name, value: child.slug, count: 0 }))
+      ]),
+    },
+    {
+      key: 'form' as const,
+      label: 'Format',
+      options: (response?.filters?.forms || []).map((f: any) => ({ label: f.label.charAt(0).toUpperCase() + f.label.slice(1), value: f.label, count: f.count })),
+    },
+    {
+      key: 'ratio' as const,
+      label: 'Concentration (Ratio)',
+      options: (response?.filters?.ratios || []).map((r: any) => ({ label: r.label, value: r.label, count: r.count })),
+    },
+    {
+      key: 'size' as const,
+      label: 'Pack Size',
+      options: (response?.filters?.sizes || []).map((s: any) => ({ label: s.label, value: s.label, count: s.count })),
+    },
+  ], [response]);
 
   // Sync scroll for sticky bar & Parallax
   const { scrollY } = useScroll();
@@ -116,11 +118,6 @@ const CollectionsPage = () => {
     window.addEventListener('scroll', handler);
     return () => window.removeEventListener('scroll', handler);
   }, []);
-
-  const { data: response, isLoading } = useProducts({
-    ...filters,
-    page: String(currentPage),
-  });
 
   const products: Product[] = useMemo(() => {
     const newItems = response?.data || [];
@@ -151,7 +148,7 @@ const CollectionsPage = () => {
   useEffect(() => {
     setCurrentPage(1);
     setAccumulatedProducts([]);
-  }, [filters.type, filters.form, filters.ratio, filters.sort_by]);
+  }, [filters.category, filters.form, filters.ratio, filters.sort_by, filters.search]);
 
   const toggleFilter = (key: any, value: string) => {
     const current = (filters as any)[key] || '';
@@ -171,52 +168,88 @@ const CollectionsPage = () => {
     if (hasMore) setCurrentPage(prev => prev + 1);
   };
 
+  const currentCategory = response?.current_category;
+
   return (
     <div className="bg-background min-h-screen">
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-48 pb-20 relative overflow-hidden bg-[#F9F9F7]">
-        {/* Subtle Organic Texture/Pattern could go here */}
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 rounded-l-[100px] blur-3xl opacity-50" />
-        <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-lime/5 rounded-r-[100px] blur-3xl opacity-50" />
+      <section className={`pt-48 pb-20 relative overflow-hidden ${currentCategory?.hero_banner_url ? 'bg-forest/5 shadow-inner' : 'bg-[#F9F9F7]'}`}>
+        {/* Dynamic Background Image if Hero Banner exists */}
+        {currentCategory?.hero_banner_url && (
+          <div 
+            className="absolute inset-0 z-0 opacity-20 bg-cover bg-center" 
+            style={{ backgroundImage: `url(${currentCategory.hero_banner_url})` }}
+          />
+        )}
         
-        <div className="container mx-auto px-4 relative z-10">
+        {/* Subtle Organic Texture/Pattern */}
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 rounded-l-[100px] blur-3xl opacity-50 z-10" />
+        <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-lime/5 rounded-r-[100px] blur-3xl opacity-50 z-10" />
+        
+        <div className="container mx-auto px-4 relative z-20">
           <div className="text-center max-w-4xl mx-auto">
+            {/* Dynamic Breadcrumbs for Category Hierarchy */}
+            {currentCategory && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center justify-center gap-2 mb-4 text-[10px] font-black uppercase tracking-widest text-primary/50"
+              >
+                <Link to="/collections/all" className="hover:text-primary transition-colors">All Products</Link>
+                {currentCategory.parent && (
+                  <>
+                    <ChevronRight className="w-3 h-3" />
+                    <Link to={`/collections?category=${currentCategory.parent.slug}`} className="hover:text-primary transition-colors">{currentCategory.parent.name}</Link>
+                  </>
+                )}
+                <ChevronRight className="w-3 h-3" />
+                <span className="text-primary">{currentCategory.name}</span>
+              </motion.div>
+            )}
+
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="eyebrow flex items-center justify-center gap-2 mb-6 text-primary"
             >
               <Sparkles className="w-4 h-4" />
-              <span className="font-bold tracking-widest uppercase text-xs">Nature's Finest Essentials</span>
+              <span className="font-bold tracking-widest uppercase text-xs">
+                {currentCategory?.name || "Nature's Finest Essentials"}
+              </span>
             </motion.div>
             
-            <h1 className="text-6xl md:text-8xl font-display font-black leading-[0.9] tracking-tight mb-8 text-foreground">
-              Pure Sweetness,<br />
-              <span className="italic font-light text-primary">Zero Guilt.</span>
+            <h1 className="text-6xl md:text-8xl font-display font-black leading-[0.9] tracking-tight mb-8 text-foreground uppercase">
+              {currentCategory ? (
+                <>
+                  {currentCategory.name.split(' ')[0]}<br />
+                  <span className="italic font-light text-primary">{currentCategory.name.split(' ').slice(1).join(' ') || 'Sweetness'}</span>
+                </>
+              ) : (
+                <>
+                  Pure Sweetness,<br />
+                  <span className="italic font-light text-primary">Zero Guilt.</span>
+                </>
+              )}
             </h1>
             
             <p className="text-muted-foreground text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-16">
-              Experience uncompromising taste without the calories. Meticulously extracted, plant-based sweetness for your daily ritual.
+              {currentCategory?.description || "Experience uncompromising taste without the calories. Meticulously extracted, plant-based sweetness for your daily ritual."}
             </p>
 
             {/* Catalog Discovery Tabs (Horizontal Scroll) */}
             <div className="flex overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:gap-8 justify-start md:justify-center">
               {[
                 { label: 'All Sweeteners', value: '', icon: Sparkles, color: 'bg-primary/5 text-primary' },
-                { label: 'Stevia Powder', value: 'Base_Stevia', icon: Leaf, color: 'bg-green-50 text-green-700' },
-                { label: 'Monk Fruit', value: 'Base_Monkfruit', icon: Grape, color: 'bg-purple-50 text-purple-700' },
-                { label: 'Liquid Drops', value: 'Form_Drops', icon: Droplets, color: 'bg-blue-50 text-blue-700' },
-                { label: 'Baking Essentials', value: 'UseCase_Baking', icon: Package, color: 'bg-amber-50 text-amber-700' },
+                { label: 'Stevia Products', value: 'stevia', icon: Leaf, color: 'bg-green-50 text-green-700' },
+                { label: 'Monk Fruit', value: 'monk-fruit', icon: Grape, color: 'bg-purple-50 text-purple-700' },
               ].map((item) => (
                 <button
                   key={item.label}
                   onClick={() => {
-                    if (item.value.startsWith('Base_')) setFilter('type', item.value.split('_')[1].toLowerCase());
-                    else if (item.value.startsWith('Form_')) setFilter('form', item.value.split('_')[1].toLowerCase());
-                    else if (item.value === '') resetFilters();
-                    else setFilter('tags', [item.value]);
+                    if (item.value === '') resetFilters();
+                    else setFilter('category', item.value);
                   }}
                   className="flex-shrink-0 flex flex-col items-center gap-3 transition-all hover:-translate-y-1 group"
                 >
