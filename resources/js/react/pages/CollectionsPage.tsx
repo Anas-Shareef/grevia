@@ -201,26 +201,29 @@ const CollectionsPage = () => {
               Experience uncompromising taste without the calories. Meticulously extracted, plant-based sweetness for your daily ritual.
             </p>
 
-            {/* Category Quick-Links */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+            {/* Catalog Discovery Tabs (Horizontal Scroll) */}
+            <div className="flex overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:gap-8 justify-start md:justify-center">
               {[
-                { label: 'Stevia', value: 'stevia', icon: Leaf, color: 'bg-green-100 text-green-700' },
-                { label: 'Monkfruit', value: 'monk-fruit', icon: Grape, color: 'bg-purple-100 text-purple-700' },
-                { label: 'Drops', value: 'drops', icon: Droplets, color: 'bg-blue-100 text-blue-700' },
-                { label: 'Powder', value: 'powder', icon: Wind, color: 'bg-amber-100 text-amber-700' },
+                { label: 'All Sweeteners', value: '', icon: Sparkles, color: 'bg-primary/5 text-primary' },
+                { label: 'Stevia Powder', value: 'Base_Stevia', icon: Leaf, color: 'bg-green-50 text-green-700' },
+                { label: 'Monk Fruit', value: 'Base_Monkfruit', icon: Grape, color: 'bg-purple-50 text-purple-700' },
+                { label: 'Liquid Drops', value: 'Form_Drops', icon: Droplets, color: 'bg-blue-50 text-blue-700' },
+                { label: 'Baking Essentials', value: 'UseCase_Baking', icon: Package, color: 'bg-amber-50 text-amber-700' },
               ].map((item) => (
                 <button
                   key={item.label}
                   onClick={() => {
-                    if (item.label === 'Stevia' || item.label === 'Monkfruit') setFilter('type', item.value);
-                    else setFilter('form', item.value);
+                    if (item.value.startsWith('Base_')) setFilter('type', item.value.split('_')[1].toLowerCase());
+                    else if (item.value.startsWith('Form_')) setFilter('form', item.value.split('_')[1].toLowerCase());
+                    else if (item.value === '') resetFilters();
+                    else setFilter('tags', [item.value]);
                   }}
-                  className="flex flex-col items-center gap-3 transition-transform hover:-translate-y-2 group"
+                  className="flex-shrink-0 flex flex-col items-center gap-3 transition-all hover:-translate-y-1 group"
                 >
-                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full ${item.color} flex items-center justify-center shadow-sm group-hover:shadow-xl transition-all duration-300 border-4 border-white`}>
-                    <item.icon className="w-6 h-6 md:w-8 md:h-8" />
+                  <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl ${item.color} flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 border border-white/50`}>
+                    <item.icon className="w-6 h-6" />
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-widest text-foreground/60 group-hover:text-primary transition-colors">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-foreground/50 group-hover:text-primary transition-colors whitespace-nowrap">
                     {item.label}
                   </span>
                 </button>

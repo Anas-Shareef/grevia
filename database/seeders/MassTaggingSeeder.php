@@ -44,46 +44,41 @@ class MassTaggingSeeder extends Seeder
                     $tags[] = $ratioTag;
                 }
             }
-
-            // Weight/Size Tags (e.g. Size_50g)
-            if ($product->size_label) {
-                // Extract number and unit if possible, or just use as is
-                $cleanSize = str_replace(' ', '', $product->size_label);
-                $sizeTag = 'Size_' . $cleanSize;
-                if (!in_array($sizeTag, $tags)) {
-                    $tags[] = $sizeTag;
-                }
+                // Normalize ratio for tagging (e.g. 1:10 -> Ratio_1-10)
+                $normalizedRatio = str_replace([':', '.'], '-', $product->ratio);
+                $tags[] = 'Ratio_' . $normalizedRatio;
             }
 
-            // Badges to Tags (Keto-Friendly, 100% Organic)
-            if (stripos($product->description, 'keto') !== false || stripos($product->name, 'keto') !== false) {
-                if (!in_array('Keto-Friendly', $tags)) $tags[] = 'Keto-Friendly';
-            }
-            if (stripos($product->description, 'organic') !== false || stripos($product->name, 'organic') !== false) {
-                if (!in_array('100% Organic', $tags)) $tags[] = '100% Organic';
-            }
+            // 4. Region
+            $tags[] = 'Region_IN';
+
+            // 5. Special Badges/Categories
+            if ($product->is_featured) $tags[] = 'BestSeller';
+            if ($product->created_at > now()->subMonths(2)) $tags[] = 'NewArrival';
 
             $product->tags = array_values(array_unique($tags));
             $product->save();
         }
 
-        // 2. Convert Existing Categories to Smart Collections
-        $steviaCategory = Category::where('slug', 'stevia-products')->first();
-        if ($steviaCategory) {
-            $steviaCategory->update([
+        // Updating Smart Collections to follow the new rules
+        $steviaCat = Category::where('slug', 'stevia-products')->first();
+        if ($steviaCat) {
+            $steviaCat->update([
                 'is_smart' => true,
                 'rules' => [
-                    ['field' => 'tags', 'operator' => 'contains', 'value' => 'Sub_Stevia']
+                    ['field' => 'tags', 'operator' => 'contains', 'value' => 'Base_Stevia'],
+                    ['field' => 'tags', 'operator' => 'exclude', 'value' => 'Base_Monkfruit']
                 ]
             ]);
         }
 
-        $monkFruitCategory = Category::where('slug', 'monk-fruit-products')->first();
-        if ($monkFruitCategory) {
-            $monkFruitCategory->update([
+        $monkCat = Category::where('slug', 'monk-fruit-products')->first();
+        if ($monkCat) {
+            $monkCat->update([
                 'is_smart' => true,
                 'rules' => [
-                    ['field' => 'tags', 'operator' => 'contains', 'value' => 'Sub_Monkfruit']
+                    ['field' => 'tags', 'operator' => 'contains', 'value' => 'Base_Monkfruit'],
+                    ['field' => 'tags', 'operator' => 'exclude', 'value' => 'Base_Stevia']
                 ]
             ]);
         }

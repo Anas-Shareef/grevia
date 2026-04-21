@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 type DropdownItem = {
   label: string;
@@ -46,11 +47,15 @@ const Header = () => {
 
   const handleMouseEnter = (label: string) => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-    setOpenDropdown(label);
+    // 200ms delay to prevent accidental opening
+    dropdownTimeout.current = setTimeout(() => {
+      setOpenDropdown(label);
+    }, 200);
   };
 
   const handleMouseLeave = () => {
-    dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 150);
+    if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+    dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 300);
   };
 
   const navLinks: NavLink[] = [
@@ -62,25 +67,25 @@ const Header = () => {
         {
           title: "Natural Sweeteners",
           items: [
-            { label: "Stevia Products", href: "/collections/stevia-products", icon: Leaf },
-            { label: "Monk Fruit", href: "/collections/monk-fruit-products", icon: Grape },
-            { label: "Healthy Snacks", href: "/collections/healthy-snacks-pantry", icon: Sparkles },
+            { label: "Pure Stevia", href: "/collections?type=stevia", icon: Leaf },
+            { label: "Monk Fruit", href: "/collections?type=monk-fruit", icon: Grape },
+            { label: "Erythritol", href: "/collections?type=erythritol", icon: Sparkles },
           ]
         },
         {
-          title: "Curated Collections",
+          title: "Shop By Form",
           items: [
+            { label: "Fine Powder", href: "/collections?form=powder", icon: Package },
+            { label: "Liquid Drops", href: "/collections?form=drops", icon: Sparkles },
+            { label: "Practical Sachets", href: "/collections?form=sachets", icon: Gift },
+          ]
+        },
+        {
+          title: "Discovery",
+          items: [
+            { label: "Best Sellers", href: "/collections?tags=BestSeller", icon: Heart },
+            { label: "New Arrivals", href: "/collections?tags=NewArrival", icon: Sparkles },
             { label: "Combo Packs", href: "/collections?tags=Combo", icon: Package },
-            { label: "Gift Hampers", href: "/collections?tags=Gifts", icon: Gift },
-            { label: "New Arrivals", href: "/collections?sort_by=newest", icon: Sparkles },
-          ]
-        },
-        {
-          title: "Shop By Concern",
-          items: [
-            { label: "Weight Management", href: "/collections/weight-management", icon: Library },
-            { label: "Diabetes-Friendly", href: "/collections/diabetes-friendly", icon: Heart },
-            { label: "Keto Recipes", href: "/collections/keto-friendly", icon: Leaf },
           ]
         }
       ]
@@ -165,14 +170,23 @@ const Header = () => {
                                       <Link
                                         key={item.label}
                                         to={item.href}
-                                        className="group flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-primary/5 transition-all duration-300"
+                                        className="group flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-primary/5 transition-all duration-300"
                                       >
-                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                                          {item.icon && <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary" />}
+                                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors overflow-hidden border border-gray-100">
+                                          {column.title === "Discovery" ? (
+                                            <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=100&auto=format&fit=crop')` }} />
+                                          ) : (
+                                            item.icon && <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary" />
+                                          )}
                                         </div>
-                                        <span className="text-sm font-bold text-gray-600 group-hover:text-primary">
-                                          {item.label}
-                                        </span>
+                                        <div className="flex flex-col">
+                                          <span className="text-sm font-bold text-gray-600 group-hover:text-primary">
+                                            {item.label}
+                                          </span>
+                                          {column.title === "Discovery" && (
+                                            <span className="text-[10px] font-medium text-gray-400">Pure Plant-Based</span>
+                                          )}
+                                        </div>
                                       </Link>
                                     ))}
                                   </div>

@@ -54,6 +54,14 @@ class ProductController extends Controller
                                         $q->where($field, 'like', "%{$value}%");
                                     }
                                     break;
+                                case 'not_contains':
+                                case 'exclude':
+                                    if ($field === 'tags') {
+                                        $q->whereJsonDoesntContain('tags', $value);
+                                    } else {
+                                        $q->where($field, 'not like', "%{$value}%");
+                                    }
+                                    break;
                                 case 'equals':
                                     $q->where($field, $value);
                                     break;
@@ -112,7 +120,14 @@ class ProductController extends Controller
              }
         }
 
-        // 6. Specialized Sweetener Filters (Using New Dedicated Columns)
+        // 6. Regional Visibility
+        $userRegion = $request->header('X-User-Region', 'Region_IN');
+        $query->where(function($q) use ($userRegion) {
+            $q->whereJsonContains('tags', $userRegion)
+              ->orWhereJsonLength('tags', 0); // Items with no region tags are visible to all
+        });
+
+        // 7. Specialized Sweetener Filters (Using New Dedicated Columns)
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
@@ -129,7 +144,7 @@ class ProductController extends Controller
             $query->where('size_label', 'like', "%{$request->size}%");
         }
 
-        // 6. Sorting
+        // 8. Sorting
         $sortBy = $request->get('sort_by', 'newest');
         switch ($sortBy) {
             case 'price_low':

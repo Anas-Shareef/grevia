@@ -5,7 +5,9 @@ import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Check } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -39,11 +41,19 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
     toast.success(`${product.name} added to cart!`);
   };
 
+  const [isQuickShopOpen, setIsQuickShopOpen] = useState(false);
+
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isWishlisted) removeFromWishlist(String(product.id));
     else addToWishlist(product);
+  };
+
+  const handleQuickShop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsQuickShopOpen(true);
   };
 
   return (
@@ -103,27 +113,64 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
         </Link>
         
-        {/* Hover Source Botanical Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-10" 
-          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=600&auto=format&fit=crop')` }} 
-        />
-
-        {/* Hover Overlay with Quick Add */}
-        <div className="absolute inset-0 bg-forest/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
+        {/* Hover Overlay with Quick Shop Reveal */}
+        <div className="absolute inset-0 bg-forest/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-6 z-20">
           <button
-            onClick={handleAddToCart}
-            className="inline-flex items-center justify-center gap-2 bg-lime text-forest hover:bg-cream hover:text-forest rounded-squircle shadow-glow hover:shadow-lg font-extrabold h-12 px-6 text-sm translate-y-4 group-hover:translate-y-0 transition-all duration-500"
+            onClick={handleQuickShop}
+            className="inline-flex items-center justify-center gap-2 bg-white text-forest hover:bg-forest hover:text-white rounded-full shadow-lg font-bold h-11 px-8 text-xs translate-y-4 group-hover:translate-y-0 transition-all duration-300"
           >
             <ShoppingCart className="w-4 h-4" />
-            Quick Add
+            Quick Shop
           </button>
         </div>
       </div>
+
+      {/* Quick Shop Drawer */}
+      <Sheet open={isQuickShopOpen} onOpenChange={setIsQuickShopOpen}>
+        <SheetContent side="bottom" className="rounded-t-[40px] px-8 pb-12 pt-10 border-none bg-cream">
+            <SheetHeader className="text-left mb-8">
+                <SheetTitle className="text-2xl font-black uppercase tracking-tight text-forest">Select Your Size</SheetTitle>
+                <p className="text-sm text-forest/60 font-medium">Choose a pack size for {product.name}</p>
+            </SheetHeader>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(product.variants || []).map((v) => (
+                    <button
+                        key={v.id}
+                        onClick={() => {
+                            addToCart(product, 1, v.id);
+                            setIsQuickShopOpen(false);
+                            toast.success(`Added ${v.weight} to cart!`);
+                        }}
+                        className={`flex items-center justify-between p-6 rounded-[24px] border-2 transition-all group ${
+                            selectedWeight === v.weight 
+                            ? "border-lime bg-lime/5" 
+                            : "border-forest/10 bg-white hover:border-lime/30"
+                        }`}
+                    >
+                        <div className="text-left">
+                            <p className="text-lg font-black text-forest">{v.weight}</p>
+                            <p className="text-sm font-bold text-lime">₹{v.discount_price || v.price}</p>
+                        </div>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                            selectedWeight === v.weight ? "bg-lime text-forest" : "bg-forest/5 text-forest/20 group-hover:bg-lime/10"
+                        }`}>
+                            <Check className="w-5 h-5" />
+                        </div>
+                    </button>
+                ))}
+            </div>
+            
+            <div className="mt-10 flex items-center justify-between p-4 bg-forest/5 rounded-2xl">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-forest/40">Pure Plant-Based Sweetness</p>
+                <Link to={`/products/${product.slug || product.id}`} className="text-xs font-bold text-forest hover:text-lime transition-colors">See Full Details</Link>
+            </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Content Area */}
       <div className={viewMode === 'list'

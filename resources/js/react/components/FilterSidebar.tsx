@@ -155,23 +155,56 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                         <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Concentration</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
-                                {meta.ratios.map((r) => (
-                                    <div key={r.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("ratio", filters.ratio === r.label ? "" : r.label)}>
-                                        <div className="flex items-center space-x-3">
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.ratio === r.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
-                                                {filters.ratio === r.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                {meta.ratios.map((r) => {
+                                    const isSelected = filters.ratio === r.label;
+                                    return (
+                                        <div key={r.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("ratio", isSelected ? "" : r.label)}>
+                                            <div className="flex items-center space-x-3">
+                                                <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-lime data-[state=checked]:border-lime" />
+                                                <span className={`text-sm font-bold transition-colors ${isSelected ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                                    {r.label}
+                                                </span>
                                             </div>
-                                            <span className={`text-sm font-bold transition-colors ${filters.ratio === r.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
-                                                {r.label}
-                                            </span>
+                                            <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{r.count}</span>
                                         </div>
-                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{r.count}</span>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </AccordionContent>
                     </AccordionItem>
                 )}
+
+                {/* Use-Case Filter */}
+                <AccordionItem value="use-case" className="border-b border-white/5 mb-2">
+                    <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Best For</AccordionTrigger>
+                    <AccordionContent>
+                        <div className="space-y-3 pb-4">
+                            {[
+                                { label: 'Baking', value: 'UseCase_Baking' },
+                                { label: 'Beverages', value: 'UseCase_Beverages' },
+                                { label: 'Table-top', value: 'UseCase_Tabletop' },
+                            ].map((u) => {
+                                const isSelected = filters.tags?.includes(u.value);
+                                return (
+                                    <div key={u.value} className="flex items-center justify-between group cursor-pointer" onClick={() => {
+                                        const currentTags = filters.tags || [];
+                                        const newTags = isSelected 
+                                            ? currentTags.filter(t => t !== u.value)
+                                            : [...currentTags, u.value];
+                                        setFilter("tags", newTags);
+                                    }}>
+                                        <div className="flex items-center space-x-3">
+                                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-lime data-[state=checked]:border-lime" />
+                                            <span className={`text-sm font-bold transition-colors ${isSelected ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                                {u.label}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
 
                 {/* Pack Size Filter */}
                 {meta?.sizes && (
@@ -179,19 +212,20 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                         <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Pack Size</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
-                                {meta.sizes.map((s) => (
-                                    <div key={s.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("size", filters.size === s.label ? "" : s.label)}>
-                                        <div className="flex items-center space-x-3">
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.size === s.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
-                                                {filters.size === s.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                {meta.sizes.map((s) => {
+                                    const isSelected = filters.size === s.label;
+                                    return (
+                                        <div key={s.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("size", isSelected ? "" : s.label)}>
+                                            <div className="flex items-center space-x-3">
+                                                <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-lime data-[state=checked]:border-lime" />
+                                                <span className={`text-sm font-bold transition-colors ${isSelected ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                                    {s.label}
+                                                </span>
                                             </div>
-                                            <span className={`text-sm font-bold transition-colors ${filters.size === s.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
-                                                {s.label}
-                                            </span>
+                                            <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{s.count}</span>
                                         </div>
-                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{s.count}</span>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </AccordionContent>
                     </AccordionItem>
