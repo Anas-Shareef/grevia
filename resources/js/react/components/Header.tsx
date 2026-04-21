@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X, ChevronDown, Heart, User } from "lucide-react";
+import { ShoppingCart, Menu, X, ChevronDown, Heart, User, Leaf, Grape, Gift, Library, Package, Sparkles } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
@@ -10,10 +10,16 @@ type DropdownItem = {
   href: string;
 };
 
+type MegaMenuColumn = {
+  title: string;
+  items: { label: string; href: string; icon?: any }[];
+};
+
 type NavLink = {
   label: string;
   href: string;
   dropdown?: DropdownItem[];
+  megaMenu?: MegaMenuColumn[];
 };
 
 const Header = () => {
@@ -49,24 +55,35 @@ const Header = () => {
 
   const navLinks: NavLink[] = [
     { label: "Home", href: "/" },
-    { label: "Collections", href: "/collections" },
     {
-      label: "Shop By Concern",
+      label: "Shop By Category",
       href: "/collections",
-      dropdown: [
-        { label: "Weight Management", href: "/collections/weight-management" },
-        { label: "Diabetes-Friendly", href: "/collections/diabetes-friendly" },
-        { label: "Keto Recipes", href: "/collections/keto-friendly" },
-      ],
-    },
-    {
-      label: "Category",
-      href: "/collections",
-      dropdown: [
-        { label: "Stevia Products", href: "/collections/stevia-products" },
-        { label: "Monk Fruit", href: "/collections/monk-fruit-products" },
-        { label: "Healthy Snacks", href: "/collections/healthy-snacks-pantry" },
-      ],
+      megaMenu: [
+        {
+          title: "Natural Sweeteners",
+          items: [
+            { label: "Stevia Products", href: "/collections/stevia-products", icon: Leaf },
+            { label: "Monk Fruit", href: "/collections/monk-fruit-products", icon: Grape },
+            { label: "Healthy Snacks", href: "/collections/healthy-snacks-pantry", icon: Sparkles },
+          ]
+        },
+        {
+          title: "Curated Collections",
+          items: [
+            { label: "Combo Packs", href: "/collections?tags=Combo", icon: Package },
+            { label: "Gift Hampers", href: "/collections?tags=Gifts", icon: Gift },
+            { label: "New Arrivals", href: "/collections?sort_by=newest", icon: Sparkles },
+          ]
+        },
+        {
+          title: "Shop By Concern",
+          items: [
+            { label: "Weight Management", href: "/collections/weight-management", icon: Library },
+            { label: "Diabetes-Friendly", href: "/collections/diabetes-friendly", icon: Heart },
+            { label: "Keto Recipes", href: "/collections/keto-friendly", icon: Leaf },
+          ]
+        }
+      ]
     },
     { label: "Benefits", href: "/benefits" },
     { label: "Contact", href: "/contact" },
@@ -132,17 +149,47 @@ const Header = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 8, scale: 0.96 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute top-full left-0 mt-1 min-w-[200px] bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                          className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white rounded-[20px] shadow-2xl border border-gray-100 py-6 z-50 ${
+                            link.megaMenu ? "min-w-[700px] px-8" : "min-w-[200px] px-2"
+                          }`}
                         >
-                          {link.dropdown.map((item) => (
-                            <Link
-                              key={item.label}
-                              to={item.href}
-                              className="block px-4 py-2.5 text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 transition-colors"
-                            >
-                              {item.label}
-                            </Link>
-                          ))}
+                          {link.megaMenu ? (
+                            <div className="grid grid-cols-3 gap-8">
+                              {link.megaMenu.map((column) => (
+                                <div key={column.title} className="space-y-4">
+                                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50 pb-2">
+                                    {column.title}
+                                  </h4>
+                                  <div className="space-y-1">
+                                    {column.items.map((item) => (
+                                      <Link
+                                        key={item.label}
+                                        to={item.href}
+                                        className="group flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-primary/5 transition-all duration-300"
+                                      >
+                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                          {item.icon && <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary" />}
+                                        </div>
+                                        <span className="text-sm font-bold text-gray-600 group-hover:text-primary">
+                                          {item.label}
+                                        </span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            link.dropdown?.map((item) => (
+                              <Link
+                                key={item.label}
+                                to={item.href}
+                                className="block px-4 py-2.5 text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 transition-colors"
+                              >
+                                {item.label}
+                              </Link>
+                            ))
+                          )}
                         </motion.div>
                       )}
                     </AnimatePresence>

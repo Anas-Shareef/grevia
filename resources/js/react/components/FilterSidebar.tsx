@@ -101,10 +101,10 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
             )}
 
             <Accordion type="multiple" defaultValue={["type", "form", "ratio", "size"]} className="w-full border-none">
-                {/* Type Filter */}
+                {/* Product Type Filter */}
                 {meta?.types && (
                     <AccordionItem value="type" className="border-b border-white/5 mb-2">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Type</AccordionTrigger>
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Product Type</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.types.map((t) => (
@@ -149,10 +149,10 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                     </AccordionItem>
                 )}
 
-                {/* Ratio Filter */}
+                {/* Concentration Filter */}
                 {meta?.ratios && (
                     <AccordionItem value="ratio" className="border-b border-white/5 mb-2">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Strength Ratio</AccordionTrigger>
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Concentration</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.ratios.map((r) => (
@@ -173,10 +173,10 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                     </AccordionItem>
                 )}
 
-                {/* Size Filter */}
+                {/* Pack Size Filter */}
                 {meta?.sizes && (
                     <AccordionItem value="size" className="border-b border-white/5">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Size</AccordionTrigger>
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Pack Size</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.sizes.map((s) => (

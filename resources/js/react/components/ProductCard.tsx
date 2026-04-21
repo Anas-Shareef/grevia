@@ -61,12 +61,24 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         ? "w-full md:w-1/3 lg:w-1/4 relative overflow-hidden aspect-square rounded-xl bg-secondary/30 flex-shrink-0"
         : "relative aspect-square overflow-hidden bg-secondary/30"
       }>
-        {/* Organic Badge */}
-        {product.badge && (
-          <div className="absolute top-4 left-4 z-30 bg-lime text-forest font-black uppercase tracking-widest text-[10px] px-3 py-1 shadow-sm rounded-t-xl rounded-bl-xl rounded-br-sm border border-lime-glow">
-            {product.badge}
-          </div>
-        )}
+        {/* Dynamic Badges from Tags */}
+        <div className="absolute top-4 left-4 z-30 flex flex-col gap-2">
+            {product.badge && (
+                <div className="bg-lime text-forest font-black uppercase tracking-widest text-[10px] px-3 py-1 shadow-sm rounded-t-xl rounded-bl-xl rounded-br-sm border border-lime-glow">
+                    {product.badge}
+                </div>
+            )}
+            {product.tags?.includes('Keto-Friendly') && (
+                <div className="bg-blue-500 text-white font-black uppercase tracking-widest text-[8px] px-2 py-0.5 shadow-sm rounded-full w-fit">
+                    Keto-Friendly
+                </div>
+            )}
+            {product.tags?.includes('100% Organic') && (
+                <div className="bg-emerald-600 text-white font-black uppercase tracking-widest text-[8px] px-2 py-0.5 shadow-sm rounded-full w-fit">
+                    100% Organic
+                </div>
+            )}
+        </div>
 
         {/* Wishlist Heart */}
         <button
@@ -162,9 +174,16 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         {/* Price + View button */}
         {viewMode === 'list' ? (
           <div className="flex justify-between items-end mt-6">
-            <span className="text-xl md:text-2xl font-bold text-foreground">
-              ₹{displayPrice}
-            </span>
+            <div className="flex flex-col">
+                {currentVariant?.discount_price && (
+                    <span className="text-sm text-muted-foreground line-through">
+                        ₹{currentVariant.price}
+                    </span>
+                )}
+                <span className="text-xl md:text-2xl font-bold text-foreground">
+                    ₹{displayPrice}
+                </span>
+            </div>
             <button 
               onClick={handleAddToCart}
               className="bg-[#1a1a1a] text-white px-6 md:px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors rounded-none"
@@ -174,9 +193,16 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
           </div>
         ) : (
           <div className="flex items-center justify-between mt-auto">
-            <span className="text-2xl font-black text-foreground">
-              ₹{displayPrice}
-            </span>
+            <div className="flex flex-col">
+                {currentVariant?.discount_price && (
+                    <span className="text-xs text-muted-foreground line-through decoration-destructive/50">
+                        ₹{currentVariant.price}
+                    </span>
+                )}
+                <span className="text-2xl font-black text-foreground">
+                    ₹{displayPrice}
+                </span>
+            </div>
             <Link
               to={`/products/${product.slug || product.id}`}
               className="inline-flex items-center justify-center text-sm font-bold border-2 border-forest text-forest hover:bg-forest hover:text-white rounded-full h-10 px-6 transition-all duration-300"

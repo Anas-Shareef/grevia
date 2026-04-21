@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { X, ChevronDown, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List } from "lucide-react";
+import { X, ChevronDown, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List, Droplets, Wind, Grape, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
@@ -176,33 +176,56 @@ const CollectionsPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-40 pb-24 relative overflow-hidden flex items-center justify-center min-h-[450px]">
-        {/* Ambient Blobs & Parallax Image */}
-        <motion.div 
-          style={{ y: heroY, opacity: heroOpacity }} 
-          className="absolute inset-0 z-0"
-        >
-          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=2000&auto=format&fit=crop')" }} />
-          <div className="absolute inset-0 bg-black/40" />
-        </motion.div>
+      <section className="pt-48 pb-20 relative overflow-hidden bg-[#F9F9F7]">
+        {/* Subtle Organic Texture/Pattern could go here */}
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 rounded-l-[100px] blur-3xl opacity-50" />
+        <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-lime/5 rounded-r-[100px] blur-3xl opacity-50" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="eyebrow flex items-center gap-2 mb-8 inline-flex text-cream bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="eyebrow flex items-center justify-center gap-2 mb-6 text-primary"
             >
-              <Leaf className="w-4 h-4 text-lime" />
-              <span>Plant-Based Sweetness</span>
+              <Sparkles className="w-4 h-4" />
+              <span className="font-bold tracking-widest uppercase text-xs">Nature's Finest Essentials</span>
             </motion.div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-black leading-tight tracking-tight mb-8 text-white drop-shadow-lg">
-              Sweetness <br />
-              <span className="italic font-light">Without Sacrifice.</span>
+            
+            <h1 className="text-6xl md:text-8xl font-display font-black leading-[0.9] tracking-tight mb-8 text-foreground">
+              Pure Sweetness,<br />
+              <span className="italic font-light text-primary">Zero Guilt.</span>
             </h1>
-            <p className="text-cream/90 text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-12 drop-shadow-md">
-              Discover nature's finest sweeteners, meticulously extracted for pure health and uncompromising taste.
+            
+            <p className="text-muted-foreground text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-16">
+              Experience uncompromising taste without the calories. Meticulously extracted, plant-based sweetness for your daily ritual.
             </p>
+
+            {/* Category Quick-Links */}
+            <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+              {[
+                { label: 'Stevia', value: 'stevia', icon: Leaf, color: 'bg-green-100 text-green-700' },
+                { label: 'Monkfruit', value: 'monk-fruit', icon: Grape, color: 'bg-purple-100 text-purple-700' },
+                { label: 'Drops', value: 'drops', icon: Droplets, color: 'bg-blue-100 text-blue-700' },
+                { label: 'Powder', value: 'powder', icon: Wind, color: 'bg-amber-100 text-amber-700' },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    if (item.label === 'Stevia' || item.label === 'Monkfruit') setFilter('type', item.value);
+                    else setFilter('form', item.value);
+                  }}
+                  className="flex flex-col items-center gap-3 transition-transform hover:-translate-y-2 group"
+                >
+                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full ${item.color} flex items-center justify-center shadow-sm group-hover:shadow-xl transition-all duration-300 border-4 border-white`}>
+                    <item.icon className="w-6 h-6 md:w-8 md:h-8" />
+                  </div>
+                  <span className="text-[11px] font-black uppercase tracking-widest text-foreground/60 group-hover:text-primary transition-colors">
+                    {item.label}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
