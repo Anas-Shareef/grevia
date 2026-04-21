@@ -13,7 +13,9 @@ type DropdownItem = {
 
 type MegaMenuColumn = {
   title: string;
-  items: { label: string; href: string; icon?: any; imageUrl?: string }[];
+  icon?: any;
+  imageUrl?: string;
+  items: { label: string; href: string }[];
 };
 
 type NavLink = {
@@ -79,16 +81,15 @@ const Header = () => {
   };
 
   const buildShopMegaMenu = (): MegaMenuColumn[] => {
-    // Column 1: Shop All + top-level category links
+    // Column 1: Shop All
     const shopAllColumn: MegaMenuColumn = {
       title: 'Shop All',
+      icon: Package,
       items: [
-        { label: 'Browse All Products', href: '/collections', icon: Package },
+        { label: 'Browse All Products', href: '/collections' },
         ...categories.map(cat => ({
           label: cat.name,
           href: `/collections?category=${cat.slug}`,
-          icon: cat.icon_url ? undefined : Sparkles,
-          imageUrl: cat.icon_url,
         })),
       ],
     };
@@ -96,11 +97,11 @@ const Header = () => {
     // Columns 2+: each top-level category becomes a column showing its children
     const categoryColumns: MegaMenuColumn[] = categories.map(cat => ({
       title: cat.name,
+      icon: cat.icon_url ? undefined : (cat.slug?.includes('stevia') ? Leaf : Grape),
+      imageUrl: cat.icon_url,
       items: (cat.children || []).map(child => ({
         label: child.name,
         href: `/collections?category=${child.slug}`,
-        icon: child.icon_url ? undefined : (cat.slug?.includes('stevia') ? Leaf : Grape),
-        imageUrl: child.icon_url,
       })),
     })).filter(col => col.items.length > 0);
 
@@ -195,36 +196,28 @@ const Header = () => {
                                 <div key={column.title} className="space-y-6">
                                   {/* Column Header with Icon */}
                                   <div className="flex items-center gap-3 pb-3 border-b border-gray-50">
-                                    <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center text-primary italic font-serif">
-                                       G
+                                    <div className="w-8 h-8 flex items-center justify-center text-primary/60">
+                                       {column.imageUrl ? (
+                                         <img src={column.imageUrl} alt={column.title} className="w-full h-full object-contain" />
+                                       ) : (
+                                         column.icon && <column.icon className="w-5 h-5" />
+                                       )}
                                     </div>
-                                    <h4 className="text-[13px] font-black uppercase tracking-[0.2em] text-foreground">
+                                    <h4 className="text-[12px] font-black uppercase tracking-[0.15em] text-foreground/90">
                                       {column.title}
                                     </h4>
                                   </div>
 
-                                  <div className="space-y-3">
+                                  <div className="space-y-4">
                                     {column.items.map((item) => (
                                       <Link
                                         key={item.label}
                                         to={item.href}
-                                        className="group flex items-center gap-3 transition-all duration-200"
+                                        className="block group transition-all duration-200"
                                       >
-                                        <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors overflow-hidden border border-gray-100/50 group-hover:border-primary/20 group-hover:shadow-sm">
-                                          {item.imageUrl ? (
-                                            <img src={item.imageUrl} alt={item.label} className="w-full h-full object-contain p-1" />
-                                          ) : (
-                                            item.icon && <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
-                                          )}
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-[13px] font-bold text-gray-600 group-hover:text-primary transition-colors">
-                                            {item.label}
-                                          </span>
-                                          <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 group-hover:text-primary/50 transition-colors">
-                                            Plant-Based
-                                          </span>
-                                        </div>
+                                        <span className="text-[14px] font-medium text-gray-500 group-hover:text-primary transition-colors leading-tight">
+                                          {item.label}
+                                        </span>
                                       </Link>
                                     ))}
                                   </div>
