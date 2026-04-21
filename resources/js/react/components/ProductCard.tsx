@@ -6,8 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Check } from "lucide-react";
+import { QuickViewModal } from "./QuickViewModal";
 
 interface ProductCardProps {
   product: Product;
@@ -66,6 +65,13 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         : "group bg-card rounded-squircle-xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-500 border border-border/50 hover:border-lime/30"
       }
     >
+      {/* Quick View Modal */}
+      <QuickViewModal 
+        product={product} 
+        open={isQuickShopOpen} 
+        onOpenChange={setIsQuickShopOpen} 
+      />
+
       {/* Image Area — aspect-square with hover overlay */}
       <div className={viewMode === 'list'
         ? "w-full md:w-1/3 lg:w-1/4 relative overflow-hidden aspect-square rounded-xl bg-secondary/30 flex-shrink-0"
@@ -128,49 +134,6 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
           </button>
         </div>
       </div>
-
-      {/* Quick Shop Drawer */}
-      <Sheet open={isQuickShopOpen} onOpenChange={setIsQuickShopOpen}>
-        <SheetContent side="bottom" className="rounded-t-[40px] px-8 pb-12 pt-10 border-none bg-cream">
-            <SheetHeader className="text-left mb-8">
-                <SheetTitle className="text-2xl font-black uppercase tracking-tight text-forest">Select Your Size</SheetTitle>
-                <p className="text-sm text-forest/60 font-medium">Choose a pack size for {product.name}</p>
-            </SheetHeader>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(product.variants || []).map((v) => (
-                    <button
-                        key={v.id}
-                        onClick={() => {
-                            addToCart(product, 1, v.id);
-                            setIsQuickShopOpen(false);
-                            toast.success(`Added ${v.weight} to cart!`);
-                        }}
-                        className={`flex items-center justify-between p-6 rounded-[24px] border-2 transition-all group ${
-                            selectedWeight === v.weight 
-                            ? "border-lime bg-lime/5" 
-                            : "border-forest/10 bg-white hover:border-lime/30"
-                        }`}
-                    >
-                        <div className="text-left">
-                            <p className="text-lg font-black text-forest">{v.weight}</p>
-                            <p className="text-sm font-bold text-lime">₹{v.discount_price || v.price}</p>
-                        </div>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                            selectedWeight === v.weight ? "bg-lime text-forest" : "bg-forest/5 text-forest/20 group-hover:bg-lime/10"
-                        }`}>
-                            <Check className="w-5 h-5" />
-                        </div>
-                    </button>
-                ))}
-            </div>
-            
-            <div className="mt-10 flex items-center justify-between p-4 bg-forest/5 rounded-2xl">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-forest/40">Pure Plant-Based Sweetness</p>
-                <Link to={`/products/${product.slug || product.id}`} className="text-xs font-bold text-forest hover:text-lime transition-colors">See Full Details</Link>
-            </div>
-        </SheetContent>
-      </Sheet>
 
       {/* Content Area */}
       <div className={viewMode === 'list'
