@@ -79,7 +79,7 @@ const Header = () => {
   };
 
   const buildShopMegaMenu = (): MegaMenuColumn[] => {
-    // Column 1: Shop All + top-level category links
+    // Column 1: Shop All + top-level category links (always visible)
     const shopAllColumn: MegaMenuColumn = {
       title: 'Browse',
       items: [
@@ -90,10 +90,14 @@ const Header = () => {
           icon: cat.icon_url ? undefined : Leaf,
           imageUrl: cat.icon_url,
         })),
+        // Static fallback items when categories haven't loaded yet
+        ...(categories.length === 0 ? [
+          { label: 'Natural Sweeteners', href: '/collections?category=natural-sweeteners', icon: Leaf },
+        ] : []),
       ],
     };
 
-    // Columns 2+: each top-level category becomes a column showing its children
+    // Columns 2+: each top-level category becomes a column showing its sub-categories
     const categoryColumns: MegaMenuColumn[] = categories.map(cat => ({
       title: cat.name,
       items: (cat.children || []).map(child => ({
