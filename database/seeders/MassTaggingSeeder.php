@@ -42,6 +42,7 @@ class MassTaggingSeeder extends Seeder
                 $ratioTag = 'Ratio_' . str_replace(':', '-', $product->ratio);
                 if (!in_array($ratioTag, $tags)) {
                     $tags[] = $ratioTag;
+                }
             }
             
             // 4. Region

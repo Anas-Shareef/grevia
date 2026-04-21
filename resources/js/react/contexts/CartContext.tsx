@@ -158,14 +158,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (existingItem) {
       newItems = items.map(item =>
         (item.product.id === product.id && item.variantId == variantId)
-          ? { ...item, quantity: item.quantity + quantity }
+          ? { ...item, quantity: Number(item.quantity) + Number(quantity) }
           : item
       );
       toast.success(`Updated quantity in cart`);
     } else {
       newItems = [...items, {
         product,
-        quantity,
+        quantity: Number(quantity),
         variantId,
         weight: variant?.weight,
         packSize: variant?.pack_size
@@ -194,7 +194,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newItems = items.map(item => {
       if (item.product.id !== productId) return item;
       if (variantId !== undefined && item.variantId != variantId) return item;
-      return { ...item, quantity };
+      return { ...item, quantity: Number(quantity) };
     });
     await updateCart(newItems);
   }, [items, updateCart, removeFromCart]);
