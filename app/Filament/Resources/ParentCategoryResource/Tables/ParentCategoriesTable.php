@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ParentCategoryResource\Tables;
 
 use App\Models\Category;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -67,11 +67,11 @@ class ParentCategoriesTable
                 //
             ])
             ->actions([
-                EditAction::make()
+                \Filament\Actions\EditAction::make()
                     ->button()
                     ->color('primary')
                     ->icon('heroicon-m-pencil-square'),
-                DeleteAction::make()
+                \Filament\Actions\DeleteAction::make()
                     ->before(function ($record, $action) {
                         if ($record->children()->count() > 0) {
                             \Filament\Notifications\Notification::make()
