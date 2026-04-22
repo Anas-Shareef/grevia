@@ -17,13 +17,13 @@ class ParentCategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-plus';
+    protected static string|\UnitEnum|null $navigationIcon = 'heroicon-o-squares-plus';
 
     protected static ?string $navigationLabel = 'Parent Categories';
 
     protected static ?string $pluralModelLabel = 'Parent Categories';
 
-    protected static ?string $navigationGroup = 'Catalog';
+    protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
 
     protected static ?int $navigationSort = 1;
 
