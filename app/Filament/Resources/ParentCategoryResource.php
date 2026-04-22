@@ -17,7 +17,7 @@ class ParentCategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-plus';
+    protected static string|\BackedEnum|null $navigationIcon = null; // Group [Catalog] already has an icon
 
     protected static ?string $navigationLabel = 'Parent Categories';
 
