@@ -247,7 +247,14 @@ const Header = () => {
                                           onClick={() => setOpenDropdown(null)}
                                           className="block group"
                                         >
-                                          <span className="text-[13px] font-[500] text-[#4A4A4A] group-hover:text-[#2E4D31] group-hover:pl-1 transition-all duration-200 leading-snug inline-block">
+                                          <span className={[
+                                            'text-[13px] font-[500] text-[#4A4A4A]',
+                                            'transition-all duration-250 ease-[cubic-bezier(0.4,0,0.2,1)]',
+                                            'group-hover:text-[#77cb4d] group-hover:pl-[6px]',
+                                            'leading-snug inline-block'
+                                          ].join(' ')}
+                                          style={{ textShadow: 'inherit' }} // To allow text-shadow transition if needed
+                                          >
                                             {item.label}
                                           </span>
                                         </Link>
