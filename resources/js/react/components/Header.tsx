@@ -180,46 +180,47 @@ const Header = () => {
                           initial={{ opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 8 }}
-                          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                           onMouseEnter={() => {
                             if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
                           }}
                           onMouseLeave={handleMouseLeave}
                           className={[
-                            'fixed z-[999] bg-white/95 backdrop-blur-xl',
-                            'shadow-[0_20px_60px_rgba(0,0,0,0.10)]',
+                            'fixed z-[9999] bg-white/98 backdrop-blur-[15px]',
+                            'shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]',
                             'border border-gray-100/60 rounded-[32px] overflow-visible',
                             link.megaMenu
-                              ? 'top-[72px] w-[90vw] max-w-[1280px] p-12'
+                              ? 'top-[72px] w-[95vw] max-w-[1400px] p-16'
                               : 'top-[68px] min-w-[240px] p-2',
-                            // TRUE viewport centering: left 50% + translateX(-50%)
+                            // GLOBAL CENTERING: left 50% + translateX(-50%)
                             'left-1/2 -translate-x-1/2',
                           ].join(' ')}
                           style={{
-                            // Ensure the transform stacks correctly with framer motion's y
                             transformOrigin: 'top center',
                           }}
                         >
-                          {/* Tooltip Arrow — positioned relative to trigger button center */}
+                          {/* Tooltip Arrow — Dynamic alignment with navbar text */}
                           <div
-                            className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70 shadow-[-2px_-2px_4px_rgba(0,0,0,0.03)]"
+                            className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70"
                             style={{
-                              // Offset arrow from panel left-edge to sit under trigger button
                               left: triggerRect
-                                ? `calc(${triggerRect.left}px - (90vw / 2) + 50vw - 7px)`
+                                ? `calc(${triggerRect.left}px - (100vw - 95vw) / 2 - (50vw - 47.5vw) - 7px)`
                                 : '50%',
-                              transform: triggerRect ? 'none' : 'translateX(-50%) rotate(45deg)',
+                              // On very wide screens, 95vw is capped at 1400px, so we need a more robust arrow calc
+                              left: triggerRect
+                                ? `calc(50% + (${triggerRect.left}px - 50vw))`
+                                : '50%',
+                              transform: 'translateX(-50%) rotate(45deg)',
                             }}
                           />
 
                           {link.megaMenu ? (
-                            // Grid: 2col tablet → 3col → 5col large desktop
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-10 gap-y-10 justify-items-start">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-12 gap-y-12 justify-items-start">
                               {link.megaMenu.map((column) => (
-                                <div key={column.title} className="w-full space-y-5">
+                                <div key={column.title} className="w-full space-y-6">
 
-                                  {/* Column Header — clickable, Outfit Bold 11px */}
-                                  <div className="flex items-center gap-2.5 pb-3 border-b border-[#2E4D31]/10">
+                                  {/* Column Header — Outfit Bold 12px */}
+                                  <div className="flex items-center gap-2.5 pb-4 border-b border-[#2E4D31]/10">
                                     <div className="w-[23px] h-[23px] flex-shrink-0 flex items-center justify-center text-[#2E4D31]/70">
                                       {column.imageUrl ? (
                                         <img
@@ -233,15 +234,15 @@ const Header = () => {
                                     </div>
                                     <Link
                                       to={`/collections?category=${column.slug}`}
-                                      className="font-['Outfit'] text-[11px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
+                                      className="font-['Outfit'] text-[12px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
                                       onClick={() => setOpenDropdown(null)}
                                     >
                                       {column.title}
                                     </Link>
                                   </div>
 
-                                  {/* Sub-links — Work Sans 13px with 2px left shift on hover */}
-                                  <div className="space-y-2.5">
+                                  {/* Sub-links — Work Sans 14px */}
+                                  <div className="space-y-3">
                                     {column.items.map((item) => (
                                       <Link
                                         key={item.label}
@@ -249,7 +250,7 @@ const Header = () => {
                                         onClick={() => setOpenDropdown(null)}
                                         className="block group"
                                       >
-                                        <span className="font-['Work_Sans'] text-[13px] font-medium text-gray-400 group-hover:text-[#2E4D31] group-hover:pl-0.5 transition-all duration-200 leading-snug inline-block">
+                                        <span className="font-['Work_Sans'] text-[14px] font-medium text-gray-400 group-hover:text-[#2E4D31] group-hover:pl-1 transition-all duration-200 leading-snug inline-block">
                                           {item.label}
                                         </span>
                                       </Link>
