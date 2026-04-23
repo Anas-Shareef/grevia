@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Menu, X, ChevronDown, Heart, User, Leaf, Grape, Gift, Library, Package, Sparkles } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,10 +40,13 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  // Track the trigger button rect so the tooltip arrow aligns to it
+  const [triggerRect, setTriggerRect] = useState<{ left: number; width: number } | null>(null);
   const { setIsCartOpen, getCartCount } = useCart();
   const { user } = useAuth();
   const location = useLocation();
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -69,17 +72,22 @@ const Header = () => {
     setMobileExpanded(null);
   }, [location]);
 
-  const handleMouseEnter = (label: string) => {
+  const handleMouseEnter = useCallback((label: string, e?: React.MouseEvent) => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+    // Capture trigger button rect so the arrow can point precisely to it
+    if (e?.currentTarget) {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setTriggerRect({ left: rect.left + rect.width / 2, width: rect.width });
+    }
     dropdownTimeout.current = setTimeout(() => {
       setOpenDropdown(label);
-    }, 200);
-  };
+    }, 150);
+  }, []);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-    dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 300);
-  };
+    dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 250);
+  }, []);
 
   const buildShopMegaMenu = (): MegaMenuColumn[] => {
     // Each top-level category becomes a column — NO "Shop All" column (moved to navbar)
@@ -133,15 +141,18 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav
+            ref={navRef}
             className="hidden lg:flex items-center gap-8"
             aria-label="Main navigation"
           >
             {navLinks.map((link) => (
+              // NOTE: no 'relative' here for mega-menu items — fixed positioning
+              // must be relative to the viewport, not the nav item
               <div
                 key={link.label}
-                className="relative"
-                onMouseEnter={() =>
-                  (link.dropdown || link.megaMenu) && handleMouseEnter(link.label)
+                className={link.megaMenu ? 'static' : 'relative'}
+                onMouseEnter={(e) =>
+                  (link.dropdown || link.megaMenu) && handleMouseEnter(link.label, e)
                 }
                 onMouseLeave={() => (link.dropdown || link.megaMenu) && handleMouseLeave()}
               >
@@ -166,27 +177,49 @@ const Header = () => {
                     <AnimatePresence>
                       {openDropdown === link.label && (
                         <motion.div
-                          initial={{ opacity: 0, y: 15, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                          transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-                          className={`fixed top-[72px] left-1/2 -translate-x-1/2 mt-1 z-50 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100/50 backdrop-blur-xl rounded-[32px] overflow-visible border-border/40 ${
-                            link.megaMenu 
-                              ? "w-[95vw] max-w-7xl p-10" 
-                              : "min-w-[240px] p-2"
-                          }`}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                          onMouseEnter={() => {
+                            if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+                          }}
+                          onMouseLeave={handleMouseLeave}
+                          className={[
+                            'fixed z-[999] bg-white/95 backdrop-blur-xl',
+                            'shadow-[0_20px_60px_rgba(0,0,0,0.10)]',
+                            'border border-gray-100/60 rounded-[32px] overflow-visible',
+                            link.megaMenu
+                              ? 'top-[72px] w-[90vw] max-w-[1280px] p-12'
+                              : 'top-[68px] min-w-[240px] p-2',
+                            // TRUE viewport centering: left 50% + translateX(-50%)
+                            'left-1/2 -translate-x-1/2',
+                          ].join(' ')}
+                          style={{
+                            // Ensure the transform stacks correctly with framer motion's y
+                            transformOrigin: 'top center',
+                          }}
                         >
-                          {/* Pointer Arrow */}
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-l border-t border-gray-100/50" />
+                          {/* Tooltip Arrow — positioned relative to trigger button center */}
+                          <div
+                            className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70 shadow-[-2px_-2px_4px_rgba(0,0,0,0.03)]"
+                            style={{
+                              // Offset arrow from panel left-edge to sit under trigger button
+                              left: triggerRect
+                                ? `calc(${triggerRect.left}px - (90vw / 2) + 50vw - 7px)`
+                                : '50%',
+                              transform: triggerRect ? 'none' : 'translateX(-50%) rotate(45deg)',
+                            }}
+                          />
 
                           {link.megaMenu ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-10 gap-y-10">
+                            // Grid: 2col tablet → 3col → 5col large desktop
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-10 gap-y-10 justify-items-start">
                               {link.megaMenu.map((column) => (
-                                <div key={column.title} className="space-y-5">
+                                <div key={column.title} className="w-full space-y-5">
 
-                                  {/* Column Header — clickable link to filtered collection */}
+                                  {/* Column Header — clickable, Outfit Bold 11px */}
                                   <div className="flex items-center gap-2.5 pb-3 border-b border-[#2E4D31]/10">
-                                    {/* Category Icon: 23px per PRD */}
                                     <div className="w-[23px] h-[23px] flex-shrink-0 flex items-center justify-center text-[#2E4D31]/70">
                                       {column.imageUrl ? (
                                         <img
@@ -198,26 +231,25 @@ const Header = () => {
                                         column.icon && <column.icon className="w-[18px] h-[18px]" />
                                       )}
                                     </div>
-                                    {/* Clickable parent category header */}
                                     <Link
                                       to={`/collections?category=${column.slug}`}
-                                      className="text-[11px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:text-[#2E4D31]/70 transition-colors leading-tight"
+                                      className="font-['Outfit'] text-[11px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
                                       onClick={() => setOpenDropdown(null)}
                                     >
                                       {column.title}
                                     </Link>
                                   </div>
 
-                                  {/* Sub-category links — text only, no icons */}
-                                  <div className="space-y-3">
+                                  {/* Sub-links — Work Sans 13px with 2px left shift on hover */}
+                                  <div className="space-y-2.5">
                                     {column.items.map((item) => (
                                       <Link
                                         key={item.label}
                                         to={item.href}
                                         onClick={() => setOpenDropdown(null)}
-                                        className="block group transition-all duration-200"
+                                        className="block group"
                                       >
-                                        <span className="text-[13px] font-medium text-gray-400 group-hover:text-[#2E4D31] transition-colors leading-snug">
+                                        <span className="font-['Work_Sans'] text-[13px] font-medium text-gray-400 group-hover:text-[#2E4D31] group-hover:pl-0.5 transition-all duration-200 leading-snug inline-block">
                                           {item.label}
                                         </span>
                                       </Link>
@@ -232,7 +264,7 @@ const Header = () => {
                                 <Link
                                   key={item.label}
                                   to={item.href}
-                                  className="block px-6 py-3 text-[14px] font-bold text-gray-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                                  className="block px-6 py-3 text-[14px] font-bold text-gray-500 hover:text-[#2E4D31] hover:bg-[#2E4D31]/5 rounded-xl transition-all"
                                 >
                                   {item.label}
                                 </Link>
