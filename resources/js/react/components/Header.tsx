@@ -223,6 +223,12 @@ const Header = () => {
                                           <img
                                             src={column.imageUrl}
                                             alt={column.title}
+                                            onError={(e) => {
+                                              // Fallback to a default icon or hide the image
+                                              e.currentTarget.style.display = 'none';
+                                              // We can't easily switch to the Lucide icon here since it's a child of a different branch
+                                              // but hiding the broken img is better than a 404 icon box.
+                                            }}
                                             className="w-full h-full object-contain"
                                           />
                                         ) : (

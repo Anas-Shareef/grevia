@@ -33,6 +33,10 @@ const CollectionCard = ({ category, index }: { category: Category, index: number
       <img
         src={category.card_image_full_url || 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop'}
         alt={category.name}
+        onError={(e) => {
+          e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+          e.currentTarget.onerror = null;
+        }}
         className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale(1.04)"
         loading="lazy"
       />

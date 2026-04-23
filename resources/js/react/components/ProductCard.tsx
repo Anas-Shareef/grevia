@@ -117,8 +117,12 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
           className="block w-full h-full relative z-10"
         >
           <img
-            src={product.image}
+            src={product.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop'}
             alt={product.name}
+            onError={(e) => {
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+              e.currentTarget.onerror = null;
+            }}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
         </Link>
