@@ -43,8 +43,8 @@ class CategoryForm
                             ->label('Active')
                             ->default(true),
                         Toggle::make('show_in_filter')
-                            ->label('Show in Filter')
-                            ->helperText('Enable this to show the category in the shop dropdown filters.')
+                            ->label('Show in Navigation Menu')
+                            ->helperText('Enable this to show the category in the "Shop by Category" dropdown mega-menu.')
                             ->default(true),
                         TextInput::make('order')
                             ->required()

@@ -188,59 +188,90 @@ class ProductForm
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
                             ->collapsible(),
                     ]),
-                Section::make('Sweetener Specific Attributes')
-                    ->description('Data specific to sweetener products like ratio, form, and use cases.')
+                Section::make('🔍 Search & Filter Attributes')
+                    ->description('These fields directly power the sidebar filters on the Collections page. Fill these accurately to ensure products appear when customers use filters.')
+                    ->icon('heroicon-o-funnel')
+                    ->collapsible()
+                    ->columns(3)
                     ->components([
-                        TextInput::make('type')
-                            ->label('Type')
-                            ->placeholder('e.g. stevia, monk-fruit'),
-                        TextInput::make('form')
-                            ->label('Form')
-                            ->placeholder('e.g. powder, drops'),
-                        TextInput::make('ratio')
-                            ->label('Ratio')
-                            ->placeholder('e.g. 1:10, 1:50'),
+                        Select::make('form')
+                            ->label('Product Format')
+                            ->helperText('The physical state of the product — drives the "Format" filter.')
+                            ->options([
+                                'powder'  => 'Powder',
+                                'drops'   => 'Drops',
+                                'tablets' => 'Tablets',
+                                'jar'     => 'Jar',
+                                'liquid'  => 'Liquid',
+                            ])
+                            ->placeholder('Select format...')
+                            ->searchable()
+                            ->native(false),
+
+                        Select::make('ratio')
+                            ->label('Sweetener Concentration')
+                            ->helperText('Potency ratio — drives the "Concentration" filter.')
+                            ->options([
+                                '1:10'  => '1:10 (High Potency)',
+                                '1:50'  => '1:50 (Medium)',
+                                '1:100' => '1:100 (Mild)',
+                                '1:200' => '1:200 (Extra Mild)',
+                            ])
+                            ->placeholder('Select concentration...')
+                            ->native(false),
+
                         TextInput::make('size_label')
-                            ->label('Size Label')
-                            ->placeholder('e.g. 50g, 100g'),
+                            ->label('Pack Size Label')
+                            ->helperText('Auto-filled from variants. E.g. "50g, 100g". Edit if not syncing.')
+                            ->placeholder('e.g. 50g'),
+
+                        TextInput::make('type')
+                            ->label('Sweetener Type')
+                            ->placeholder('e.g. stevia, monk-fruit')
+                            ->helperText('Internal type identifier.'),
+
                         TextInput::make('sweetness_description')
                             ->label('Sweetness Description')
                             ->placeholder('e.g. 1g replaces 10g of sugar')
-                            ->columnSpanFull(),
+                            ->columnSpan(2),
+
                         TextInput::make('use_case')
-                            ->label('Ideal Use Case')
-                            ->placeholder('e.g. tea, coffee, smoothies')
-                            ->columnSpanFull(),
+                            ->label('Ideal Use Cases')
+                            ->placeholder('e.g. tea, coffee, smoothies, baking')
+                            ->columnSpan(3),
+
                         RichEditor::make('usage_instructions')
-                            ->label('Usage Instructions (How to Use)')
+                            ->label('Usage Instructions')
                             ->placeholder('Step by step guide on how to use this product...')
                             ->visible(fn () => \Illuminate\Support\Facades\Schema::hasColumn('products', 'usage_instructions'))
                             ->columnSpanFull(),
+
                         RichEditor::make('nutrition_facts')
                             ->label('Nutrition Facts')
                             ->placeholder('Nutrition details, vitamins, etc...')
                             ->visible(fn () => \Illuminate\Support\Facades\Schema::hasColumn('products', 'nutrition_facts'))
                             ->columnSpanFull(),
+
                         TextInput::make('related_products')
-                            ->label('Related Products (You may also like)')
-                            ->placeholder('Comma-separated slugs, e.g. stevia-powder-1-10-100g,stevia-drops-1-10-50g')
-                            ->helperText('Exact slugs of the products to show in the "You may also like" row.')
+                            ->label('Related Products')
+                            ->placeholder('Comma-separated slugs: stevia-powder-100g, stevia-drops-50ml')
+                            ->helperText('Shown in the "You may also like" row on the product page.')
                             ->columnSpanFull(),
+
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('rating')
                                     ->numeric()
                                     ->step(0.1)
                                     ->readOnly()
-                                    ->helperText('Managed by customer reviews'),
+                                    ->helperText('Auto-managed by customer reviews.'),
                                 TextInput::make('reviews')
                                     ->label('Reviews Count')
                                     ->numeric()
                                     ->readOnly()
-                                    ->helperText('Managed by customer reviews'),
+                                    ->helperText('Auto-managed by customer reviews.'),
                             ]),
-                    ])
-                    ->columns(2),
+                    ]),
                 Section::make('Live Preview & Tools')
                     ->collapsed()
                     ->components([

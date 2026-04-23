@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { X, ChevronDown, ChevronRight, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List, Droplets, Wind, Grape, Sparkles, Package, Shield } from "lucide-react";
+import { X, ChevronDown, ChevronRight, ChevronLeft, SlidersHorizontal, ShoppingBag, Leaf, Globe, LayoutGrid, List, Droplets, Wind, Grape, Sparkles, Package, Shield } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Product } from "@/data/products";
@@ -24,6 +24,10 @@ const CollectionsPage = () => {
   const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
   const [isSticky, setIsSticky] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  const scrollSliderLeft = () => sliderRef.current?.scrollBy({ left: -220, behavior: 'smooth' });
+  const scrollSliderRight = () => sliderRef.current?.scrollBy({ left: 220, behavior: 'smooth' });
 
   const { data: response, isLoading } = useProducts({
     ...filters,
@@ -32,56 +36,50 @@ const CollectionsPage = () => {
 
   const FILTER_GROUPS = useMemo(() => [
     {
-      // Category / Origin: shows top-level + children from API
+      // Category: Top-level parent categories ONLY (no sub-cats in sidebar)
       key: 'category' as const,
-      label: 'Sweetener Type',
-      options: (response?.filters?.categories || []).flatMap((cat: any) => [
-        { label: cat.name, value: cat.slug, count: cat.products_count ?? 0 },
-        ...(cat.children || []).map((child: any) => ({
-          label: '↳ ' + child.name,
-          value: child.slug,
-          count: child.products_count ?? 0,
-        }))
-      ]),
+      label: 'Category',
+      options: (response?.filters?.categories || []).map((cat: any) => ({
+        label: cat.name,
+        value: cat.slug,
+        count: cat.products_count ?? 0,
+        disabled: (cat.products_count ?? 0) === 0,
+      })),
     },
     {
-      // Form factor (Powder / Drops)
+      // Format: physical form of the product
       key: 'form' as const,
       label: 'Format',
       options: (response?.filters?.forms || []).map((f: any) => ({
         label: f.display || (f.label.charAt(0).toUpperCase() + f.label.slice(1)),
         value: f.label,
         count: f.count,
+        disabled: (f.count ?? 0) === 0,
       })),
     },
     {
-      // Concentration ratio
+      // Concentration: sweetener potency ratio
       key: 'ratio' as const,
       label: 'Concentration',
-      options: (response?.filters?.ratios || [])
-        .filter((r: any) => r.count > 0)
-        .map((r: any) => ({
-          label: r.display || r.label,
-          value: r.label,
-          count: r.count,
-        })),
+      options: (response?.filters?.ratios || []).map((r: any) => ({
+        label: r.display || r.label,
+        value: r.label,
+        count: r.count,
+        disabled: (r.count ?? 0) === 0,
+      })),
     },
     {
-      // Pack size (from size_label column and variant options)
+      // Pack Size: weight / volume of the physical package
       key: 'size' as const,
       label: 'Pack Size',
-      options: (response?.filters?.sizes || [])
-        .filter((s: any) => s.count > 0)
-        .map((s: any) => ({ label: s.label, value: s.label, count: s.count })),
+      options: (response?.filters?.sizes || []).map((s: any) => ({
+        label: s.label,
+        value: s.label,
+        count: s.count,
+        disabled: (s.count ?? 0) === 0,
+      })),
     },
-    {
-      // Certifications (cert-* normalized tags)
-      key: 'certification' as const,
-      label: 'Certifications',
-      options: (response?.filters?.certifications || [])
-        .filter((c: any) => c.count > 0)
-        .map((c: any) => ({ label: c.display, value: c.label, count: c.count })),
-    },
+    // Certifications intentionally removed per PRD
   ], [response]);
 
   // Sync scroll for sticky bar & Parallax
@@ -215,51 +213,78 @@ const CollectionsPage = () => {
               {currentCategory?.description || "Experience uncompromising taste without the calories. Meticulously extracted, plant-based sweetness for your daily ritual."}
             </p>
 
-            {/* Catalog Discovery Tabs — Dynamic from API */}
-            <div className="flex overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:gap-8 justify-start md:justify-center">
-              {/* Shop All */}
+            {/* ── Category Discovery Slider — Grevia Cream Card Design ── */}
+            <div className="relative mt-2">
+              {/* Left Arrow */}
               <button
-                onClick={() => resetFilters()}
-                className="flex-shrink-0 flex flex-col items-center gap-3 transition-all hover:-translate-y-1 group"
+                onClick={scrollSliderLeft}
+                aria-label="Scroll categories left"
+                className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-[#2E4D31] text-white flex items-center justify-center shadow-md hover:bg-[#1e3422] active:scale-95 transition-all duration-200 md:-left-5"
               >
-                <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 border border-white/50 ${
-                  !filters.category ? 'bg-primary text-white' : 'bg-primary/5 text-primary'
-                }`}>
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <span className={`text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap ${
-                  !filters.category ? 'text-primary' : 'text-foreground/50 group-hover:text-primary'
-                }`}>
-                  All Products
-                </span>
+                <ChevronLeft className="w-4 h-4" />
               </button>
 
-              {/* Dynamic category tabs from API */}
-              {(response?.filters?.categories || []).flatMap((cat: any) => [
-                cat,
-                ...(cat.children || []),
-              ]).map((item: any) => (
+              {/* Slider Track */}
+              <div
+                ref={sliderRef}
+                className="flex gap-3 overflow-x-auto scroll-smooth no-scrollbar py-2 px-1"
+              >
+                {/* Shop All card */}
                 <button
-                  key={item.slug}
-                  onClick={() => setFilter('category', item.slug)}
-                  className="flex-shrink-0 flex flex-col items-center gap-3 transition-all hover:-translate-y-1 group"
+                  onClick={() => resetFilters()}
+                  className={`flex-shrink-0 flex flex-col items-center gap-[10px] px-4 pt-4 pb-3 rounded-[12px] min-w-[78px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                    !filters.category
+                      ? 'bg-[#2E4D31] shadow-md'
+                      : 'bg-[#F9F9EB] hover:bg-[#f0f0df]'
+                  }`}
                 >
-                  <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 border border-white/50 overflow-hidden ${
-                    filters.category === item.slug ? 'bg-primary text-white border-primary' : 'bg-secondary/30 text-foreground/60'
+                  <Sparkles className={`w-7 h-7 ${!filters.category ? 'text-white' : 'text-[#2E4D31]'}`} />
+                  <span className={`text-[10px] font-black uppercase tracking-widest font-outfit text-center leading-tight ${
+                    !filters.category ? 'text-white' : 'text-[#2E4D31]'
                   }`}>
-                    {item.icon_url ? (
-                      <img src={item.icon_url} alt={item.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <Leaf className="w-6 h-6" />
-                    )}
-                  </div>
-                  <span className={`text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap max-w-[80px] text-center ${
-                    filters.category === item.slug ? 'text-primary' : 'text-foreground/50 group-hover:text-primary'
-                  }`}>
-                    {item.name}
+                    All
                   </span>
                 </button>
-              ))}
+
+                {/* Parent category cards — NO sub-categories here */}
+                {(response?.filters?.categories || []).map((cat: any) => (
+                  <button
+                    key={cat.slug}
+                    onClick={() => setFilter('category', cat.slug)}
+                    className={`flex-shrink-0 flex flex-col items-center gap-[10px] px-4 pt-4 pb-3 rounded-[12px] min-w-[78px] max-w-[96px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                      filters.category === cat.slug
+                        ? 'bg-[#2E4D31] shadow-md'
+                        : 'bg-[#F9F9EB] hover:bg-[#f0f0df]'
+                    }`}
+                  >
+                    {cat.icon_url ? (
+                      <img
+                        src={cat.icon_url}
+                        alt={cat.name}
+                        className={`w-7 h-7 object-contain ${
+                          filters.category === cat.slug ? 'brightness-0 invert' : ''
+                        }`}
+                      />
+                    ) : (
+                      <Leaf className={`w-7 h-7 ${filters.category === cat.slug ? 'text-white' : 'text-[#2E4D31]'}`} />
+                    )}
+                    <span className={`text-[10px] font-black uppercase tracking-widest font-outfit text-center leading-tight ${
+                      filters.category === cat.slug ? 'text-white' : 'text-[#2E4D31]'
+                    }`}>
+                      {cat.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Right Arrow */}
+              <button
+                onClick={scrollSliderRight}
+                aria-label="Scroll categories right"
+                className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-[#2E4D31] text-white flex items-center justify-center shadow-md hover:bg-[#1e3422] active:scale-95 transition-all duration-200 md:-right-5"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -324,21 +349,38 @@ const CollectionsPage = () => {
                 {FILTER_GROUPS.map(group => (
                   <div key={group.key}>
                     <h4 className="sidebar-header">{group.label}</h4>
-                    <div className="space-y-4">
-                      {group.options.map(opt => {
+                    <div className="space-y-3">
+                      {group.options.map((opt: any) => {
                         const isChecked = (filters as any)[group.key] === opt.value;
+                        const isDisabled = opt.disabled;
                         return (
                           <button
                             key={opt.value}
-                            onClick={() => toggleFilter(group.key, opt.value)}
-                            className="flex items-center gap-5 w-full group text-left py-2"
+                            onClick={() => !isDisabled && toggleFilter(group.key, opt.value)}
+                            disabled={isDisabled}
+                            className={`flex items-center gap-4 w-full group text-left py-1.5 transition-opacity ${
+                              isDisabled ? 'opacity-35 cursor-not-allowed' : ''
+                            }`}
                           >
-                            <div className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-primary border-primary shadow-glow' : 'border-border'}`}>
+                            <div className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                              isChecked
+                                ? 'bg-[#2E4D31] border-[#2E4D31]'
+                                : isDisabled
+                                  ? 'border-border/40'
+                                  : 'border-border'
+                            }`}>
                               {isChecked && <X className="w-3.5 h-3.5 text-white" />}
                             </div>
-                            <span className={`text-sm font-black uppercase tracking-widest transition-colors ${isChecked ? 'text-primary' : 'text-muted-foreground'}`}>
+                            <span className={`text-sm font-black uppercase tracking-widest transition-colors flex-1 ${
+                              isChecked ? 'text-[#2E4D31]' : isDisabled ? 'text-muted-foreground/40' : 'text-muted-foreground'
+                            }`}>
                               {opt.label}
                             </span>
+                            {opt.count !== undefined && (
+                              <span className={`text-[10px] font-bold tabular-nums ${
+                                isChecked ? 'text-[#2E4D31]/60' : 'text-muted-foreground/40'
+                              }`}>{opt.count}</span>
+                            )}
                           </button>
                         );
                       })}
@@ -372,21 +414,38 @@ const CollectionsPage = () => {
                 {FILTER_GROUPS.map(group => (
                   <div key={group.key} className="mb-10">
                     <h4 className="sidebar-header">{group.label}</h4>
-                    <div className="space-y-4">
-                      {group.options.map(opt => {
+                    <div className="space-y-3">
+                      {group.options.map((opt: any) => {
                         const isChecked = (filters as any)[group.key] === opt.value;
+                        const isDisabled = opt.disabled;
                         return (
                           <button
                             key={opt.value}
-                            onClick={() => toggleFilter(group.key, opt.value)}
-                            className="flex items-center gap-4 w-full group text-left"
+                            onClick={() => !isDisabled && toggleFilter(group.key, opt.value)}
+                            disabled={isDisabled}
+                            className={`flex items-center gap-4 w-full group text-left transition-opacity ${
+                              isDisabled ? 'opacity-35 cursor-not-allowed' : ''
+                            }`}
                           >
-                            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-primary border-primary shadow-glow' : 'border-border group-hover:border-primary'}`}>
+                            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                              isChecked
+                                ? 'bg-[#2E4D31] border-[#2E4D31] shadow-sm'
+                                : isDisabled
+                                  ? 'border-border/40'
+                                  : 'border-border group-hover:border-[#2E4D31]'
+                            }`}>
                               {isChecked && <X className="w-3 h-3 text-white" />}
                             </div>
-                            <span className={`text-xs font-black uppercase tracking-widest transition-colors ${isChecked ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
+                            <span className={`text-xs font-black uppercase tracking-widest transition-colors flex-1 ${
+                              isChecked ? 'text-[#2E4D31]' : isDisabled ? 'text-muted-foreground/40' : 'text-muted-foreground group-hover:text-[#2E4D31]'
+                            }`}>
                               {opt.label}
                             </span>
+                            {opt.count !== undefined && (
+                              <span className={`text-[10px] font-bold tabular-nums ${
+                                isChecked ? 'text-[#2E4D31]/60' : 'text-muted-foreground/50'
+                              }`}>{opt.count}</span>
+                            )}
                           </button>
                         );
                       })}
