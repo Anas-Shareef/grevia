@@ -13,6 +13,7 @@ type DropdownItem = {
 
 type MegaMenuColumn = {
   title: string;
+  slug: string;
   icon?: any;
   imageUrl?: string;
   items: { label: string; href: string }[];
@@ -81,22 +82,10 @@ const Header = () => {
   };
 
   const buildShopMegaMenu = (): MegaMenuColumn[] => {
-    // Column 1: Shop All
-    const shopAllColumn: MegaMenuColumn = {
-      title: 'Shop All',
-      icon: Package,
-      items: [
-        { label: 'Browse All Products', href: '/collections' },
-        ...categories.map(cat => ({
-          label: cat.name,
-          href: `/collections?category=${cat.slug}`,
-        })),
-      ],
-    };
-
-    // Columns 2+: each top-level category becomes a column showing its children
-    const categoryColumns: MegaMenuColumn[] = categories.map(cat => ({
+    // Each top-level category becomes a column — NO "Shop All" column (moved to navbar)
+    return categories.map(cat => ({
       title: cat.name,
+      slug: cat.slug,
       icon: cat.icon_url ? undefined : (cat.slug?.includes('stevia') ? Leaf : Grape),
       imageUrl: cat.icon_url,
       items: (cat.children || []).map(child => ({
@@ -104,8 +93,6 @@ const Header = () => {
         href: `/collections?category=${child.slug}`,
       })),
     })).filter(col => col.items.length > 0);
-
-    return [shopAllColumn, ...categoryColumns];
   };
 
   const shopItem = {
@@ -116,6 +103,8 @@ const Header = () => {
 
   const navLinks: NavLink[] = [
     { label: 'Home', href: '/' },
+    // 'Shop All' is now a standalone link — NOT inside the mega-menu dropdown
+    { label: 'Shop All', href: '/collections' },
     shopItem,
     { label: 'Benefits', href: '/benefits' },
     { label: 'Contact', href: '/contact' },
@@ -191,31 +180,44 @@ const Header = () => {
                           <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-l border-t border-gray-100/50" />
 
                           {link.megaMenu ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-12 gap-y-16">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-10 gap-y-10">
                               {link.megaMenu.map((column) => (
-                                <div key={column.title} className="space-y-6">
-                                  {/* Column Header with Icon */}
-                                  <div className="flex items-center gap-3 pb-3 border-b border-gray-50">
-                                    <div className="w-8 h-8 flex items-center justify-center text-primary/60">
-                                       {column.imageUrl ? (
-                                         <img src={column.imageUrl} alt={column.title} className="w-full h-full object-contain" />
-                                       ) : (
-                                         column.icon && <column.icon className="w-5 h-5" />
-                                       )}
+                                <div key={column.title} className="space-y-5">
+
+                                  {/* Column Header — clickable link to filtered collection */}
+                                  <div className="flex items-center gap-2.5 pb-3 border-b border-[#2E4D31]/10">
+                                    {/* Category Icon: 23px per PRD */}
+                                    <div className="w-[23px] h-[23px] flex-shrink-0 flex items-center justify-center text-[#2E4D31]/70">
+                                      {column.imageUrl ? (
+                                        <img
+                                          src={column.imageUrl}
+                                          alt={column.title}
+                                          className="w-full h-full object-contain"
+                                        />
+                                      ) : (
+                                        column.icon && <column.icon className="w-[18px] h-[18px]" />
+                                      )}
                                     </div>
-                                    <h4 className="text-[12px] font-black uppercase tracking-[0.15em] text-foreground/90">
+                                    {/* Clickable parent category header */}
+                                    <Link
+                                      to={`/collections?category=${column.slug}`}
+                                      className="text-[11px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:text-[#2E4D31]/70 transition-colors leading-tight"
+                                      onClick={() => setOpenDropdown(null)}
+                                    >
                                       {column.title}
-                                    </h4>
+                                    </Link>
                                   </div>
 
-                                  <div className="space-y-4">
+                                  {/* Sub-category links — text only, no icons */}
+                                  <div className="space-y-3">
                                     {column.items.map((item) => (
                                       <Link
                                         key={item.label}
                                         to={item.href}
+                                        onClick={() => setOpenDropdown(null)}
                                         className="block group transition-all duration-200"
                                       >
-                                        <span className="text-[14px] font-medium text-gray-500 group-hover:text-primary transition-colors leading-tight">
+                                        <span className="text-[13px] font-medium text-gray-400 group-hover:text-[#2E4D31] transition-colors leading-snug">
                                           {item.label}
                                         </span>
                                       </Link>
@@ -368,12 +370,14 @@ const Header = () => {
                         }
                         className="flex items-center justify-between w-full py-4 border-b border-gray-50 group"
                       >
-                         <span className={`text-[15px] font-black uppercase tracking-widest transition-colors ${mobileExpanded === link.label ? "text-primary" : "text-foreground/70"}`}>
-                           {link.label}
-                         </span>
+                        <span className={`text-[15px] font-black uppercase tracking-widest transition-colors ${
+                          mobileExpanded === link.label ? 'text-[#2E4D31]' : 'text-foreground/70'
+                        }`}>
+                          {link.label}
+                        </span>
                         <ChevronDown
                           className={`w-5 h-5 transition-transform duration-300 ${
-                            mobileExpanded === link.label ? "rotate-180 text-primary" : "text-foreground/20"
+                            mobileExpanded === link.label ? 'rotate-180 text-[#2E4D31]' : 'text-foreground/20'
                           }`}
                         />
                       </button>
@@ -381,36 +385,40 @@ const Header = () => {
                         {mobileExpanded === link.label && (
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
+                            animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="bg-gray-50/50 rounded-2xl my-2 overflow-hidden px-4"
+                            className="bg-[#F9F9EB]/60 rounded-2xl my-2 overflow-hidden"
                           >
-                            {(link.megaMenu || link.dropdown)?.map((section: any) => (
-                              <div key={section.title || section.label} className="py-2">
-                                {section.items ? (
-                                  <>
-                                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40 p-2">
-                                      {section.title}
-                                    </h5>
-                                    {section.items.map((item: any) => (
-                                      <Link
-                                        key={item.label}
-                                        to={item.href}
-                                        className="block py-3 pl-2 text-sm font-bold text-foreground/60 active:text-primary transition-colors"
-                                      >
-                                        {item.label}
-                                      </Link>
-                                    ))}
-                                  </>
-                                ) : (
-                                  <Link
-                                    key={section.label}
-                                    to={section.href}
-                                    className="block py-3 pl-2 text-sm font-bold text-foreground/60"
-                                  >
-                                    {section.label}
-                                  </Link>
-                                )}
+                            {link.megaMenu?.map((column: MegaMenuColumn) => (
+                              <div key={column.title} className="border-b border-[#2E4D31]/5 last:border-0">
+                                {/* Clickable parent header in mobile drawer */}
+                                <Link
+                                  to={`/collections?category=${column.slug}`}
+                                  className="flex items-center gap-2 px-4 pt-4 pb-2"
+                                >
+                                  <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center text-[#2E4D31]/60">
+                                    {column.imageUrl ? (
+                                      <img src={column.imageUrl} alt={column.title} className="w-full h-full object-contain" />
+                                    ) : (
+                                      column.icon && <column.icon className="w-4 h-4" />
+                                    )}
+                                  </div>
+                                  <span className="text-[11px] font-black uppercase tracking-[0.15em] text-[#2E4D31]">
+                                    {column.title}
+                                  </span>
+                                </Link>
+                                {/* Sub-category links */}
+                                <div className="px-4 pb-3 space-y-0.5">
+                                  {column.items.map((item) => (
+                                    <Link
+                                      key={item.label}
+                                      to={item.href}
+                                      className="block py-2 pl-7 text-[13px] font-medium text-gray-400 active:text-[#2E4D31] transition-colors"
+                                    >
+                                      {item.label}
+                                    </Link>
+                                  ))}
+                                </div>
                               </div>
                             ))}
                           </motion.div>
@@ -420,7 +428,11 @@ const Header = () => {
                   ) : (
                     <Link
                       to={link.href}
-                      className="block py-4 border-b border-gray-50 text-[15px] font-black uppercase tracking-widest text-foreground/70 active:text-primary transition-colors last:border-0"
+                      className={`block py-4 border-b border-gray-50 text-[15px] font-black uppercase tracking-widest transition-colors last:border-0 ${
+                        link.href === '/collections'
+                          ? 'text-[#2E4D31]'
+                          : 'text-foreground/70 active:text-[#2E4D31]'
+                      }`}
                     >
                       {link.label}
                     </Link>
