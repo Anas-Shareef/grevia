@@ -177,9 +177,9 @@ const Header = () => {
                     <AnimatePresence>
                       {openDropdown === link.label && (
                         <motion.div
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 8 }}
+                          initial={{ opacity: 0, y: 12, x: '-50%' }}
+                          animate={{ opacity: 1, y: 0, x: '-50%' }}
+                          exit={{ opacity: 0, y: 8, x: '-50%' }}
                           transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                           onMouseEnter={() => {
                             if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
@@ -192,10 +192,9 @@ const Header = () => {
                             link.megaMenu
                               ? 'top-[72px] w-[95vw] max-w-[1400px] p-16'
                               : 'top-[68px] min-w-[240px] p-2',
-                            // GLOBAL CENTERING: left 50% + translateX(-50%)
-                            'left-1/2 -translate-x-1/2',
                           ].join(' ')}
                           style={{
+                            left: '50%',
                             transformOrigin: 'top center',
                           }}
                         >
@@ -203,8 +202,7 @@ const Header = () => {
                           <div
                             className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70"
                             style={{
-                              // Robust arrow calculation: anchors exactly to trigger center
-                              // regardless of whether the menu is at 95vw or capped at 1400px
+                              // Precise arrow positioning relative to the button trigger
                               left: triggerRect
                                 ? `calc(50% + (${triggerRect.left}px - 50vw))`
                                 : '50%',
