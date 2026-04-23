@@ -203,10 +203,8 @@ const Header = () => {
                           <div
                             className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70"
                             style={{
-                              left: triggerRect
-                                ? `calc(${triggerRect.left}px - (100vw - 95vw) / 2 - (50vw - 47.5vw) - 7px)`
-                                : '50%',
-                              // On very wide screens, 95vw is capped at 1400px, so we need a more robust arrow calc
+                              // Robust arrow calculation: anchors exactly to trigger center
+                              // regardless of whether the menu is at 95vw or capped at 1400px
                               left: triggerRect
                                 ? `calc(50% + (${triggerRect.left}px - 50vw))`
                                 : '50%',
