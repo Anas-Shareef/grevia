@@ -145,12 +145,9 @@ const Header = () => {
             className="hidden lg:flex items-center gap-8"
             aria-label="Main navigation"
           >
-            {navLinks.map((link) => (
-              // NOTE: no 'relative' here for mega-menu items — fixed positioning
-              // must be relative to the viewport, not the nav item
               <div
                 key={link.label}
-                className={link.megaMenu ? 'static' : 'relative'}
+                className="static"
                 onMouseEnter={(e) =>
                   (link.dropdown || link.megaMenu) && handleMouseEnter(link.label, e)
                 }
@@ -176,99 +173,102 @@ const Header = () => {
                     {/* Dropdown/Mega Menu Panel */}
                     <AnimatePresence>
                       {openDropdown === link.label && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 8 }}
-                          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-                          onMouseEnter={() => {
-                            if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-                          }}
-                          onMouseLeave={handleMouseLeave}
-                          className={[
-                            'fixed z-[9999] bg-white/98 backdrop-blur-[15px]',
-                            'shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]',
-                            'border border-gray-100/60 rounded-[32px] overflow-visible',
-                            link.megaMenu
-                              ? 'top-[72px] w-[95vw] max-w-[1400px] p-16'
-                              : 'top-[68px] min-w-[240px] p-2',
-                            'inset-x-0 mx-auto',
-                          ].join(' ')}
-                          style={{
-                            transformOrigin: 'top center',
+                        // POSITIONING WRAPPER: Centers globally relative to viewport
+                        <div 
+                          className="fixed left-1/2 -translate-x-1/2 z-[9999]"
+                          style={{ 
+                            top: scrolled ? '56px' : '64px',
+                            width: link.megaMenu ? '95vw' : 'auto',
+                            maxWidth: link.megaMenu ? '1400px' : 'none'
                           }}
                         >
-                          {/* Tooltip Arrow — Dynamic alignment with navbar text */}
-                          <div
-                            className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70"
-                            style={{
-                              // Precise arrow positioning relative to the button trigger
-                              left: triggerRect
-                                ? `calc(50% + (${triggerRect.left}px - 50vw))`
-                                : '50%',
-                              transform: 'translateX(-50%) rotate(45deg)',
+                          <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+                            onMouseEnter={() => {
+                              if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
                             }}
-                          />
+                            onMouseLeave={handleMouseLeave}
+                            className={[
+                              'bg-white/98 backdrop-blur-[15px] mt-3',
+                              'shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]',
+                              'border border-gray-100/60 rounded-[32px] overflow-visible',
+                              link.megaMenu ? 'p-10' : 'p-2 min-w-[240px]',
+                            ].join(' ')}
+                          >
+                            {/* Tooltip Arrow — Anchored to the navbar button center */}
+                            <div
+                              className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70"
+                              style={{
+                                left: triggerRect
+                                  ? `calc(50% + (${triggerRect.left}px - 50vw))`
+                                  : '50%',
+                                transform: 'translateX(-50%) rotate(45deg)',
+                              }}
+                            />
 
-                          {link.megaMenu ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-12 gap-y-12 justify-items-start">
-                              {link.megaMenu.map((column) => (
-                                <div key={column.title} className="w-full space-y-6">
+                            {link.megaMenu ? (
+                              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-10 gap-y-10 justify-items-start">
+                                {link.megaMenu.map((column) => (
+                                  <div key={column.title} className="w-full space-y-6">
 
-                                  {/* Column Header — Outfit Bold 12px */}
-                                  <div className="flex items-center gap-2.5 pb-4 border-b border-[#2E4D31]/10">
-                                    <div className="w-[23px] h-[23px] flex-shrink-0 flex items-center justify-center text-[#2E4D31]/70">
-                                      {column.imageUrl ? (
-                                        <img
-                                          src={column.imageUrl}
-                                          alt={column.title}
-                                          className="w-full h-full object-contain"
-                                        />
-                                      ) : (
-                                        column.icon && <column.icon className="w-[18px] h-[18px]" />
-                                      )}
-                                    </div>
-                                    <Link
-                                      to={`/collections?category=${column.slug}`}
-                                      className="font-['Outfit'] text-[12px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
-                                      onClick={() => setOpenDropdown(null)}
-                                    >
-                                      {column.title.replace(/Sweetenerss/gi, 'Sweeteners')}
-                                    </Link>
-                                  </div>
-
-                                  {/* Sub-links — Work Sans 14px */}
-                                  <div className="space-y-3">
-                                    {column.items.map((item) => (
+                                    {/* Column Header — Outfit Bold 12px */}
+                                    <div className="flex items-center gap-2.5 pb-4 border-b border-[#2E4D31]/10">
+                                      <div className="w-[23px] h-[23px] flex-shrink-0 flex items-center justify-center text-[#2E4D31]/70">
+                                        {column.imageUrl ? (
+                                          <img
+                                            src={column.imageUrl}
+                                            alt={column.title}
+                                            className="w-full h-full object-contain"
+                                          />
+                                        ) : (
+                                          column.icon && <column.icon className="w-[18px] h-[18px]" />
+                                        )}
+                                      </div>
                                       <Link
-                                        key={item.label}
-                                        to={item.href}
+                                        to={`/collections?category=${column.slug}`}
+                                        className="font-['Outfit'] text-[12px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
                                         onClick={() => setOpenDropdown(null)}
-                                        className="block group"
                                       >
-                                        <span className="font-['Work_Sans'] text-[14px] font-medium text-gray-400 group-hover:text-[#2E4D31] group-hover:pl-1 transition-all duration-200 leading-snug inline-block">
-                                          {item.label}
-                                        </span>
+                                        {column.title.replace(/Sweetenerss/gi, 'Sweeteners')}
                                       </Link>
-                                    ))}
+                                    </div>
+
+                                    {/* Sub-links — Work Sans 14px */}
+                                    <div className="space-y-3">
+                                      {column.items.map((item) => (
+                                        <Link
+                                          key={item.label}
+                                          to={item.href}
+                                          onClick={() => setOpenDropdown(null)}
+                                          className="block group"
+                                        >
+                                          <span className="font-['Work_Sans'] text-[14px] font-medium text-gray-400 group-hover:text-[#2E4D31] group-hover:pl-1 transition-all duration-200 leading-snug inline-block">
+                                            {item.label}
+                                          </span>
+                                        </Link>
+                                      ))}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="flex flex-col py-1">
-                              {link.dropdown?.map((item) => (
-                                <Link
-                                  key={item.label}
-                                  to={item.href}
-                                  className="block px-6 py-3 text-[14px] font-bold text-gray-500 hover:text-[#2E4D31] hover:bg-[#2E4D31]/5 rounded-xl transition-all"
-                                >
-                                  {item.label}
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                        </motion.div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="flex flex-col py-1">
+                                {link.dropdown?.map((item) => (
+                                  <Link
+                                    key={item.label}
+                                    to={item.href}
+                                    className="block px-6 py-3 text-[14px] font-bold text-gray-500 hover:text-[#2E4D31] hover:bg-[#2E4D31]/5 rounded-xl transition-all"
+                                  >
+                                    {item.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </motion.div>
+                        </div>
                       )}
                     </AnimatePresence>
                   </div>
