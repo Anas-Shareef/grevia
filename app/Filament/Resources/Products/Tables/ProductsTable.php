@@ -11,6 +11,7 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Filament\Actions\BulkAction;
@@ -27,6 +28,7 @@ class ProductsTable
     {
         return $table
             ->columns([
+                // ── Thumbnail ───────────────────────────────────────────
                 TextColumn::make('image_url')
                     ->label('Thumbnail')
                     ->state(function (Model $record): string {
@@ -34,33 +36,107 @@ class ProductsTable
                         return '<img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" class="shadow-sm border border-gray-200" alt="Thumbnail">';
                     })
                     ->html(),
+
+                // ── Product Name ─────────────────────────────────────────
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+
+                // ── Category ─────────────────────────────────────────────
                 TextColumn::make('category.name')
-                    ->sortable(),
+                    ->sortable()
+                    ->badge()
+                    ->color('gray'),
+
+                // ── Price ────────────────────────────────────────────────
                 TextColumn::make('price')
                     ->money('INR')
                     ->sortable(),
-                TextColumn::make('rating')
-                    ->numeric(1)
-                    ->sortable(),
+
+                // ── Filter Attributes — Power the Collections sidebar ────
+                TextColumn::make('form')
+                    ->label('Format')
+                    ->badge()
+                    ->color(fn (?string $state): string => match($state) {
+                        'powder'  => 'success',
+                        'drops'   => 'info',
+                        'tablets' => 'warning',
+                        'liquid'  => 'info',
+                        'jar'     => 'gray',
+                        default   => 'gray',
+                    })
+                    ->formatStateUsing(fn (?string $state): string => $state ? ucfirst($state) : '—')
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('ratio')
+                    ->label('Concentration')
+                    ->badge()
+                    ->color('warning')
+                    ->formatStateUsing(fn (?string $state): string => $state ?: '—')
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('size_label')
+                    ->label('Pack Size')
+                    ->badge()
+                    ->color('primary')
+                    ->formatStateUsing(fn (?string $state): string => $state ?: '—')
+                    ->toggleable(),
+
+                // ── Status Columns ────────────────────────────────────────
                 IconColumn::make('in_stock')
                     ->boolean()
                     ->sortable(),
+
                 IconColumn::make('is_featured')
                     ->label('Featured')
                     ->boolean()
                     ->sortable(),
+
+                TextColumn::make('rating')
+                    ->numeric(1)
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                // ── Filter by Category ────────────────────────────────────
+                SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                // ── Filter by Format ──────────────────────────────────────
+                SelectFilter::make('form')
+                    ->label('Format')
+                    ->options([
+                        'powder'  => 'Powder',
+                        'drops'   => 'Drops',
+                        'tablets' => 'Tablets',
+                        'liquid'  => 'Liquid',
+                        'jar'     => 'Jar',
+                    ]),
+
+                // ── Filter by Concentration ──────────────────────────────
+                SelectFilter::make('ratio')
+                    ->label('Concentration')
+                    ->options([
+                        '1:10'  => '1:10 (High Potency)',
+                        '1:50'  => '1:50 (Medium)',
+                        '1:100' => '1:100 (Mild)',
+                        '1:200' => '1:200 (Extra Mild)',
+                    ]),
+
                 TrashedFilter::make(),
             ])
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->recordActions([
                 EditAction::make(),
             ])
@@ -72,6 +148,52 @@ class ProductsTable
                     ->url(fn () => route('admin.export.products'))
                     ->openUrlInNewTab(),
                 BulkActionGroup::make([
+                    // ── NEW: Bulk-set filter attributes ──────────────────
+                    BulkAction::make('set_filter_attributes')
+                        ->label('Set Filter Attributes')
+                        ->icon('heroicon-o-funnel')
+                        ->color('primary')
+                        ->form([
+                            Select::make('form')
+                                ->label('Product Format')
+                                ->options([
+                                    'powder'  => 'Powder',
+                                    'drops'   => 'Drops',
+                                    'tablets' => 'Tablets',
+                                    'liquid'  => 'Liquid',
+                                    'jar'     => 'Jar',
+                                ])
+                                ->placeholder('Leave blank to keep existing'),
+
+                            Select::make('ratio')
+                                ->label('Sweetener Concentration')
+                                ->options([
+                                    '1:10'  => '1:10 (High Potency)',
+                                    '1:50'  => '1:50 (Medium)',
+                                    '1:100' => '1:100 (Mild)',
+                                    '1:200' => '1:200 (Extra Mild)',
+                                ])
+                                ->placeholder('Leave blank to keep existing'),
+
+                            TextInput::make('size_label')
+                                ->label('Pack Size Label')
+                                ->placeholder('e.g. 50g, 100g — leave blank to keep existing'),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            $updates = array_filter([
+                                'form'       => $data['form'] ?? null,
+                                'ratio'      => $data['ratio'] ?? null,
+                                'size_label' => $data['size_label'] ?? null,
+                            ], fn ($v) => !is_null($v) && $v !== '');
+                            if (!empty($updates)) {
+                                foreach ($records as $record) {
+                                    $record->update($updates);
+                                }
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    // ── Existing bulk actions ─────────────────────────────
                     BulkAction::make('assign_category')
                         ->label('Assign Category')
                         ->icon('heroicon-o-folder-open')
@@ -87,7 +209,7 @@ class ProductsTable
                             }
                         })
                         ->deselectRecordsAfterCompletion(),
-                        
+
                     BulkAction::make('add_tags')
                         ->label('Add Tags')
                         ->icon('heroicon-o-tag')
@@ -119,18 +241,16 @@ class ProductsTable
                         ->action(function (Collection $records, array $data): void {
                             $discount = (float) $data['discount_percentage'];
                             foreach ($records as $record) {
-                                // If base price is identical to true base, move it to historic so it slashes correctly
                                 $basePrice = $record->original_price ?: $record->price;
-                                $newPrice = $basePrice - ($basePrice * ($discount / 100));
-                                
+                                $newPrice  = $basePrice - ($basePrice * ($discount / 100));
                                 $record->update([
                                     'original_price' => $basePrice,
-                                    'price' => $newPrice
+                                    'price'          => $newPrice,
                                 ]);
                             }
                         })
                         ->deselectRecordsAfterCompletion(),
-                        
+
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
