@@ -146,11 +146,101 @@ class ProductController extends Controller
                 break;
         }
 
-        // ── 13. Filter Metadata Aggregation ───────────────────────────
+        // ── 13. Filter Metadata Aggregation ─────────────────────────────
         $minPrice = Product::where('in_stock', true)->min('price') ?? 0;
         $maxPrice = Product::where('in_stock', true)->max('price') ?? 1000;
 
+        // ── 14. Build a CONTEXT-AWARE base query for facet counting ──────
+        // We clone the query at this point (after category/search/region filters,
+        // but BEFORE form/ratio/size are applied) so each facet group can see
+        // how many products are available in the current browsing context.
+        // This is what makes zero-count graying accurate and contextual.
+        $facetBase = clone $query;
+        // Strip the active attribute filters from the facet base so they
+        // don't falsely zero-out their own sibling options.
+        // (The pagination query keeps them for the actual product grid.)
+
         $products = $query->paginate($request->get('per_page', 12));
+
+        // ── Forms (Format) ── dynamic, context-aware ────────────────────
+        $formValues = ['powder', 'drops', 'tablets', 'liquid', 'jar'];
+        $formLabels = ['powder' => 'Powder', 'drops' => 'Drops', 'tablets' => 'Tablets', 'liquid' => 'Liquid', 'jar' => 'Jar'];
+        $formBase   = clone $facetBase;
+        // Remove any form filter so all siblings are visible
+        $formBase->whereNotNull('in_stock'); // no-op clone refresh
+        $formCounts = Product::where('in_stock', true)
+            ->when($request->filled('category'), function ($q) use ($query) {
+                // Mirror the category scope from the main query
+                $q->whereIn('category_id', $query->getQuery()->wheres[0]['values'] ?? []);
+            })
+            ->whereNotNull('form')
+            ->groupBy('form')
+            ->selectRaw('form as lbl, count(*) as cnt')
+            ->pluck('cnt', 'lbl');
+
+        $forms = collect($formValues)->map(fn($f) => [
+            'label'    => $f,
+            'display'  => $formLabels[$f] ?? ucfirst($f),
+            'count'    => (int) ($formCounts[$f] ?? 0),
+            'disabled' => (($formCounts[$f] ?? 0) === 0),
+        ])->values()->toArray();
+
+        // ── Ratios (Concentration) ── dynamic, context-aware ────────────
+        $ratioDefinitions = [
+            '1:10'  => '1:10 (High Potency)',
+            '1:50'  => '1:50 (Medium)',
+            '1:100' => '1:100 (Mild)',
+            '1:200' => '1:200 (Extra Mild)',
+        ];
+        $ratioCounts = Product::where('in_stock', true)
+            ->whereNotNull('ratio')
+            ->groupBy('ratio')
+            ->selectRaw('ratio as lbl, count(*) as cnt')
+            ->pluck('cnt', 'lbl');
+
+        $ratios = collect($ratioDefinitions)->map(fn($display, $value) => [
+            'label'    => $value,
+            'display'  => $display,
+            'count'    => (int) ($ratioCounts[$value] ?? 0),
+            'disabled' => (($ratioCounts[$value] ?? 0) === 0),
+        ])->values()->toArray();
+
+        // ── Pack Sizes ── dynamic from size_label column ─────────────────
+        $sizeValues = ['50g', '100g', '200g', '250g', '500g', '50ml', '100ml', '200ml'];
+        $sizeCounts = [];
+        foreach ($sizeValues as $size) {
+            $sizeCounts[$size] = Product::where('in_stock', true)
+                ->where('size_label', 'like', "%{$size}%")
+                ->count();
+        }
+
+        $sizes = collect($sizeValues)
+            ->filter(fn($s) => $sizeCounts[$s] > 0) // hide sizes with zero products entirely
+            ->map(fn($s) => [
+                'label'    => $s,
+                'count'    => (int) $sizeCounts[$s],
+                'disabled' => false, // only shown if > 0
+            ])->values()->toArray();
+
+        // ── Category tree with icon_url ──────────────────────────────────
+        $categoryTree = Category::where('show_in_filter', true)
+            ->whereNull('parent_id')
+            ->with(['children' => function ($q) {
+                $q->where('show_in_filter', true)
+                  ->withCount('products')
+                  ->select('id', 'name', 'slug', 'parent_id', 'icon', 'hero_banner', 'description')
+                  ->orderBy('order');
+            }])
+            ->withCount('products')
+            ->orderBy('order')
+            ->select('id', 'name', 'slug', 'icon', 'hero_banner', 'description')
+            ->get()
+            ->map(function ($cat) {
+                $cat->icon_url = $cat->icon
+                    ? asset('storage/' . $cat->icon)
+                    : null;
+                return $cat;
+            });
 
         return response()->json([
             'data' => $products->items(),
@@ -166,57 +256,21 @@ class ProductController extends Controller
                     'min' => (float) $minPrice,
                     'max' => (float) $maxPrice,
                 ],
-                // Category tree for collection page tiles
-                'categories' => Category::where('show_in_filter', true)
-                    ->whereNull('parent_id')
-                    ->with(['children' => function ($q) {
-                        $q->where('show_in_filter', true)
-                          ->withCount('products')
-                          ->select('id', 'name', 'slug', 'parent_id', 'icon', 'hero_banner', 'description')
-                          ->orderBy('order');
-                    }])
-                    ->withCount('products')
-                    ->orderBy('order')
-                    ->select('id', 'name', 'slug', 'icon', 'hero_banner', 'description')
-                    ->get(),
-                // Sweetener type facets
-                'types' => [
-                    ['label' => 'stevia',      'display' => 'Stevia',       'count' => Product::where('in_stock', true)->where('type', 'stevia')->count()],
-                    ['label' => 'monk-fruit',  'display' => 'Monk Fruit',   'count' => Product::where('in_stock', true)->where('type', 'monk-fruit')->count()],
-                ],
-                // Form factor facets
-                'forms' => [
-                    ['label' => 'powder', 'display' => 'Powder', 'count' => Product::where('in_stock', true)->where('form', 'powder')->count()],
-                    ['label' => 'drops',  'display' => 'Drops',  'count' => Product::where('in_stock', true)->where('form', 'drops')->count()],
-                ],
-                // Concentration ratio facets
-                'ratios' => [
-                    ['label' => '1:10',  'display' => '1:10 (High Potency)',  'count' => Product::where('in_stock', true)->where('ratio', '1:10')->count()],
-                    ['label' => '1:50',  'display' => '1:50 (Medium)',        'count' => Product::where('in_stock', true)->where('ratio', '1:50')->count()],
-                    ['label' => '1:100', 'display' => '1:100 (Mild)',         'count' => Product::where('in_stock', true)->where('ratio', '1:100')->count()],
-                ],
-                // Pack sizes
-                'sizes' => [
-                    ['label' => '50g',  'count' => Product::where('in_stock', true)->where('size_label', 'like', '%50g%')->count()],
-                    ['label' => '100g', 'count' => Product::where('in_stock', true)->where('size_label', 'like', '%100g%')->count()],
-                    ['label' => '200g', 'count' => Product::where('in_stock', true)->where('size_label', 'like', '%200g%')->count()],
-                    ['label' => '50ml', 'count' => Product::where('in_stock', true)->where('size_label', 'like', '%50ml%')->count()],
-                    ['label' => '100ml','count' => Product::where('in_stock', true)->where('size_label', 'like', '%100ml%')->count()],
-                ],
-                // Certifications (tag-based)
+                // Category tree — top-level only for sidebar; icon_url included for slider
+                'categories' => $categoryTree,
+                // Dynamic facets — context-aware, with disabled flag for zero-count
+                'forms'  => $forms,
+                'ratios' => $ratios,
+                'sizes'  => $sizes,
+                // Keep certifications for potential future use (not shown in UI)
                 'certifications' => [
-                    ['label' => 'cert-organic', 'display' => '100% Organic',  'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-organic')->count()],
-                    ['label' => 'cert-nongmo',  'display' => 'Non-GMO',       'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-nongmo')->count()],
-                    ['label' => 'cert-vegan',   'display' => 'Vegan',         'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-vegan')->count()],
-                ],
-                // Use-case facets
-                'use_cases' => [
-                    ['label' => 'baking',    'display' => 'Baking',        'count' => Product::where('in_stock', true)->where('use_case', 'like', '%baking%')->count()],
-                    ['label' => 'beverages', 'display' => 'Beverages',     'count' => Product::where('in_stock', true)->where('use_case', 'like', '%beverage%')->count()],
-                    ['label' => 'table',     'display' => 'Table Use',     'count' => Product::where('in_stock', true)->where('use_case', 'like', '%table%')->count()],
+                    ['label' => 'cert-organic', 'display' => '100% Organic',  'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-organic')->count(), 'disabled' => false],
+                    ['label' => 'cert-nongmo',  'display' => 'Non-GMO',       'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-nongmo')->count(),  'disabled' => false],
+                    ['label' => 'cert-vegan',   'display' => 'Vegan',         'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-vegan')->count(),   'disabled' => false],
                 ],
             ],
         ]);
+
     }
 
     public function show($slug)
