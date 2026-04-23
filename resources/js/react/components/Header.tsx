@@ -145,6 +145,7 @@ const Header = () => {
             className="hidden lg:flex items-center gap-8"
             aria-label="Main navigation"
           >
+            {navLinks.map((link) => (
               <div
                 key={link.label}
                 className="static"
@@ -196,8 +197,8 @@ const Header = () => {
                               'shadow-[0_20px_50px_rgba(0,0,0,0.1)]', // Soft premium shadow
                               'border border-gray-100/60 rounded-[32px] overflow-visible',
                               link.megaMenu ? 'p-10' : 'p-2 min-w-[240px]',
-                              'font-["Montserrat",sans-serif]', // Montserrat Font Family
                             ].join(' ')}
+                            style={{ fontFamily: "'Montserrat', sans-serif" }}
                           >
                             {/* Tooltip Arrow — Anchored to the navbar button center */}
                             <div
@@ -230,7 +231,7 @@ const Header = () => {
                                       </div>
                                       <Link
                                         to={`/collections?category=${column.slug}`}
-                                        className="font-['Montserrat'] text-[14px] font-[700] uppercase tracking-[0.1em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
+                                        className="text-[14px] font-[700] uppercase tracking-[0.1em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
                                         onClick={() => setOpenDropdown(null)}
                                       >
                                         {column.title.replace(/Sweetenerss/gi, 'Sweeteners')}
@@ -246,7 +247,7 @@ const Header = () => {
                                           onClick={() => setOpenDropdown(null)}
                                           className="block group"
                                         >
-                                          <span className="font-['Montserrat'] text-[13px] font-[500] text-[#4A4A4A] group-hover:text-[#2E4D31] group-hover:pl-1 transition-all duration-200 leading-snug inline-block">
+                                          <span className="text-[13px] font-[500] text-[#4A4A4A] group-hover:text-[#2E4D31] group-hover:pl-1 transition-all duration-200 leading-snug inline-block">
                                             {item.label}
                                           </span>
                                         </Link>
