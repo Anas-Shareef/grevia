@@ -1,110 +1,141 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, ShoppingCart, Trash2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroBg from "@/assets/hero-bg.jpg";
+import { api } from "@/lib/api";
 
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  card_description: string;
+  card_image_full_url: string;
+  availability_status: 'active' | 'coming_soon' | 'hidden';
+  overlay_density: number;
+}
+
+const EditorialCard = ({ category, index }: { category: Category, index: number }) => {
+  const density = (category.overlay_density ?? 72) / 100;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{
+        duration: 0.8,
+        delay: index * 0.1,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className="group relative h-[450px] md:h-[500px] bg-[#1a2a1e] rounded-[30px] md:rounded-[40px] overflow-hidden shadow-soft hover:shadow-card transition-all duration-700"
+    >
+      {/* Editorial Background Image */}
+      <img
+        src={category.card_image_full_url || 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop'}
+        alt={category.name}
+        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-[1.04]"
+        loading="lazy"
+      />
+
+      {/* 5-Stop Premium Gradient Overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `linear-gradient(
+            to bottom,
+            transparent 0%,
+            transparent 20%,
+            rgba(0, 0, 0, ${0.18 * density / 0.72}) 45%,
+            rgba(0, 0, 0, ${0.60 * density / 0.72}) 70%,
+            rgba(0, 0, 0, ${0.78 * density / 0.72}) 100%
+          )`
+        }}
+      />
+
+      {/* Editorial Content block */}
+      <div className="absolute inset-x-0 bottom-0 p-8 md:p-12 z-10 font-['Montserrat']">
+        <h3 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight tracking-[-0.01em] max-w-[80%] md:max-w-[60%]">
+          {category.name}
+        </h3>
+        <p className="text-white/88 font-medium mb-8 line-clamp-2 max-w-[85%] md:max-w-[55%] leading-relaxed text-sm md:text-base">
+          {category.card_description || 'Thoughtfully prepared items aligned with our clean-label standards.'}
+        </p>
+        <div className="mt-8">
+          <Link
+            to={`/collections?category=${category.slug}`}
+            className="inline-flex items-center justify-center gap-3 border-2 border-white/92 text-white font-bold rounded-full hover:bg-white hover:text-[#2E4D31] transition-all duration-300 h-14 px-10 text-[14px] tracking-wide"
+          >
+            Explore Products
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const BeyondSweetenersSection = () => {
-  const categories = [
-    {
-      title: "Bakery Items",
-      description:
-        "Freshly prepared baked goods made for everyday indulgence without the sugar spike.",
-      image: heroBg,
-      link: "/collections/bakery",
-      delay: 0.1,
-    },
-    {
-      title: "Pickles & Preserves",
-      description:
-        "Traditional recipes crafted with natural ingredients and no artificial preservatives.",
-      image: heroBg,
-      link: "/collections/pickles",
-      delay: 0.2,
-    },
-  ];
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    api.get('/categories')
+      .then(data => {
+        // We pick specific categories for the homepage or just the first few
+        // For now, let's show categories that aren't the primary sweeteners if possible, 
+        // or just the first 2 editorial-ready categories.
+        const editorialReady = data.filter((c: any) => 
+          c.availability_status === 'active' && 
+          !c.slug.includes('stevia') && 
+          !c.slug.includes('monk')
+        );
+        setCategories(editorialReady.slice(0, 2));
+      })
+      .catch(err => console.error("Failed to fetch home categories:", err));
+  }, []);
+
+  if (categories.length === 0) return null;
 
   return (
     <section
       id="beyond-sweeteners"
-      className="py-24 md:py-32 bg-background relative overflow-hidden"
+      className="py-24 md:py-32 bg-[#FDFDF7] relative overflow-hidden"
       aria-labelledby="beyond-sweeteners-heading"
     >
-      {/* Ambient background glows for airiness */}
-      <div className="absolute top-1/2 left-[-10%] w-[40%] h-[40%] bg-primary/3 rounded-full blur-[120px] -z-10" />
-      <div className="absolute top-[10%] right-[-5%] w-[30%] h-[30%] bg-primary/2 rounded-full blur-[100px] -z-10" />
+      {/* Soft atmospheric glows */}
+      <div className="absolute top-1/2 left-[-10%] w-[40%] h-[40%] bg-[#77cb4d]/5 rounded-full blur-[120px] -z-10" />
+      <div className="absolute top-[10%] right-[-5%] w-[30%] h-[30%] bg-[#2E4D31]/3 rounded-full blur-[100px] -z-10" />
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto mb-16 md:mb-20"
+          className="text-center max-w-3xl mx-auto mb-16 md:mb-24"
         >
-          <span className="eyebrow mb-4 !text-lime">
+          <span className="font-['Montserrat'] text-[10px] font-black uppercase tracking-[0.3em] text-[#77cb4d] mb-4 inline-block">
             Explore More
           </span>
           <h2
             id="beyond-sweeteners-heading"
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground leading-tight mb-8"
+            className="font-['Montserrat'] text-4xl md:text-5xl lg:text-6xl font-black text-[#2E4D31] leading-tight mb-8"
           >
             Beyond
             <br />
-            <span className="text-primary font-bold">Sweeteners</span>
+            <span className="font-bold text-[#77cb4d]">Sweeteners</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="font-['Montserrat'] text-lg text-[#4A4A4A] max-w-2xl mx-auto leading-relaxed opacity-80">
             Crafted foods made with the same health-first philosophy as Grevia
             sweeteners. Thoughtfully prepared items aligned with our clean-label
             standards.
           </p>
         </motion.div>
 
-        {/* Categories Grid - High Fidelity Cards */}
+        {/* Categories Grid - Editorial High Fidelity Cards */}
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
-          {categories.map((cat) => (
-            <motion.div
-              key={cat.title}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.8,
-                delay: cat.delay,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="group relative h-[400px] md:h-[500px] bg-card rounded-squircle-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-700 border border-border/50"
-            >
-              {/* Foreground Image with Zoom */}
-              <img
-                src={cat.image}
-                alt={cat.title}
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-              />
-
-              {/* Sophisticated Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/30 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
-
-              {/* Overlay Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-                <h3 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">
-                  {cat.title}
-                </h3>
-                <p className="text-white/80 font-medium mb-8 line-clamp-2 max-w-sm leading-relaxed">
-                  {cat.description}
-                </p>
-                <div className="mt-8">
-                  <Link
-                    to={cat.link}
-                    className="inline-flex items-center justify-center gap-2 border-2 border-white/80 text-white font-bold rounded-full hover:bg-white hover:text-foreground transition-all duration-300 h-14 px-10 text-sm"
-                  >
-                    Explore Products
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
+          {categories.map((cat, i) => (
+            <EditorialCard key={cat.id} category={cat} index={i} />
           ))}
         </div>
       </div>

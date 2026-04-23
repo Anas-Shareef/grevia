@@ -13,7 +13,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::where('status', true)
+        $categories = Category::where('availability_status', '!=', 'hidden')
             ->whereNull('parent_id')
             ->with(['children' => function ($q) {
                 $q->where('status', true)
@@ -21,7 +21,7 @@ class CategoryController extends Controller
                   ->orderBy('order');
             }])
             ->withCount('products')
-            ->orderBy('order')
+            ->orderBy('order') // Replaced 'sort_order' with 'order' if that's the existing column, but let's check migration
             ->get();
 
         return response()->json($categories);

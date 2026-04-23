@@ -23,55 +23,49 @@ class Category extends Model
         'is_smart',
         'rules',
         'seo_title',
-        'seo_description'
+        'seo_description',
+        'card_image_url',
+        'card_description',
+        'availability_status',
+        'overlay_density'
     ];
 
     protected $casts = [
         'is_smart' => 'boolean',
         'rules' => 'array',
         'show_in_filter' => 'boolean',
-        'status' => 'boolean'
+        'status' => 'boolean',
+        'overlay_density' => 'integer'
     ];
 
-    protected $appends = ['image_url', 'hero_banner_url', 'icon_url'];
+    protected $appends = ['image_url', 'hero_banner_url', 'icon_url', 'card_image_full_url'];
 
     public function getImageUrlAttribute()
     {
-        if (!$this->image) {
-            return null;
-        }
-        
-        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
-            return $this->image;
-        }
-
+        if (!$this->image) return null;
+        if (str_starts_with($this->image, 'http')) return $this->image;
         return \Illuminate\Support\Facades\Storage::url($this->image);
     }
 
     public function getHeroBannerUrlAttribute()
     {
-        if (!$this->hero_banner) {
-            return null;
-        }
-        
-        if (str_starts_with($this->hero_banner, 'http://') || str_starts_with($this->hero_banner, 'https://')) {
-            return $this->hero_banner;
-        }
-
+        if (!$this->hero_banner) return null;
+        if (str_starts_with($this->hero_banner, 'http')) return $this->hero_banner;
         return \Illuminate\Support\Facades\Storage::url($this->hero_banner);
     }
 
     public function getIconUrlAttribute()
     {
-        if (!$this->icon) {
-            return null;
-        }
-        
-        if (str_starts_with($this->icon, 'http://') || str_starts_with($this->icon, 'https://')) {
-            return $this->icon;
-        }
-
+        if (!$this->icon) return null;
+        if (str_starts_with($this->icon, 'http')) return $this->icon;
         return \Illuminate\Support\Facades\Storage::url($this->icon);
+    }
+
+    public function getCardImageFullUrlAttribute()
+    {
+        if (!$this->card_image_url) return null;
+        if (str_starts_with($this->card_image_url, 'http')) return $this->card_image_url;
+        return \Illuminate\Support\Facades\Storage::url($this->card_image_url);
     }
 
     public function parent()
