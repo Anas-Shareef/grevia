@@ -177,9 +177,9 @@ const Header = () => {
                     <AnimatePresence>
                       {openDropdown === link.label && (
                         <motion.div
-                          initial={{ opacity: 0, y: 12, x: '-50%' }}
-                          animate={{ opacity: 1, y: 0, x: '-50%' }}
-                          exit={{ opacity: 0, y: 8, x: '-50%' }}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
                           transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                           onMouseEnter={() => {
                             if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
@@ -192,9 +192,9 @@ const Header = () => {
                             link.megaMenu
                               ? 'top-[72px] w-[95vw] max-w-[1400px] p-16'
                               : 'top-[68px] min-w-[240px] p-2',
+                            'inset-x-0 mx-auto',
                           ].join(' ')}
                           style={{
-                            left: '50%',
                             transformOrigin: 'top center',
                           }}
                         >
@@ -233,7 +233,7 @@ const Header = () => {
                                       className="font-['Outfit'] text-[12px] font-black uppercase tracking-[0.15em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
                                       onClick={() => setOpenDropdown(null)}
                                     >
-                                      {column.title}
+                                      {column.title.replace(/Sweetenerss/gi, 'Sweeteners')}
                                     </Link>
                                   </div>
 
