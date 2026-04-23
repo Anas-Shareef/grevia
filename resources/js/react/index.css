@@ -152,6 +152,14 @@
   .shadow-orb {
     @apply absolute -z-10 rounded-full blur-[100px] opacity-30;
   }
+
+  /* Mega Menu Interactions */
+  .mega-menu-link-shadow {
+    transition: text-shadow 0.25s ease;
+  }
+  .group:hover .mega-menu-link-shadow {
+    text-shadow: 0.2px 0px 0px #77cb4d;
+  }
 }
 
 /* === Animations === */
