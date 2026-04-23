@@ -239,17 +239,15 @@ const Header = () => {
                                     </div>
 
                                     {/* Sub-links — Montserrat Medium 13px */}
-                                    <div className="space-y-1">
+                                    <div className="space-y-0">
                                       {column.items.map((item) => (
                                         <Link
                                           key={item.label}
                                           to={item.href}
                                           onClick={() => setOpenDropdown(null)}
-                                          className="block group py-1.5"
+                                          className="mega-menu-link"
                                         >
-                                          <span 
-                                            className="text-[13px] font-[500] text-[#4A4A4A] group-hover:text-[#77cb4d] group-hover:pl-[6px] transition-all duration-250 ease-[cubic-bezier(0.4,0,0.2,1)] leading-snug inline-block mega-menu-link-shadow"
-                                          >
+                                          <span className="leading-snug">
                                             {item.label}
                                           </span>
                                         </Link>

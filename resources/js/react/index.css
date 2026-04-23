@@ -153,11 +153,20 @@
     @apply absolute -z-10 rounded-full blur-[100px] opacity-30;
   }
 
-  /* Mega Menu Interactions */
-  .mega-menu-link-shadow {
-    transition: text-shadow 0.25s ease;
+  /* Mega Menu Interaction Reset - PRD Specification */
+  .mega-menu-link {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 500;
+    font-size: 13px;
+    color: #4A4A4A;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+    padding: 6px 0;
+    text-decoration: none;
   }
-  .group:hover .mega-menu-link-shadow {
+  .mega-menu-link:hover {
+    color: #77cb4d !important;
+    padding-left: 6px;
     text-shadow: 0.2px 0px 0px #77cb4d;
   }
 }
