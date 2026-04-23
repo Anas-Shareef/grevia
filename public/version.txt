@@ -1,0 +1,3 @@
+Version: 1.0.5 - Viewport Fix
+Timestamp: 2026-04-23 13:10:00
+Status: Centered Mega Menu & Typo Fix Pushed.
