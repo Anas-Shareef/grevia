@@ -24,10 +24,6 @@ const CollectionsPage = () => {
   const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
   const [isSticky, setIsSticky] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  const scrollSliderLeft = () => sliderRef.current?.scrollBy({ left: -220, behavior: 'smooth' });
-  const scrollSliderRight = () => sliderRef.current?.scrollBy({ left: 220, behavior: 'smooth' });
 
   const { data: response, isLoading } = useProducts({
     ...filters,
