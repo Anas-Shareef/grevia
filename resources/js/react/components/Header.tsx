@@ -435,7 +435,14 @@ const Header = () => {
                                 >
                                   <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center text-[#2E4D31]/60">
                                     {column.imageUrl ? (
-                                      <img src={column.imageUrl} alt={column.title} className="w-full h-full object-contain" />
+                                      <img 
+                                        src={column.imageUrl} 
+                                        alt={column.title} 
+                                        onError={(e) => {
+                                          e.currentTarget.style.display = 'none';
+                                        }}
+                                        className="w-full h-full object-contain" 
+                                      />
                                     ) : (
                                       column.icon && <column.icon className="w-4 h-4" />
                                     )}

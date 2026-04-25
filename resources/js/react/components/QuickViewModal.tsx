@@ -97,7 +97,15 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                         activeImage === img ? "border-[#2E4D31]" : "border-transparent opacity-60 hover:opacity-100"
                       )}
                     >
-                      <img src={img} alt="" className="w-full h-full object-cover rounded-xl" />
+                      <img 
+                        src={img} 
+                        alt="" 
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+                          e.currentTarget.onerror = null;
+                        }}
+                        className="w-full h-full object-cover rounded-xl" 
+                      />
                     </button>
                   ))}
                 </div>
@@ -115,6 +123,10 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                   <img 
                     src={activeImage} 
                     alt={product.name} 
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+                      e.currentTarget.onerror = null;
+                    }}
                     className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700" 
                   />
                 </motion.div>
@@ -132,7 +144,15 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                         activeImage === img ? "border-[#2E4D31]" : "border-transparent opacity-60"
                       )}
                     >
-                      <img src={img} alt="" className="w-full h-full object-cover rounded-[10px]" />
+                      <img 
+                        src={img} 
+                        alt="" 
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+                          e.currentTarget.onerror = null;
+                        }}
+                        className="w-full h-full object-cover rounded-[10px]" 
+                      />
                     </button>
                   ))}
             </div>

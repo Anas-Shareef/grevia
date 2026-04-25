@@ -155,7 +155,10 @@ const CollectionsPage = () => {
         {currentCategory?.hero_banner_url && (
           <div 
             className="absolute inset-0 z-0 opacity-20 bg-cover bg-center" 
-            style={{ backgroundImage: `url(${currentCategory.hero_banner_url})` }}
+            style={{ 
+              backgroundImage: `url(${currentCategory.hero_banner_url}), url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop')`,
+              backgroundBlendMode: 'overlay'
+            }}
           />
         )}
         
@@ -261,6 +264,9 @@ const CollectionsPage = () => {
                       <img
                         src={cat.icon_url}
                         alt={cat.name}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                         className={`w-7 h-7 object-contain ${
                           filters.category === cat.slug ? 'brightness-0 invert' : ''
                         }`}

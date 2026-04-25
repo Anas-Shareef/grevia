@@ -62,7 +62,7 @@ return new class extends Migration
                 'form' => 'drops',
                 'type' => 'stevia',
                 'tags' => ['coffee', 'breakfast', 'vanilla'],
-                'image' => 'categories/coffee-mockup.png'
+                'image' => null
             ]
         );
     }
