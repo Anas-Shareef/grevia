@@ -406,10 +406,15 @@ Route::get('/sync-filters', function () {
 
     $other = \App\Models\Category::where('slug', 'other-products')->first();
     if ($other) {
+        // Fix names if they were changed
+        \App\Models\Category::where('slug', 'bakery')->update(['name' => 'Bakery']);
+        \App\Models\Category::where('slug', 'pickles')->update(['name' => 'Pickles & Preserves']);
+        
+        // Link to parent
         \App\Models\Category::whereIn('slug', ['bakery', 'pickles'])->update(['parent_id' => $other->id]);
     }
 
-    return "Database synced successfully! Misspelled category merged and deleted. Hierarchy fixed.";
+    return "Database synced successfully! All misspellings merged, labels fixed, and hierarchy organized.";
 });
 
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
