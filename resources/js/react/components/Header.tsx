@@ -98,7 +98,7 @@ const Header = () => {
       imageUrl: cat.icon_url,
       items: (cat.children || []).map(child => ({
         label: child.name,
-        href: `/collections?category=${child.slug}`,
+        href: `/collections/all?category=${child.slug}`,
       })),
     })).filter(col => col.items.length > 0);
   };
