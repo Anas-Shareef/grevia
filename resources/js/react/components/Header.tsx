@@ -240,7 +240,7 @@ const Header = () => {
                                         className="text-[14px] font-[700] uppercase tracking-[0.1em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
                                         onClick={() => setOpenDropdown(null)}
                                       >
-                                        {column.title.replace(/Sweetenerss/gi, 'Sweeteners')}
+                                        {column.title}
                                       </Link>
                                     </div>
 
