@@ -384,13 +384,24 @@ Route::get('/sync-filters', function () {
     \App\Models\Product::whereNotNull('form')->update(['format' => \Illuminate\Support\Facades\DB::raw('form')]);
     \App\Models\Product::whereNotNull('ratio')->update(['concentration' => \Illuminate\Support\Facades\DB::raw('ratio')]);
 
-    // 2. Fix Category Tree names and SLUGS
-    \App\Models\Category::where('name', 'NATURAL SWEETENERSS')->update(['name' => 'Natural Sweeteners']);
-    \App\Models\Category::where('slug', 'natural-sweetenerss')->update(['slug' => 'natural-sweeteners']);
+    // 2. Handle Duplicate Sweeteners Categories (Merge natural-sweetenerss into natural-sweeteners)
+    $misspelled = \App\Models\Category::where('slug', 'natural-sweetenerss')->first();
+    $correct = \App\Models\Category::where('slug', 'natural-sweeteners')->first();
 
-    $natural = \App\Models\Category::where('slug', 'natural-sweeteners')->first();
-    if ($natural) {
-        \App\Models\Category::whereIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => $natural->id]);
+    if ($misspelled && $correct) {
+        // Move all products from misspelled to correct
+        \App\Models\Product::where('category_id', $misspelled->id)->update(['category_id' => $correct->id]);
+        // Delete the misspelled category
+        $misspelled->delete();
+    } elseif ($misspelled && !$correct) {
+        // Just rename it if no correct one exists
+        $misspelled->update(['name' => 'Natural Sweeteners', 'slug' => 'natural-sweeteners']);
+        $correct = $misspelled;
+    }
+
+    // 3. Fix Sub-category hierarchy
+    if ($correct) {
+        \App\Models\Category::whereIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => $correct->id]);
     }
 
     $other = \App\Models\Category::where('slug', 'other-products')->first();
@@ -398,7 +409,7 @@ Route::get('/sync-filters', function () {
         \App\Models\Category::whereIn('slug', ['bakery', 'pickles'])->update(['parent_id' => $other->id]);
     }
 
-    return "Database synced successfully! Slugs fixed and categories organized.";
+    return "Database synced successfully! Misspelled category merged and deleted. Hierarchy fixed.";
 });
 
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
