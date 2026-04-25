@@ -30,16 +30,23 @@ const CollectionCard = ({ category, index }: { category: Category, index: number
       }`}
     >
       {/* Background Image with Hover Scale */}
-      <img
-        src={category.card_image_full_url || 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop'}
-        alt={category.name}
-        onError={(e) => {
-          e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
-          e.currentTarget.onerror = null;
-        }}
-        className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale(1.04)"
-        loading="lazy"
-      />
+      {category.card_image_full_url ? (
+        <img
+          src={category.card_image_full_url}
+          alt={category.name}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+          className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          loading="lazy"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-[#2E4D31]/10 flex items-center justify-center">
+          <div className="opacity-10 scale-150">
+            {/* Branded placeholder or just empty */}
+          </div>
+        </div>
+      )}
 
       {/* 5-Stop Gradient Overlay (PRD Spec) */}
       <div 

@@ -116,15 +116,20 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
           to={`/products/${product.slug || product.id}`}
           className="block w-full h-full relative z-10"
         >
-          <img
-            src={product.image || 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop'}
-            alt={product.name}
-            onError={(e) => {
-              e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
-              e.currentTarget.onerror = null;
-            }}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#2E4D31]/5 flex items-center justify-center">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31]/20">Grevia</span>
+            </div>
+          )}
         </Link>
         
         {/* Hover Overlay with Quick Shop Reveal */}

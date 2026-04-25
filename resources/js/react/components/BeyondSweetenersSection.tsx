@@ -30,16 +30,21 @@ const EditorialCard = ({ category, index }: { category: Category, index: number 
       className="group relative h-[450px] md:h-[500px] bg-[#1a2a1e] rounded-[30px] md:rounded-[40px] overflow-hidden shadow-soft hover:shadow-card transition-all duration-700"
     >
       {/* Editorial Background Image */}
-      <img
-        src={category.card_image_full_url || 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop'}
-        alt={category.name}
-        onError={(e) => {
-          e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
-          e.currentTarget.onerror = null;
-        }}
-        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-[1.04]"
-        loading="lazy"
-      />
+      {category.card_image_full_url ? (
+        <img
+          src={category.card_image_full_url}
+          alt={category.name}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-[1.04]"
+          loading="lazy"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-[#2E4D31]/10 flex items-center justify-center">
+          {/* Branded placeholder or just empty */}
+        </div>
+      )}
 
       {/* 5-Stop Premium Gradient Overlay */}
       <div 
