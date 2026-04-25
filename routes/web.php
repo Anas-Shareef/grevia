@@ -396,4 +396,4 @@ Route::get('/sync-filters', function () {
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '^(?!api|admin|filament|storage|build|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|fix-db|fix-server|\..*\.php$).*$');
+})->where('any', '^(?!api|admin|filament|storage|build|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|sync-filters|fix-db|fix-server|\..*\.php$).*$');
