@@ -125,7 +125,8 @@ class ProductForm
                             ->schema([
                                 TextInput::make('weight')
                                     ->placeholder('e.g. 100g, 250g, 1kg')
-                                    ->required(),
+                                    ->required()
+                                    ->helperText('This value automatically appears as a Pack Size filter option on the collections page. Always use a number followed immediately by the unit: 50g, 250g, 1kg, 30ml. No spaces between number and unit. If left blank, this variant will NOT appear in the Pack Size filter.'),
                                 TextInput::make('pack_size')
                                     ->label('Pack Size')
                                     ->numeric()
@@ -194,9 +195,9 @@ class ProductForm
                     ->collapsible()
                     ->columns(3)
                     ->components([
-                        Select::make('form')
-                            ->label('Product Format')
-                            ->helperText('The physical state of the product — drives the "Format" filter.')
+                        Select::make('format')
+                            ->label('Format / Product Type')
+                            ->helperText('This value controls which Format option this product appears under in the filter sidebar.')
                             ->options([
                                 'powder'  => 'Powder',
                                 'drops'   => 'Drops',
@@ -204,20 +205,21 @@ class ProductForm
                                 'jar'     => 'Jar',
                                 'liquid'  => 'Liquid',
                             ])
+                            ->required()
                             ->placeholder('Select format...')
                             ->searchable()
                             ->native(false),
 
-                        Select::make('ratio')
-                            ->label('Sweetener Concentration')
-                            ->helperText('Potency ratio — drives the "Concentration" filter.')
+                        Select::make('concentration')
+                            ->label('Concentration / Potency')
+                            ->helperText('Concentration is the ratio of active extract to carrier liquid. 1:10 = highest potency (1 part extract in 10 parts total). 1:200 = most diluted, mildest form.')
                             ->options([
-                                '1:10'  => '1:10 (High Potency)',
-                                '1:50'  => '1:50 (Medium)',
-                                '1:100' => '1:100 (Mild)',
-                                '1:200' => '1:200 (Extra Mild)',
+                                '1:10'  => '1:10 — High Potency',
+                                '1:50'  => '1:50 — Medium',
+                                '1:100' => '1:100 — Mild',
+                                '1:200' => '1:200 — Extra Mild',
                             ])
-                            ->placeholder('Select concentration...')
+                            ->placeholder('Not Applicable')
                             ->native(false),
 
                         TextInput::make('size_label')

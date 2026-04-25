@@ -13,8 +13,8 @@ export type FilterState = {
     in_stock: string;
     featured?: string;
     type?: string;
-    form?: string;
-    ratio?: string;
+    format?: string;
+    concentration?: string;
     size?: string;
     certification?: string;
     use_case?: string;
@@ -35,8 +35,8 @@ export const useProductFilters = () => {
             page: searchParams.get("page") || "1",
             in_stock: searchParams.get("in_stock") || "",
             type: searchParams.get("type") || "",
-            form: searchParams.get("form") || "",
-            ratio: searchParams.get("ratio") || "",
+            format: searchParams.get("format") || "",
+            concentration: searchParams.get("concentration") || "",
             size: searchParams.get("size") || "",
             certification: searchParams.get("certification") || "",
             use_case: searchParams.get("use_case") || "",

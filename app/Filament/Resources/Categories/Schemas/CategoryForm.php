@@ -36,7 +36,7 @@ class CategoryForm
                             ->directory('categories'),
                         Select::make('parent_id')
                             ->label('Parent Category')
-                            ->relationship('parent', 'name')
+                            ->relationship('parent', 'name', fn (\Illuminate\Database\Eloquent\Builder $query) => $query->whereNull('parent_id'))
                             ->searchable()
                             ->placeholder('Select a parent category'),
                         Toggle::make('status')

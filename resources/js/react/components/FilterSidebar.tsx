@@ -100,7 +100,7 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                 </div>
             )}
 
-            <Accordion type="multiple" defaultValue={["type", "form", "ratio", "size"]} className="w-full border-none">
+            <Accordion type="multiple" defaultValue={["type", "format", "concentration", "size"]} className="w-full border-none">
                 {/* Product Type Filter */}
                 {meta?.types && (
                     <AccordionItem value="type" className="border-b border-white/5 mb-2">
@@ -127,17 +127,17 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
 
                 {/* Form Filter */}
                 {meta?.forms && (
-                    <AccordionItem value="form" className="border-b border-white/5 mb-2">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Form</AccordionTrigger>
+                    <AccordionItem value="format" className="border-b border-white/5 mb-2">
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Format</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.forms.map((f) => (
-                                    <div key={f.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("form", filters.form === f.label ? "" : f.label)}>
+                                    <div key={f.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("format", filters.format === f.label ? "" : f.label)}>
                                         <div className="flex items-center space-x-3">
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.form === f.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
-                                                {filters.form === f.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.format === f.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
+                                                {filters.format === f.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
                                             </div>
-                                            <span className={`text-sm font-bold transition-colors capitalize ${filters.form === f.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
+                                            <span className={`text-sm font-bold transition-colors capitalize ${filters.format === f.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
                                                 {f.label}
                                             </span>
                                         </div>
@@ -151,14 +151,14 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
 
                 {/* Concentration Filter */}
                 {meta?.ratios && (
-                    <AccordionItem value="ratio" className="border-b border-white/5 mb-2">
+                    <AccordionItem value="concentration" className="border-b border-white/5 mb-2">
                         <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Concentration</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.ratios.map((r) => {
-                                    const isSelected = filters.ratio === r.label;
+                                    const isSelected = filters.concentration === r.label;
                                     return (
-                                        <div key={r.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("ratio", isSelected ? "" : r.label)}>
+                                        <div key={r.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("concentration", isSelected ? "" : r.label)}>
                                             <div className="flex items-center space-x-3">
                                                 <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-lime data-[state=checked]:border-lime" />
                                                 <span className={`text-sm font-bold transition-colors ${isSelected ? "text-white" : "text-white/50 group-hover:text-white"}`}>

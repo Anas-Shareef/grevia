@@ -29,6 +29,8 @@ class Product extends Model
         'tags',
         'ratio',
         'form',
+        'format',
+        'concentration',
         'type',
         'size_label',
         'sweetness_description',

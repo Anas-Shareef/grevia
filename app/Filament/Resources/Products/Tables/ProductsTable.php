@@ -55,7 +55,7 @@ class ProductsTable
                     ->sortable(),
 
                 // ── Filter Attributes — Power the Collections sidebar ────
-                TextColumn::make('form')
+                TextColumn::make('format')
                     ->label('Format')
                     ->badge()
                     ->color(fn (?string $state): string => match($state) {
@@ -70,7 +70,7 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('ratio')
+                TextColumn::make('concentration')
                     ->label('Concentration')
                     ->badge()
                     ->color('warning')
@@ -114,7 +114,7 @@ class ProductsTable
                     ->preload(),
 
                 // ── Filter by Format ──────────────────────────────────────
-                SelectFilter::make('form')
+                SelectFilter::make('format')
                     ->label('Format')
                     ->options([
                         'powder'  => 'Powder',
@@ -125,7 +125,7 @@ class ProductsTable
                     ]),
 
                 // ── Filter by Concentration ──────────────────────────────
-                SelectFilter::make('ratio')
+                SelectFilter::make('concentration')
                     ->label('Concentration')
                     ->options([
                         '1:10'  => '1:10 (High Potency)',
@@ -154,7 +154,7 @@ class ProductsTable
                         ->icon('heroicon-o-funnel')
                         ->color('primary')
                         ->form([
-                            Select::make('form')
+                            Select::make('format')
                                 ->label('Product Format')
                                 ->options([
                                     'powder'  => 'Powder',
@@ -165,7 +165,7 @@ class ProductsTable
                                 ])
                                 ->placeholder('Leave blank to keep existing'),
 
-                            Select::make('ratio')
+                            Select::make('concentration')
                                 ->label('Sweetener Concentration')
                                 ->options([
                                     '1:10'  => '1:10 (High Potency)',
@@ -181,8 +181,8 @@ class ProductsTable
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $updates = array_filter([
-                                'form'       => $data['form'] ?? null,
-                                'ratio'      => $data['ratio'] ?? null,
+                                'format'     => $data['format'] ?? null,
+                                'concentration' => $data['concentration'] ?? null,
                                 'size_label' => $data['size_label'] ?? null,
                             ], fn ($v) => !is_null($v) && $v !== '');
                             if (!empty($updates)) {

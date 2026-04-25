@@ -20,6 +20,12 @@ class CategoriesTable
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->withCount(['products', 'childProducts']))
+            ->groups([
+                \Filament\Tables\Grouping\Group::make('parent.name')
+                    ->label('Parent Category')
+                    ->collapsible(),
+            ])
+            ->defaultGroup('parent.name')
             ->columns([
                 TextColumn::make('name')
                     ->searchable()

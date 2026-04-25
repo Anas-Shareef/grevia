@@ -112,11 +112,11 @@ class ProductController extends Controller
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
-        if ($request->filled('form')) {
-            $query->where('form', $request->form);
+        if ($request->filled('format')) {
+            $query->where('format', $request->format);
         }
-        if ($request->filled('ratio')) {
-            $query->where('ratio', $request->ratio);
+        if ($request->filled('concentration')) {
+            $query->where('concentration', $request->concentration);
         }
         if ($request->filled('size')) {
             $query->where('size_label', 'like', "%{$request->size}%");
@@ -173,9 +173,9 @@ class ProductController extends Controller
                 // Mirror the category scope from the main query
                 $q->whereIn('category_id', $query->getQuery()->wheres[0]['values'] ?? []);
             })
-            ->whereNotNull('form')
-            ->groupBy('form')
-            ->selectRaw('form as lbl, count(*) as cnt')
+            ->whereNotNull('format')
+            ->groupBy('format')
+            ->selectRaw('format as lbl, count(*) as cnt')
             ->pluck('cnt', 'lbl');
 
         $forms = collect($formValues)->map(fn($f) => [
@@ -193,9 +193,9 @@ class ProductController extends Controller
             '1:200' => '1:200 (Extra Mild)',
         ];
         $ratioCounts = Product::where('in_stock', true)
-            ->whereNotNull('ratio')
-            ->groupBy('ratio')
-            ->selectRaw('ratio as lbl, count(*) as cnt')
+            ->whereNotNull('concentration')
+            ->groupBy('concentration')
+            ->selectRaw('concentration as lbl, count(*) as cnt')
             ->pluck('cnt', 'lbl');
 
         $ratios = collect($ratioDefinitions)->map(fn($display, $value) => [
@@ -206,20 +206,35 @@ class ProductController extends Controller
         ])->values()->toArray();
 
         // ── Pack Sizes ── dynamic from size_label column ─────────────────
-        $sizeValues = ['50g', '100g', '200g', '250g', '500g', '50ml', '100ml', '200ml'];
-        $sizeCounts = [];
-        foreach ($sizeValues as $size) {
-            $sizeCounts[$size] = Product::where('in_stock', true)
-                ->where('size_label', 'like', "%{$size}%")
-                ->count();
+        // Pull all size_labels, split by comma, strip spaces, and normalize
+        $allSizes = Product::where('in_stock', true)
+            ->whereNotNull('size_label')
+            ->pluck('size_label');
+
+        $sizeMap = [];
+        foreach ($allSizes as $labelGroup) {
+            $parts = array_map('trim', explode(',', $labelGroup));
+            foreach ($parts as $part) {
+                // Normalize by making lowercase and removing spaces (e.g. "1 kg" -> "1kg")
+                $normalized = strtolower(str_replace(' ', '', $part));
+                if (!empty($normalized)) {
+                    if (!isset($sizeMap[$normalized])) {
+                        $sizeMap[$normalized] = 0;
+                    }
+                    $sizeMap[$normalized]++;
+                }
+            }
         }
 
+        // Sort sizes naturally (e.g. 50g before 100g)
+        $sizeValues = array_keys($sizeMap);
+        natsort($sizeValues);
+
         $sizes = collect($sizeValues)
-            ->filter(fn($s) => $sizeCounts[$s] > 0) // hide sizes with zero products entirely
             ->map(fn($s) => [
                 'label'    => $s,
-                'count'    => (int) $sizeCounts[$s],
-                'disabled' => false, // only shown if > 0
+                'count'    => (int) $sizeMap[$s],
+                'disabled' => false,
             ])->values()->toArray();
 
         // ── Category tree with icon_url ──────────────────────────────────
