@@ -156,7 +156,7 @@ const CollectionsPage = () => {
           <div 
             className="absolute inset-0 z-0 opacity-20 bg-cover bg-center" 
             style={{ 
-              backgroundImage: `url(${currentCategory.hero_banner_url}), url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop')`,
+              backgroundImage: `url(${currentCategory.hero_banner_url}), url('https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop')`,
               backgroundBlendMode: 'overlay'
             }}
           />

@@ -101,7 +101,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                         src={img} 
                         alt="" 
                         onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
                           e.currentTarget.onerror = null;
                         }}
                         className="w-full h-full object-cover rounded-xl" 
@@ -124,7 +124,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                     src={activeImage} 
                     alt={product.name} 
                     onError={(e) => {
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
                       e.currentTarget.onerror = null;
                     }}
                     className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700" 
@@ -148,7 +148,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                         src={img} 
                         alt="" 
                         onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2000&auto=format&fit=crop';
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
                           e.currentTarget.onerror = null;
                         }}
                         className="w-full h-full object-cover rounded-[10px]" 
