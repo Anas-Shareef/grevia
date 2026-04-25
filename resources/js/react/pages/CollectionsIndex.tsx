@@ -90,7 +90,7 @@ const CollectionCard = ({ category, index }: { category: Category, index: number
   if (isActive) {
     return (
       <Link 
-        to={`/collections?category=${category.slug}`}
+        to={`/collections/all?category=${category.slug}`}
         className="block h-full"
       >
         {cardContent}
