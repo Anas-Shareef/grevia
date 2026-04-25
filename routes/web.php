@@ -385,17 +385,24 @@ Route::get('/sync-filters', function () {
     \App\Models\Product::whereNotNull('ratio')->update(['concentration' => \Illuminate\Support\Facades\DB::raw('ratio')]);
 
     // 2. Handle Duplicate Sweeteners Categories (Merge natural-sweetenerss into natural-sweeteners)
-    $misspelled = \App\Models\Category::where('slug', 'natural-sweetenerss')->first();
-    $correct = \App\Models\Category::where('slug', 'natural-sweeteners')->first();
+    // We use withTrashed() because a 'ghost' deleted record might be blocking the unique slug index
+    $misspelled = \App\Models\Category::withTrashed()->where('slug', 'natural-sweetenerss')->first();
+    $correct = \App\Models\Category::withTrashed()->where('slug', 'natural-sweeteners')->first();
+
+    // If the correct one is in the trash, restore it so we can use it
+    if ($correct && $correct->trashed()) {
+        $correct->restore();
+    }
 
     if ($misspelled && $correct) {
         // Move all products from misspelled to correct
         \App\Models\Product::where('category_id', $misspelled->id)->update(['category_id' => $correct->id]);
-        // Delete the misspelled category
-        $misspelled->delete();
+        // Delete the misspelled category permanently to free up the slug if needed
+        $misspelled->forceDelete();
     } elseif ($misspelled && !$correct) {
         // Just rename it if no correct one exists
         $misspelled->update(['name' => 'Natural Sweeteners', 'slug' => 'natural-sweeteners']);
+        if ($misspelled->trashed()) $misspelled->restore();
         $correct = $misspelled;
     }
 
