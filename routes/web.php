@@ -411,17 +411,26 @@ Route::get('/sync-filters', function () {
         \App\Models\Category::whereIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => $correct->id]);
     }
 
+    // 4. Ensure 'Other Products' parent exists and link sub-categories
     $other = \App\Models\Category::where('slug', 'other-products')->first();
-    if ($other) {
-        // Fix names if they were changed
-        \App\Models\Category::where('slug', 'bakery')->update(['name' => 'Bakery']);
-        \App\Models\Category::where('slug', 'pickles')->update(['name' => 'Pickles & Preserves']);
-        
-        // Link to parent
-        \App\Models\Category::whereIn('slug', ['bakery', 'pickles'])->update(['parent_id' => $other->id]);
+    if (!$other) {
+        $other = \App\Models\Category::create([
+            'name' => 'Other Products',
+            'slug' => 'other-products',
+            'status' => true,
+            'show_in_filter' => true,
+            'order' => 10,
+            'description' => 'Explore our range of artisanal bakery items and traditional pickles.'
+        ]);
     }
 
-    return "Database synced successfully! All misspellings merged, labels fixed, and hierarchy organized.";
+    if ($other) {
+        // Fix names if they were changed
+        \App\Models\Category::where('slug', 'bakery')->update(['name' => 'Bakery', 'parent_id' => $other->id]);
+        \App\Models\Category::where('slug', 'pickles')->update(['name' => 'Pickles & Preserves', 'parent_id' => $other->id]);
+    }
+
+    return "Database synced successfully! 'Other Products' parent created, Sweeteners merged, and Bakery/Pickles organized.";
 });
 
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
