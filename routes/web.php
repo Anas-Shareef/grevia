@@ -378,6 +378,21 @@ Route::get('/sync-moosend', function () {
     return response($html);
 });
 
+// Database Sync Route
+Route::get('/sync-filters', function () {
+    // 1. Move old data to new columns
+    \App\Models\Product::whereNotNull('form')->update(['format' => \Illuminate\Support\Facades\DB::raw('form')]);
+    \App\Models\Product::whereNotNull('ratio')->update(['concentration' => \Illuminate\Support\Facades\DB::raw('ratio')]);
+
+    // 2. Fix Category Tree hierarchy
+    $natural = \App\Models\Category::where('slug', 'natural-sweeteners')->first();
+    if ($natural) {
+        \App\Models\Category::whereIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => $natural->id]);
+        \App\Models\Category::whereNotIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => null]);
+    }
+    return "Database synced successfully!";
+});
+
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
 Route::get('/{any?}', function () {
     return view('app');
