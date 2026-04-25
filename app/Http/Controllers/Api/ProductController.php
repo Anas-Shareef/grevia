@@ -253,14 +253,24 @@ class ProductController extends Controller
             ->whereNull('parent_id')
             ->with(['children' => function ($q) {
                 $q->where('show_in_filter', true)
-                  ->withCount('products')
                   ->select('id', 'name', 'slug', 'parent_id', 'icon', 'hero_banner', 'description')
                   ->orderBy('order');
             }])
-            ->withCount('products')
             ->orderBy('order')
             ->select('id', 'name', 'slug', 'icon', 'hero_banner', 'description')
             ->get()
+            ->map(function($cat) {
+                // Calculate recursive product count
+                $childIds = $cat->children->pluck('id')->toArray();
+                $cat->products_count = \App\Models\Product::whereIn('category_id', array_merge([$cat->id], $childIds))->count();
+                
+                $cat->children = $cat->children->map(function($child) {
+                    $child->products_count = \App\Models\Product::where('category_id', $child->id)->count();
+                    return $child;
+                });
+                
+                return $cat;
+            })
             ->map(function ($cat) {
                 $cat->icon_url = $cat->icon
                     ? asset('storage/' . $cat->icon)

@@ -385,6 +385,7 @@ Route::get('/sync-filters', function () {
     \App\Models\Product::whereNotNull('ratio')->update(['concentration' => \Illuminate\Support\Facades\DB::raw('ratio')]);
 
     // 2. Fix Category Tree hierarchy
+    \App\Models\Category::where('name', 'NATURAL SWEETENERSS')->update(['name' => 'Natural Sweeteners']);
     $natural = \App\Models\Category::where('slug', 'natural-sweeteners')->first();
     if ($natural) {
         \App\Models\Category::whereIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => $natural->id]);
