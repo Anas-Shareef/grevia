@@ -384,14 +384,21 @@ Route::get('/sync-filters', function () {
     \App\Models\Product::whereNotNull('form')->update(['format' => \Illuminate\Support\Facades\DB::raw('form')]);
     \App\Models\Product::whereNotNull('ratio')->update(['concentration' => \Illuminate\Support\Facades\DB::raw('ratio')]);
 
-    // 2. Fix Category Tree hierarchy
+    // 2. Fix Category Tree names and SLUGS
     \App\Models\Category::where('name', 'NATURAL SWEETENERSS')->update(['name' => 'Natural Sweeteners']);
+    \App\Models\Category::where('slug', 'natural-sweetenerss')->update(['slug' => 'natural-sweeteners']);
+
     $natural = \App\Models\Category::where('slug', 'natural-sweeteners')->first();
     if ($natural) {
         \App\Models\Category::whereIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => $natural->id]);
-        \App\Models\Category::whereNotIn('slug', ['stevia', 'monk-fruit', 'erythritol', 'xylitol', 'allulose'])->update(['parent_id' => null]);
     }
-    return "Database synced successfully!";
+
+    $other = \App\Models\Category::where('slug', 'other-products')->first();
+    if ($other) {
+        \App\Models\Category::whereIn('slug', ['bakery', 'pickles'])->update(['parent_id' => $other->id]);
+    }
+
+    return "Database synced successfully! Slugs fixed and categories organized.";
 });
 
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
