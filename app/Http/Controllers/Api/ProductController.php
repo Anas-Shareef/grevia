@@ -101,12 +101,14 @@ class ProductController extends Controller
             });
         }
 
-        // ── 10. Regional Visibility ────────────────────────────────────
+        // ── 10. Regional Visibility (Disabled temporarily as it hides all local dev products) ──
+        /*
         $userRegion = $request->header('X-User-Region', 'Region_IN');
         $query->where(function ($q) use ($userRegion) {
             $q->whereJsonContains('tags', $userRegion)
               ->orWhereJsonLength('tags', 0);
         });
+        */
 
         // ── 11. Specialized Product Attribute Filters ──────────────────
         if ($request->filled('type')) {
@@ -165,14 +167,13 @@ class ProductController extends Controller
         // ── Forms (Format) ── dynamic, context-aware ────────────────────
         $formValues = ['powder', 'drops', 'tablets', 'liquid', 'jar'];
         $formLabels = ['powder' => 'Powder', 'drops' => 'Drops', 'tablets' => 'Tablets', 'liquid' => 'Liquid', 'jar' => 'Jar'];
-        $formBase   = clone $facetBase;
-        // Remove any form filter so all siblings are visible
-        $formBase->whereNotNull('in_stock'); // no-op clone refresh
-        $formCounts = Product::where('in_stock', true)
-            ->when($request->filled('category'), function ($q) use ($query) {
-                // Mirror the category scope from the main query
-                $q->whereIn('category_id', $query->getQuery()->wheres[0]['values'] ?? []);
-            })
+        $formBase = clone $facetBase;
+        // Remove format filter from itself so siblings are visible
+        $formBase->getQuery()->wheres = collect($formBase->getQuery()->wheres)->reject(function ($where) {
+            return ($where['column'] ?? '') === 'format';
+        })->values()->all();
+
+        $formCounts = $formBase
             ->whereNotNull('format')
             ->groupBy('format')
             ->selectRaw('format as lbl, count(*) as cnt')
@@ -192,7 +193,12 @@ class ProductController extends Controller
             '1:100' => '1:100 (Mild)',
             '1:200' => '1:200 (Extra Mild)',
         ];
-        $ratioCounts = Product::where('in_stock', true)
+        $ratioBase = clone $facetBase;
+        $ratioBase->getQuery()->wheres = collect($ratioBase->getQuery()->wheres)->reject(function ($where) {
+            return ($where['column'] ?? '') === 'concentration';
+        })->values()->all();
+
+        $ratioCounts = $ratioBase
             ->whereNotNull('concentration')
             ->groupBy('concentration')
             ->selectRaw('concentration as lbl, count(*) as cnt')
@@ -206,8 +212,13 @@ class ProductController extends Controller
         ])->values()->toArray();
 
         // ── Pack Sizes ── dynamic from size_label column ─────────────────
-        // Pull all size_labels, split by comma, strip spaces, and normalize
-        $allSizes = Product::where('in_stock', true)
+        $sizeBase = clone $facetBase;
+        $sizeBase->getQuery()->wheres = collect($sizeBase->getQuery()->wheres)->reject(function ($where) {
+            return ($where['column'] ?? '') === 'size_label';
+        })->values()->all();
+
+        // Pull all size_labels
+        $allSizes = $sizeBase
             ->whereNotNull('size_label')
             ->pluck('size_label');
 
