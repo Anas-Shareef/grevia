@@ -113,8 +113,8 @@ class CategoryForm
                         \Filament\Forms\Components\Slider::make('overlay_density')
                             ->label('Gradient Overlay Density')
                             ->helperText('Adjust for text legibility. 40 (light) to 100 (dark). Default is 72.')
-                            ->min(40)
-                            ->max(100)
+                            ->minValue(40)
+                            ->maxValue(100)
                             ->default(72)
                             ->step(1)
                             ->live(),
