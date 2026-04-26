@@ -2,8 +2,9 @@ import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
-import steviaPlant from "@/assets/stevia-plant.png";
-import monkfruitImg from "@/assets/monkfruit.png";
+import steviaPlant from "@/assets/stevia-plant.jpg";
+import monkfruitImg from "@/assets/monkfruit.jpg";
+
 
 
 const IngredientsSection = () => {
