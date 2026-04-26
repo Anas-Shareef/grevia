@@ -329,7 +329,7 @@ const CollectionsPage = () => {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <div className="container mx-auto px-4 pb-32">
+      <div className="mx-auto px-4 sm:px-4 md:px-5 lg:px-6 xl:px-8 2xl:px-10 max-w-screen-2xl pb-32">
         <div className="flex flex-col lg:flex-row gap-12">
           
           {/* Sidebar - Desktop Only */}
@@ -432,9 +432,17 @@ const CollectionsPage = () => {
             </div>
 
             {isLoading && currentPage === 1 ? (
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="aspect-[4/5] rounded-squircle-xl bg-card animate-pulse border border-border/50 shadow-soft" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-4 lg:gap-5">
+                {[...Array(12)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm flex flex-col">
+                    <div className="aspect-[4/3] bg-gray-200 animate-pulse bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200" style={{ backgroundSize: '200% 100%' }} />
+                    <div className="p-3 md:p-4 flex flex-col gap-3">
+                      <div className="flex gap-2"><div className="w-4 h-4 bg-gray-200 animate-pulse rounded-full" /><div className="w-16 h-4 bg-gray-200 animate-pulse rounded" /></div>
+                      <div className="w-3/4 h-5 bg-gray-200 animate-pulse rounded" />
+                      <div className="w-1/2 h-4 bg-gray-200 animate-pulse rounded" />
+                      <div className="flex justify-between items-end mt-2"><div className="w-16 h-6 bg-gray-200 animate-pulse rounded" /><div className="w-20 h-10 bg-gray-200 animate-pulse rounded-lg" /></div>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : products.length === 0 ? (
@@ -448,7 +456,7 @@ const CollectionsPage = () => {
               </div>
             ) : (
               <div className="space-y-16">
-                <div className={viewMode === 'grid' ? "grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10" : "flex flex-col gap-0"}>
+                <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-4 lg:gap-5" : "flex flex-col gap-0"}>
                   {products.map((product, i) => (
                     <div key={product.id} className="contents">
 

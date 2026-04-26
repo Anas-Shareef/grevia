@@ -90,6 +90,16 @@ class ProductForm
                 Section::make('Product Gallery')
                     ->description('Manage main and additional photos for this product.')
                     ->components([
+                        Placeholder::make('image_warning')
+                            ->label('')
+                            ->content(function ($record) {
+                                if ($record && empty($record->image_url)) {
+                                    return \Illuminate\Support\HtmlString::make('<div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 12px; color: #92400E; border-radius: 4px; font-weight: 500;">⚠️ No images uploaded — storefront will show a placeholder.</div>');
+                                }
+                                return '';
+                            })
+                            ->hidden(fn ($record) => !$record || !empty($record->image_url))
+                            ->columnSpanFull(),
                         Repeater::make('gallery')
                             ->relationship('gallery')
                             ->schema([

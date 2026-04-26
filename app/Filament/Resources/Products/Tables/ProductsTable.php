@@ -12,6 +12,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Filament\Actions\BulkAction;
@@ -32,8 +33,10 @@ class ProductsTable
                 TextColumn::make('image_url')
                     ->label('Thumbnail')
                     ->state(function (Model $record): string {
-                        $url = $record->image_url ?: 'https://placehold.co/100x100/e2e8f0/64748b?text=No+Img';
-                        return '<img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" class="shadow-sm border border-gray-200" alt="Thumbnail">';
+                        if (empty($record->image_url)) {
+                            return '<span style="background-color: #DC2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">No Image</span>';
+                        }
+                        return '<img src="' . $record->image_url . '" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;" class="shadow-sm border border-gray-200" alt="Thumbnail">';
                     })
                     ->html(),
 
@@ -133,6 +136,19 @@ class ProductsTable
                         '1:100' => '1:100 (Mild)',
                         '1:200' => '1:200 (Extra Mild)',
                     ]),
+
+                TernaryFilter::make('has_image')
+                    ->label('Image Status')
+                    ->placeholder('All Products')
+                    ->trueLabel('Has Image')
+                    ->falseLabel('Missing Image')
+                    ->queries(
+                        true: fn ($query) => $query->whereNotNull('image_url')->where('image_url', '!=', ''),
+                        false: fn ($query) => $query->where(function ($q) {
+                            $q->whereNull('image_url')->orWhere('image_url', '');
+                        }),
+                        blank: fn ($query) => $query,
+                    ),
 
                 TrashedFilter::make(),
             ])
