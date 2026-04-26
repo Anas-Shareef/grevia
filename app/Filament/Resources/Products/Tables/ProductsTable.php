@@ -191,16 +191,25 @@ class ProductsTable
                                 ])
                                 ->placeholder('Leave blank to keep existing'),
 
-                            TextInput::make('size_label')
-                                ->label('Pack Size Label')
-                                ->placeholder('e.g. 50g, 100g — leave blank to keep existing'),
+                            TagsInput::make('size_label')
+                                ->label('Pack Size Tags')
+                                ->helperText('Add sizes like 50g, 100g. Powers the sidebar filters.')
+                                ->placeholder('Add size')
+                                ->separator(','),
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $updates = array_filter([
                                 'format'     => $data['format'] ?? null,
                                 'concentration' => $data['concentration'] ?? null,
-                                'size_label' => $data['size_label'] ?? null,
                             ], fn ($v) => !is_null($v) && $v !== '');
+                            
+                            // Handle size_label specifically if provided
+                            if (!empty($data['size_label'])) {
+                                $updates['size_label'] = is_array($data['size_label']) 
+                                    ? implode(',', $data['size_label']) 
+                                    : $data['size_label'];
+                            }
+
                             if (!empty($updates)) {
                                 foreach ($records as $record) {
                                     $record->update($updates);

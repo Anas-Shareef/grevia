@@ -107,18 +107,24 @@ class ProductController extends Controller
             $query->whereIn('type', $types);
         }
         if ($request->filled('format')) {
-            $formats = explode(',', $request->format);
-            $query->whereIn('format', $formats);
+            $formats = array_map('trim', explode(',', $request->format));
+            $query->where(function($q) use ($formats) {
+                $q->whereIn('format', $formats)
+                  ->orWhereIn('form', $formats);
+            });
         }
         if ($request->filled('concentration')) {
-            $concentrations = explode(',', $request->concentration);
-            $query->whereIn('concentration', $concentrations);
+            $concentrations = array_map('trim', explode(',', $request->concentration));
+            $query->where(function($q) use ($concentrations) {
+                $q->whereIn('concentration', $concentrations)
+                  ->orWhereIn('ratio', $concentrations);
+            });
         }
         if ($request->filled('size')) {
-            $sizes = explode(',', $request->size);
+            $sizes = array_map('trim', explode(',', $request->size));
             $query->where(function($q) use ($sizes) {
                 foreach ($sizes as $size) {
-                    $q->orWhere('size_label', 'like', "%" . trim($size) . "%");
+                    $q->orWhere('size_label', 'like', "%" . $size . "%");
                 }
             });
         }

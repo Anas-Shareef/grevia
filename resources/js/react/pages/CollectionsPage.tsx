@@ -44,7 +44,7 @@ const CollectionsPage = () => {
     },
     {
       // Format: physical form of the product
-      key: 'form' as const,
+      key: 'format' as const,
       label: 'Format',
       options: (response?.filters?.forms || []).map((f: any) => ({
         label: f.display || (f.label.charAt(0).toUpperCase() + f.label.slice(1)),
@@ -55,7 +55,7 @@ const CollectionsPage = () => {
     },
     {
       // Concentration: sweetener potency ratio
-      key: 'ratio' as const,
+      key: 'concentration' as const,
       label: 'Concentration',
       options: (response?.filters?.ratios || []).map((r: any) => ({
         label: r.display || r.label,
@@ -119,7 +119,7 @@ const CollectionsPage = () => {
   useEffect(() => {
     setCurrentPage(1);
     setAccumulatedProducts([]);
-  }, [filters.category, filters.form, filters.ratio, filters.sort_by, filters.search, filters.size, filters.certification, filters.use_case]);
+  }, [filters.category, filters.format, filters.concentration, filters.sort_by, filters.search, filters.size, filters.certification, filters.use_case]);
 
   const toggleFilter = (key: any, value: string) => {
     if (key === 'category' || key === 'sort_by') {
