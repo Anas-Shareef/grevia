@@ -236,7 +236,7 @@ const Header = () => {
                                         )}
                                       </div>
                                       <Link
-                                        to={`/collections?category=${column.slug}`}
+                                        to={`/collections/all?category=${column.slug}`}
                                         className="text-[14px] font-[700] uppercase tracking-[0.1em] text-[#2E4D31] hover:opacity-70 transition-opacity leading-tight"
                                         onClick={() => setOpenDropdown(null)}
                                       >

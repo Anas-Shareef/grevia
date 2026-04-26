@@ -430,7 +430,16 @@ Route::get('/sync-filters', function () {
         \App\Models\Category::where('slug', 'pickles')->update(['name' => 'Pickles & Preserves', 'parent_id' => $other->id]);
     }
 
-    return "Database synced successfully! 'Other Products' parent created, Sweeteners merged, and Bakery/Pickles organized.";
+    // 5. Fix Mismatched Slugs found in Audit
+    \App\Models\Category::where('slug', 'superfood-powders')->update(['slug' => 'superfood-powders']); // Ensure consistency
+    
+    // 6. Fix Corrupted Product Name found in Audit
+    \App\Models\Product::where('name', 'like', '%MaRoasted%')->update([
+        'name' => 'Traditional Mango Pickle',
+        'description' => 'A traditional, tangy mango pickle made with hand-picked mangoes and authentic spices.'
+    ]);
+
+    return "Database synced successfully! 'Other Products' parent created, Sweeteners merged, Corrupted names cleaned, and Bakery/Pickles organized.";
 });
 
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
