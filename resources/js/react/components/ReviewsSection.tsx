@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Quote, CheckCircle, X } from "lucide-react";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -22,16 +22,18 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
 
   const fetchReviews = async () => {
     try {
-      const response = await axios.get(`/api/reviews?product_id=${productId}`);
-      // Assuming response.data.data is the array of reviews if paginated
-      setReviews(response.data.data || response.data || []);
+      const response = await api.get(`/reviews?product_id=${productId}`);
+      // Assuming response.data is the array of reviews if paginated
+      setReviews(response.data || response || []);
     } catch (error) {
       console.error("Failed to fetch reviews:", error);
     }
   };
 
   useEffect(() => {
-    fetchReviews();
+    if (productId && productId !== "undefined") {
+      fetchReviews();
+    }
   }, [productId]);
 
   const handleLoadMore = () => {
@@ -59,7 +61,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
         payload.guest_email = guestEmail;
       }
 
-      await axios.post("/api/reviews", payload);
+      await api.post("/reviews", payload);
       toast.success("Review submitted! It will appear once approved by our team.");
       setIsModalOpen(false);
       // Reset form
@@ -69,7 +71,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
       setGuestName("");
       setGuestEmail("");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to submit review.");
+      toast.error(error.message || "Failed to submit review. Please check your inputs.");
     } finally {
       setIsSubmitting(false);
     }
