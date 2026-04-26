@@ -122,15 +122,30 @@ const CollectionsPage = () => {
   }, [filters.category, filters.form, filters.ratio, filters.sort_by, filters.search, filters.size, filters.certification, filters.use_case]);
 
   const toggleFilter = (key: any, value: string) => {
-    const current = (filters as any)[key] || '';
-    setFilter(key, current === value ? '' : value);
+    if (key === 'category' || key === 'sort_by') {
+      const current = (filters as any)[key] || '';
+      setFilter(key, current === value ? '' : value);
+      return;
+    }
+    const currentStr = (filters as any)[key] || '';
+    const currentArray = currentStr ? currentStr.split(',') : [];
+    
+    let newArray;
+    if (currentArray.includes(value)) {
+        newArray = currentArray.filter((v: string) => v !== value);
+    } else {
+        newArray = [...currentArray, value];
+    }
+    
+    setFilter(key, newArray.join(','));
   };
 
   const activeChips = FILTER_GROUPS.flatMap(g =>
-    g.options.filter(o => {
-      const v = (filters as any)[g.key];
-      return v === o.value;
-    }).map(o => ({ key: g.key, label: o.label, value: o.value }))
+    g.options.filter((o: any) => {
+      const currentStr = (filters as any)[g.key] || '';
+      const currentArray = currentStr ? currentStr.split(',') : [];
+      return currentArray.includes(o.value);
+    }).map((o: any) => ({ key: g.key, label: o.label, value: o.value }))
   );
 
   const hasMore = response?.meta && response.meta.current_page < response.meta.last_page;
@@ -277,7 +292,9 @@ const CollectionsPage = () => {
                     <h4 className="sidebar-header">{group.label}</h4>
                     <div className="space-y-3">
                       {group.options.map((opt: any) => {
-                        const isChecked = (filters as any)[group.key] === opt.value;
+                        const currentStr = (filters as any)[group.key] || '';
+                        const currentArray = currentStr ? currentStr.split(',') : [];
+                        const isChecked = currentArray.includes(opt.value);
                         const isDisabled = opt.disabled;
                         return (
                           <button
@@ -342,7 +359,9 @@ const CollectionsPage = () => {
                     <h4 className="sidebar-header">{group.label}</h4>
                     <div className="space-y-3">
                       {group.options.map((opt: any) => {
-                        const isChecked = (filters as any)[group.key] === opt.value;
+                        const currentStr = (filters as any)[group.key] || '';
+                        const currentArray = currentStr ? currentStr.split(',') : [];
+                        const isChecked = currentArray.includes(opt.value);
                         const isDisabled = opt.disabled;
                         return (
                           <button
@@ -430,6 +449,28 @@ const CollectionsPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Active Chips */}
+            {activeChips.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-8">
+                {activeChips.map((chip, idx) => (
+                  <button
+                    key={`${chip.key}-${chip.value}-${idx}`}
+                    onClick={() => toggleFilter(chip.key, chip.value)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#2E4D31]/10 text-[#2E4D31] hover:bg-[#2E4D31]/20 transition-colors text-xs font-bold uppercase tracking-wide"
+                  >
+                    {chip.label}
+                    <X className="w-3 h-3" />
+                  </button>
+                ))}
+                <button
+                  onClick={resetFilters}
+                  className="px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors ml-2"
+                >
+                  Clear All
+                </button>
+              </div>
+            )}
 
             {isLoading && currentPage === 1 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-4 lg:gap-5">

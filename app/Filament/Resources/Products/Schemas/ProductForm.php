@@ -232,10 +232,17 @@ class ProductForm
                             ->placeholder('Not Applicable')
                             ->native(false),
 
-                        TextInput::make('size_label')
-                            ->label('Pack Size Label')
-                            ->helperText('Auto-filled from variants. E.g. "50g, 100g". Edit if not syncing.')
-                            ->placeholder('e.g. 50g'),
+                        TagsInput::make('size_label')
+                            ->label('Pack Size Tags')
+                            ->helperText('Type a size (e.g. 50g, 100g) and press enter. This powers the storefront Pack Size filters.')
+                            ->placeholder('e.g. 50g')
+                            ->separator(',')
+                            ->afterStateHydrated(function ($component, $state) {
+                                if (is_string($state) && !empty($state)) {
+                                    $component->state(array_map('trim', explode(',', $state)));
+                                }
+                            })
+                            ->dehydrateStateUsing(fn ($state) => is_array($state) ? implode(',', $state) : $state),
 
                         TextInput::make('type')
                             ->label('Sweetener Type')

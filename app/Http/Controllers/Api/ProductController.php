@@ -112,16 +112,24 @@ class ProductController extends Controller
 
         // ── 11. Specialized Product Attribute Filters ──────────────────
         if ($request->filled('type')) {
-            $query->where('type', $request->type);
+            $types = explode(',', $request->type);
+            $query->whereIn('type', $types);
         }
         if ($request->filled('format')) {
-            $query->where('format', $request->format);
+            $formats = explode(',', $request->format);
+            $query->whereIn('format', $formats);
         }
         if ($request->filled('concentration')) {
-            $query->where('concentration', $request->concentration);
+            $concentrations = explode(',', $request->concentration);
+            $query->whereIn('concentration', $concentrations);
         }
         if ($request->filled('size')) {
-            $query->where('size_label', 'like', "%{$request->size}%");
+            $sizes = explode(',', $request->size);
+            $query->where(function($q) use ($sizes) {
+                foreach ($sizes as $size) {
+                    $q->orWhere('size_label', 'like', "%" . trim($size) . "%");
+                }
+            });
         }
 
         // ── 12. Sorting ────────────────────────────────────────────────
