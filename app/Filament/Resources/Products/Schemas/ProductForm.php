@@ -94,7 +94,7 @@ class ProductForm
                             ->label('')
                             ->content(function ($record) {
                                 if ($record && empty($record->image_url)) {
-                                    return \Illuminate\Support\HtmlString::make('<div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 12px; color: #92400E; border-radius: 4px; font-weight: 500;">⚠️ No images uploaded — storefront will show a placeholder.</div>');
+                                    return new \Illuminate\Support\HtmlString('<div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 12px; color: #92400E; border-radius: 4px; font-weight: 500;">⚠️ No images uploaded — storefront will show a placeholder.</div>');
                                 }
                                 return '';
                             })
@@ -205,32 +205,26 @@ class ProductForm
                     ->collapsible()
                     ->columns(3)
                     ->components([
-                        Select::make('format')
+                        TextInput::make('format')
                             ->label('Format / Product Type')
-                            ->helperText('This value controls which Format option this product appears under in the filter sidebar.')
-                            ->options([
-                                'powder'  => 'Powder',
-                                'drops'   => 'Drops',
-                                'tablets' => 'Tablets',
-                                'jar'     => 'Jar',
-                                'liquid'  => 'Liquid',
-                            ])
+                            ->placeholder('e.g. powder, drops, liquid')
+                            ->helperText('Type any format. This powers the "Format" filter on the storefront.')
                             ->required()
-                            ->placeholder('Select format...')
-                            ->searchable()
-                            ->native(false),
+                            ->afterStateHydrated(fn ($component, $state, $record) => $state ? null : $component->state($record?->form))
+                            ->dehydrateStateUsing(function ($state, $record) {
+                                if ($record) { $record->form = $state; }
+                                return $state;
+                            }),
 
-                        Select::make('concentration')
+                        TextInput::make('concentration')
                             ->label('Concentration / Potency')
-                            ->helperText('Concentration is the ratio of active extract to carrier liquid. 1:10 = highest potency (1 part extract in 10 parts total). 1:200 = most diluted, mildest form.')
-                            ->options([
-                                '1:10'  => '1:10 — High Potency',
-                                '1:50'  => '1:50 — Medium',
-                                '1:100' => '1:100 — Mild',
-                                '1:200' => '1:200 — Extra Mild',
-                            ])
-                            ->placeholder('Not Applicable')
-                            ->native(false),
+                            ->placeholder('e.g. 1:10, 1:50, 1:200')
+                            ->helperText('Type any ratio. This powers the "Concentration" filter on the storefront.')
+                            ->afterStateHydrated(fn ($component, $state, $record) => $state ? null : $component->state($record?->ratio))
+                            ->dehydrateStateUsing(function ($state, $record) {
+                                if ($record) { $record->ratio = $state; }
+                                return $state;
+                            }),
 
                         TagsInput::make('size_label')
                             ->label('Pack Size Tags')
