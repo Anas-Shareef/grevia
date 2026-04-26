@@ -264,10 +264,17 @@ class ProductForm
                             ->visible(fn () => \Illuminate\Support\Facades\Schema::hasColumn('products', 'nutrition_facts'))
                             ->columnSpanFull(),
 
-                        TextInput::make('related_products')
-                            ->label('Related Products')
-                            ->placeholder('Comma-separated slugs: stevia-powder-100g, stevia-drops-50ml')
-                            ->helperText('Shown in the "You may also like" row on the product page.')
+                        Select::make('related_products')
+                            ->label('Cross-Sell Picker (You May Also Like)')
+                            ->multiple()
+                            ->options(\App\Models\Product::query()->pluck('name', 'slug')->toArray())
+                            ->afterStateHydrated(function ($component, $state) {
+                                if (is_string($state) && !empty($state)) {
+                                    $component->state(array_map('trim', explode(',', $state)));
+                                }
+                            })
+                            ->dehydrateStateUsing(fn ($state) => is_array($state) ? implode(',', $state) : $state)
+                            ->helperText('Manually choose which products appear in the "You May Also Like" section.')
                             ->columnSpanFull(),
 
                         Grid::make(2)
