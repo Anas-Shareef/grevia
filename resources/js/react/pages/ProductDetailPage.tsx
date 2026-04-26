@@ -332,7 +332,7 @@ const ProductDetailPage = () => {
 
         {/* Dynamic Reviews Section */}
         <div className="mt-16 border-t border-gray-200 pt-16">
-           <ReviewsSection productId={String(product.id)} />
+           <ReviewsSection productId={String(product.dbId || product.id)} />
         </div>
 
         {/* Related Products Slider */}
