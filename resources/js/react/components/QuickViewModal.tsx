@@ -23,9 +23,12 @@ import {
 } from "@/components/ui/dialog";
 import { Product, ProductVariant } from "@/types";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Heart } from "lucide-react";
+
 
 interface QuickViewModalProps {
   product: Product;
@@ -42,12 +45,16 @@ const HealthBadge = ({ icon: Icon, label }: { icon: any, label: string }) => (
 
 export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalProps) => {
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  
+  const isWishlisted = isInWishlist(String(product.dbId || product.id));
   
   const defaultVariant = product.variants?.find(v => v.status === 'active') || product.variants?.[0];
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(defaultVariant);
   const [activeImage, setActiveImage] = useState(product.image_url || product.image);
+
 
   // Sync active image with variant if variant has specific image
   useEffect(() => {
@@ -93,8 +100,8 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                       key={idx}
                       onClick={() => setActiveImage(img)}
                       className={cn(
-                        "w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all p-1 bg-white",
-                        activeImage === img ? "border-[#2E4D31]" : "border-transparent opacity-60 hover:opacity-100"
+                        "w-16 h-16 rounded-[20px] overflow-hidden border-2 transition-all p-1.5 bg-white",
+                        activeImage === img ? "border-[#729855] shadow-lg scale-105" : "border-transparent opacity-60 hover:opacity-100"
                       )}
                     >
                       <img 
@@ -192,41 +199,71 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 <HealthBadge icon={Droplets} label="Zero Glycemic" />
                 <HealthBadge icon={Zap} label="Keto Friendly" />
                 <HealthBadge icon={Leaf} label="100% Natural" />
+                {product.ratio && (
+                  <div className="flex items-center gap-1.5 bg-[#2E4D31]/5 px-3 py-1.5 rounded-full border border-[#2E4D31]/10">
+                    <span className="text-[10px] font-bold text-[#2E4D31]/40 uppercase tracking-widest">Ratio:</span>
+                    <span className="text-[10px] font-black text-[#2E4D31]">{product.ratio}</span>
+                  </div>
+                )}
               </div>
 
-              <p className="text-[#2E4D31]/70 text-sm leading-relaxed mb-8 font-medium">
+              <p className="text-[#2E4D31]/70 text-sm leading-relaxed mb-8 font-medium italic">
                 {product.description || "Experience the pure, plant-based sweetness of Grevia. Crafted for those who refuse to compromise on taste or health."}
               </p>
 
               {/* Selection Section */}
               <div className="space-y-6 mb-10">
-                {/* Variant Selection */}
+                {/* Strength Ratio (if applicable) */}
+                {product.form && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31]/40 mb-3">Format</p>
+                    <div className="flex items-center gap-2">
+                       <div className="px-4 py-2 bg-[#F3F4ED] rounded-xl text-xs font-bold text-[#2E4D31] border border-[#E4ECE6]">
+                         {product.form}
+                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Variant Selection (Pack Size) */}
                 {product.variants && product.variants.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31]/40">Select Size</p>
-                      <p className="text-[10px] font-bold text-[#729855]">{selectedVariant?.stock_quantity ? `${selectedVariant.stock_quantity} available` : 'In Stock'}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31]/40">Pack Size</p>
+                      <p className="text-[10px] font-bold text-[#729855]">{selectedVariant?.stock_quantity ? `${selectedVariant.stock_quantity} in stock` : 'Available'}</p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                        {product.variants.map((v) => (
                          <button
                            key={v.id}
                            onClick={() => setSelectedVariant(v)}
                            disabled={v.status === 'inactive' || v.stock_quantity === 0}
                            className={cn(
-                             "px-6 py-2.5 rounded-[15px] text-xs font-bold transition-all border-2",
+                             "relative px-6 py-3 rounded-2xl text-xs font-bold transition-all border-2 flex flex-col items-center min-w-[80px]",
                              selectedVariant?.id === v.id
-                               ? "bg-[#2E4D31] text-white border-[#2E4D31] shadow-lg shadow-[#2E4D31]/10"
-                               : "bg-white text-[#2E4D31] border-forest/10 hover:border-[#2E4D31]/30",
-                             (v.status === 'inactive' || v.stock_quantity === 0) && "opacity-40 pointer-events-none line-through"
+                               ? "bg-[#2E4D31] text-white border-[#2E4D31] shadow-xl shadow-[#2E4D31]/20 scale-105"
+                               : "bg-white text-[#2E4D31] border-[#E4ECE6] hover:border-[#2E4D31]/30",
+                             (v.status === 'inactive' || v.stock_quantity === 0) && "opacity-40 pointer-events-none"
                            )}
                          >
-                           {v.weight}
+                           <span>{v.weight}</span>
+                           {v.discount_price && selectedVariant?.id !== v.id && (
+                             <span className="text-[9px] opacity-60 mt-0.5 line-through">₹{v.price}</span>
+                           )}
+                           {selectedVariant?.id === v.id && (
+                             <motion.div 
+                               layoutId="active-variant"
+                               className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#729855] rounded-full flex items-center justify-center border-2 border-white"
+                             >
+                               <Check className="w-2 h-2 text-white" />
+                             </motion.div>
+                           )}
                          </button>
                        ))}
                     </div>
                   </div>
                 )}
+
 
                 {/* Buy Box */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
@@ -255,10 +292,10 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                     onClick={handleAddToCart}
                     disabled={isAdded || !selectedVariant}
                     className={cn(
-                      "flex-1 h-14 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 w-full",
+                      "flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 w-full",
                       isAdded 
                         ? "bg-[#729855] text-white" 
-                        : "bg-[#2E4D31] text-white hover:bg-[#1a2d1d] hover:scale-[1.02] active:scale-95 shadow-button"
+                        : "bg-[#2E4D31] text-white hover:bg-[#1a2d1d] hover:shadow-xl hover:shadow-[#2E4D31]/20 active:scale-95 shadow-button"
                     )}
                   >
                     {isAdded ? (
@@ -273,7 +310,20 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                       </>
                     )}
                   </button>
+
+                  <button
+                    onClick={() => isWishlisted ? removeFromWishlist(String(product.dbId || product.id)) : addToWishlist(product)}
+                    className={cn(
+                      "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border-2",
+                      isWishlisted 
+                        ? "bg-red-50 border-red-100 text-red-500 shadow-sm" 
+                        : "bg-white border-[#E4ECE6] text-[#2E4D31] hover:border-[#2E4D31]/30 hover:bg-[#F3F4ED]"
+                    )}
+                  >
+                    <Heart className={cn("w-5 h-5 transition-transform duration-300", isWishlisted && "fill-current scale-110")} />
+                  </button>
                 </div>
+
               </div>
 
               {/* Modal Footer */}

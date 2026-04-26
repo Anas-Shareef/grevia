@@ -28,7 +28,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Convert server format to CartItem format
           const cartItems: CartItem[] = serverItems.map((item: any) => ({
             product: {
-              id: item.id,
+              ...item,
+              id: String(item.id),
               name: item.name,
               price: item.price,
               image: item.image,
@@ -151,13 +152,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const variant = product.variants?.find(v => v.id == variantId);
 
     const existingItem = items.find(item =>
-      item.product.id === product.id && item.variantId == variantId
+      String(item.product.id) === String(product.id) && String(item.variantId) === String(variantId)
     );
 
     let newItems: CartItem[];
     if (existingItem) {
       newItems = items.map(item =>
-        (item.product.id === product.id && item.variantId == variantId)
+        (String(item.product.id) === String(product.id) && String(item.variantId) === String(variantId))
           ? { ...item, quantity: Number(item.quantity) + Number(quantity) }
           : item
       );
@@ -178,9 +179,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const removeFromCart = useCallback(async (productId: string, variantId?: string | number) => {
     const newItems = items.filter(item => {
-      if (item.product.id !== productId) return true;          // keep other products
+      if (String(item.product.id) !== String(productId)) return true;          // keep other products
       if (variantId === undefined) return false;               // remove ALL variants of this product if no variantId given
-      return item.variantId != variantId;                      // keep variants that don't match
+      return String(item.variantId) !== String(variantId);                      // keep variants that don't match
     });
     await updateCart(newItems);
   }, [items, updateCart]);
@@ -192,8 +193,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const newItems = items.map(item => {
-      if (item.product.id !== productId) return item;
-      if (variantId !== undefined && item.variantId != variantId) return item;
+      if (String(item.product.id) !== String(productId)) return item;
+      if (variantId !== undefined && String(item.variantId) !== String(variantId)) return item;
       return { ...item, quantity: Number(quantity) };
     });
     await updateCart(newItems);
