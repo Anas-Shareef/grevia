@@ -35,17 +35,8 @@ class ProductController extends Controller
             $cat = Category::where('slug', $categorySlug)->first();
 
             if ($cat) {
-                $categoryIds = collect([$cat->id]);
-                $getChildren = function ($category) use (&$getChildren, &$categoryIds) {
-                    foreach ($category->children as $child) {
-                        $categoryIds->push($child->id);
-                        $getChildren($child);
-                    }
-                };
-                $cat->loadMissing('children.children'); // eager load 2 levels
-                $getChildren($cat);
-
-                $query->whereIn('category_id', $categoryIds->unique()->toArray());
+                $categoryIds = $cat->getAllDescendantIds();
+                $query->whereIn('category_id', $categoryIds);
             } else {
                 // Fallback: search by tag or subcategory string
                 $query->where(function ($q) use ($categorySlug) {
@@ -268,12 +259,17 @@ class ProductController extends Controller
             ->select('id', 'name', 'slug', 'icon', 'hero_banner', 'description')
             ->get()
             ->map(function($cat) {
-                // Calculate recursive product count
-                $childIds = $cat->children->pluck('id')->toArray();
-                $cat->products_count = \App\Models\Product::whereIn('category_id', array_merge([$cat->id], $childIds))->count();
+                // Calculate recursive product count (respecting in_stock global filter)
+                $categoryIds = $cat->getAllDescendantIds();
+                $cat->products_count = \App\Models\Product::whereIn('category_id', $categoryIds)
+                    ->where('in_stock', true)
+                    ->count();
                 
                 $cat->children = $cat->children->map(function($child) {
-                    $child->products_count = \App\Models\Product::where('category_id', $child->id)->count();
+                    $childIds = $child->getAllDescendantIds();
+                    $child->products_count = \App\Models\Product::whereIn('category_id', $childIds)
+                        ->where('in_stock', true)
+                        ->count();
                     return $child;
                 });
                 

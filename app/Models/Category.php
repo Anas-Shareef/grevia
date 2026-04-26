@@ -68,6 +68,15 @@ class Category extends Model
         return \Illuminate\Support\Facades\Storage::url($this->card_image_url);
     }
 
+    public function getAllDescendantIds()
+    {
+        $ids = [$this->id];
+        foreach ($this->children as $child) {
+            $ids = array_merge($ids, $child->getAllDescendantIds());
+        }
+        return $ids;
+    }
+
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
