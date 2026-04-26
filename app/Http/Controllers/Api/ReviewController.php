@@ -72,22 +72,22 @@ class ReviewController extends Controller
         $validated = $request->validate($rules);
         $productId = $validated['product_id'];
 
+        $isVerifiedPurchase = false;
+
         if ($user) {
              // 1. Check if already reviewed
             if ($user->reviews()->where('product_id', $productId)->exists()) {
                 return response()->json(['message' => 'You have already reviewed this product.'], 422);
             }
 
-            // 2. Verified Purchase Check (Relaxed: completed OR processing)
+            // 2. Verified Purchase Check
             $hasPurchased = $user->orders()
                 ->whereIn('status', ['completed', 'processing'])
                 ->whereHas('orderItems', function ($q) use ($productId) {
                     $q->where('product_id', $productId);
                 })->exists();
 
-            if (!$hasPurchased) {
-                return response()->json(['message' => 'You can only review products you have purchased.'], 403);
-            }
+            $isVerifiedPurchase = $hasPurchased;
         } else {
             // Guest Logic: Check if email already reviewed this product
             $existingReview = ProductReview::where('product_id', $productId)
@@ -97,6 +97,15 @@ class ReviewController extends Controller
             if ($existingReview) {
                 return response()->json(['message' => 'You have already reviewed this product with this email.'], 422);
             }
+
+            // Check if guest email matches a completed order for verified badge
+            $hasPurchased = \App\Models\Order::where('email', $validated['guest_email'])
+                ->whereIn('status', ['completed', 'processing'])
+                ->whereHas('orderItems', function ($q) use ($productId) {
+                    $q->where('product_id', $productId);
+                })->exists();
+            
+            $isVerifiedPurchase = $hasPurchased;
         }
 
         DB::beginTransaction();
@@ -107,7 +116,7 @@ class ReviewController extends Controller
                 'title' => $validated['title'],
                 'comment' => $validated['comment'],
                 'status' => 'pending',
-                'is_verified_purchase' => $user ? true : false,
+                'is_verified_purchase' => $isVerifiedPurchase,
             ];
 
             if ($user) {
