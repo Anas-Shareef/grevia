@@ -55,16 +55,21 @@ class ReviewController extends Controller
     public function store(Request $request)
     {
         $user = $request->user('sanctum'); // Handle optional auth
+        $product = \App\Models\Product::findOrFail($request->product_id);
 
         $rules = [
             'product_id' => 'required|exists:products,id',
             'rating' => 'required|integer|min:1|max:5',
             'title' => 'required|string|max:255',
             'comment' => 'required|string',
-            'images.*' => 'nullable|image|max:2048',
+            'media.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi|max:20480', // 20MB limit for video
         ];
 
         if (!$user) {
+            // Check if guest reviews are enabled for this product
+            if (!$product->enable_guest_reviews) {
+                return response()->json(['message' => 'Only verified customers who purchased this product can leave reviews.'], 403);
+            }
             $rules['guest_name'] = 'required|string|max:255';
             $rules['guest_email'] = 'required|email|max:255';
         }
@@ -73,14 +78,14 @@ class ReviewController extends Controller
         $productId = $validated['product_id'];
 
         $isVerifiedPurchase = false;
+        $verifiedCustomer = false;
+        $verifiedGuest = false;
 
         if ($user) {
-             // 1. Check if already reviewed
             if ($user->reviews()->where('product_id', $productId)->exists()) {
                 return response()->json(['message' => 'You have already reviewed this product.'], 422);
             }
 
-            // 2. Verified Purchase Check
             $hasPurchased = $user->orders()
                 ->whereIn('status', ['completed', 'processing'])
                 ->whereHas('orderItems', function ($q) use ($productId) {
@@ -88,8 +93,8 @@ class ReviewController extends Controller
                 })->exists();
 
             $isVerifiedPurchase = $hasPurchased;
+            $verifiedCustomer = $hasPurchased;
         } else {
-            // Guest Logic: Check if email already reviewed this product
             $existingReview = ProductReview::where('product_id', $productId)
                 ->where('guest_email', $validated['guest_email'])
                 ->exists();
@@ -98,7 +103,6 @@ class ReviewController extends Controller
                 return response()->json(['message' => 'You have already reviewed this product with this email.'], 422);
             }
 
-            // Check if guest email matches a completed order for verified badge
             $hasPurchased = \App\Models\Order::where('email', $validated['guest_email'])
                 ->whereIn('status', ['completed', 'processing'])
                 ->whereHas('orderItems', function ($q) use ($productId) {
@@ -106,6 +110,7 @@ class ReviewController extends Controller
                 })->exists();
             
             $isVerifiedPurchase = $hasPurchased;
+            $verifiedGuest = $hasPurchased;
         }
 
         DB::beginTransaction();
@@ -117,6 +122,9 @@ class ReviewController extends Controller
                 'comment' => $validated['comment'],
                 'status' => 'pending',
                 'is_verified_purchase' => $isVerifiedPurchase,
+                'verified_customer' => $verifiedCustomer,
+                'verified_guest' => $verifiedGuest,
+                'helpful_count' => 0,
             ];
 
             if ($user) {
@@ -127,22 +135,36 @@ class ReviewController extends Controller
                 $review = ProductReview::create($reviewData);
             }
 
-            // Handle Images
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('reviews', 'public');
-                    $review->images()->create(['image_path' => $path]);
+            // Handle Media
+            $imageUrls = [];
+            $videoUrl = null;
+
+            if ($request->hasFile('media')) {
+                foreach ($request->file('media') as $file) {
+                    $mime = $file->getMimeType();
+                    if (str_starts_with($mime, 'video/')) {
+                        $videoUrl = $file->store('reviews/videos', 'public');
+                        // Generate thumbnail placeholder or logic if needed
+                    } else {
+                        $path = $file->store('reviews/images', 'public');
+                        $imageUrls[] = \Illuminate\Support\Facades\Storage::url($path);
+                        // Also store in legacy relationship for backward compat
+                        $review->images()->create(['image_path' => $path]);
+                    }
                 }
             }
 
+            $review->update([
+                'image_urls' => $imageUrls,
+                'video_url' => $videoUrl ? \Illuminate\Support\Facades\Storage::url($videoUrl) : null,
+            ]);
+
             DB::commit();
 
-            // Send Email to Guest
             if (!$user) {
                 try {
                     \Illuminate\Support\Facades\Mail::to($review->guest_email)->send(new \App\Mail\GuestReviewSubmitted($review));
                 } catch (\Exception $e) {
-                    // Log email failure but don't fail request
                     \Illuminate\Support\Facades\Log::error('Review Email Failed: ' . $e->getMessage());
                 }
             }
@@ -155,6 +177,16 @@ class ReviewController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Failed to submit review: ' . $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Mark review as helpful
+     */
+    public function helpful(string $id)
+    {
+        $review = ProductReview::findOrFail($id);
+        $review->increment('helpful_count');
+        return response()->json(['message' => 'Feedback recorded!', 'helpful_count' => $review->helpful_count]);
     }
 
     /**

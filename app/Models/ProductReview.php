@@ -20,11 +20,25 @@ class ProductReview extends Model
         'comment',
         'status',
         'is_verified_purchase',
+        'image_urls',
+        'thumbnail_urls',
+        'video_url',
+        'video_thumbnail_url',
+        'media_approved',
+        'verified_customer',
+        'verified_guest',
+        'helpful_count',
     ];
 
     protected $casts = [
         'is_verified_purchase' => 'boolean',
         'rating' => 'integer',
+        'image_urls' => 'array',
+        'thumbnail_urls' => 'array',
+        'media_approved' => 'boolean',
+        'verified_customer' => 'boolean',
+        'verified_guest' => 'boolean',
+        'helpful_count' => 'integer',
     ];
 
     public function user()

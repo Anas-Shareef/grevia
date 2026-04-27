@@ -38,6 +38,11 @@ class Product extends Model
         'related_products',
         'nutrition_facts',
         'usage_instructions',
+        'concentration_options',
+        'health_benefits',
+        'related_product_ids',
+        'enable_guest_reviews',
+        'product_description',
     ];
 
     protected $casts = [
@@ -49,6 +54,10 @@ class Product extends Model
         'rating' => 'decimal:2',
         'in_stock' => 'boolean',
         'is_featured' => 'boolean',
+        'concentration_options' => 'array',
+        'health_benefits' => 'array',
+        'related_product_ids' => 'array',
+        'enable_guest_reviews' => 'boolean',
     ];
 
     protected $appends = ['image_url', 'reviews_count', 'average_rating'];

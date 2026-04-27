@@ -199,49 +199,78 @@ class ProductForm
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
                             ->collapsible(),
                     ]),
+                Section::make('🛒 PDP Content & Attributes')
+                    ->description('Detailed content for the Product Detail Page accordions and trust signals.')
+                    ->collapsible()
+                    ->components([
+                        RichEditor::make('product_description')
+                            ->label('Story / Detailed Description')
+                            ->helperText('Accordion 1: The premium story of the product.')
+                            ->columnSpanFull(),
+                        
+                        RichEditor::make('ingredients')
+                            ->label('Ingredients List')
+                            ->helperText('Accordion 2: Detailed list of ingredients.')
+                            ->columnSpanFull(),
+                            
+                        RichEditor::make('usage_instructions')
+                            ->label('How to Use')
+                            ->helperText('Accordion 3: Step-by-step instructions.')
+                            ->columnSpanFull(),
+
+                        Grid::make(2)
+                            ->schema([
+                                TagsInput::make('concentration_options')
+                                    ->label('Available Concentrations')
+                                    ->placeholder('e.g. 1:10, 1:50')
+                                    ->helperText('Type a ratio and press enter. These become selectable pills on the PDP.')
+                                    ->separator(','),
+                                Select::make('concentration')
+                                    ->label('Default Concentration')
+                                    ->options(fn ($get) => array_combine($get('concentration_options') ?? [], $get('concentration_options') ?? []))
+                                    ->helperText('Pre-selected concentration pill on page load.'),
+                            ]),
+
+                        TagsInput::make('health_benefits')
+                            ->label('Health Benefit Chips')
+                            ->placeholder('e.g. Keto-Friendly, Zero-Glycemic')
+                            ->helperText('Type a benefit and press enter. Renders as premium chips on the PDP.')
+                            ->columnSpanFull(),
+
+                        Select::make('related_product_ids')
+                            ->label('Cross-Sell Picker (You May Also Like)')
+                            ->multiple()
+                            ->options(fn () => \App\Models\Product::pluck('name', 'id')->toArray())
+                            ->searchable()
+                            ->preload()
+                            ->helperText('Choose up to 8 products to show in the related products slider.')
+                            ->columnSpanFull(),
+
+                        Toggle::make('enable_guest_reviews')
+                            ->label('Enable Guest Reviews')
+                            ->default(true)
+                            ->helperText('If OFF, only verified customers who purchased the product can leave reviews.'),
+                    ]),
                 Section::make('🔍 Search & Filter Attributes')
-                    ->description('These fields directly power the sidebar filters on the Collections page. Fill these accurately to ensure products appear when customers use filters.')
-                    ->icon('heroicon-o-funnel')
+                    ->description('These fields directly power the sidebar filters on the Collections page.')
                     ->collapsible()
                     ->columns(3)
                     ->components([
                         TextInput::make('format')
                             ->label('Format / Product Type')
                             ->placeholder('e.g. powder, drops, liquid')
-                            ->helperText('Type any format. This powers the "Format" filter on the storefront.')
-                            ->required()
-                            ->afterStateHydrated(fn ($component, $state, $record) => $state ? null : $component->state($record?->form))
-                            ->dehydrateStateUsing(function ($state, $record) {
-                                if ($record) { $record->form = $state; }
-                                return $state;
-                            }),
-
-                        TextInput::make('concentration')
-                            ->label('Concentration / Potency')
-                            ->placeholder('e.g. 1:10, 1:50, 1:200')
-                            ->helperText('Type any ratio. This powers the "Concentration" filter on the storefront.')
-                            ->afterStateHydrated(fn ($component, $state, $record) => $state ? null : $component->state($record?->ratio))
-                            ->dehydrateStateUsing(function ($state, $record) {
-                                if ($record) { $record->ratio = $state; }
-                                return $state;
-                            }),
-
-                        TagsInput::make('size_label')
-                            ->label('Pack Size Tags')
-                            ->helperText('Type a size (e.g. 50g, 100g) and press enter. This powers the storefront Pack Size filters.')
-                            ->placeholder('e.g. 50g')
-                            ->separator(',')
-                            ->afterStateHydrated(function ($component, $state) {
-                                if (is_string($state) && !empty($state)) {
-                                    $component->state(array_map('trim', explode(',', $state)));
-                                }
-                            })
-                            ->dehydrateStateUsing(fn ($state) => is_array($state) ? implode(',', $state) : $state),
+                            ->helperText('Powers the "Format" filter.')
+                            ->required(),
 
                         TextInput::make('type')
                             ->label('Sweetener Type')
-                            ->placeholder('e.g. stevia, monk-fruit')
-                            ->helperText('Internal type identifier.'),
+                            ->placeholder('e.g. stevia, monk-fruit'),
+
+                        TagsInput::make('size_label')
+                            ->label('Pack Size Tags')
+                            ->placeholder('e.g. 50g, 100g')
+                            ->helperText('Powers the "Pack Size" filter.')
+                            ->separator(','),
 
                         TextInput::make('sweetness_description')
                             ->label('Sweetness Description')
@@ -250,47 +279,8 @@ class ProductForm
 
                         TextInput::make('use_case')
                             ->label('Ideal Use Cases')
-                            ->placeholder('e.g. tea, coffee, smoothies, baking')
+                            ->placeholder('e.g. tea, coffee, smoothies')
                             ->columnSpan(3),
-
-                        RichEditor::make('usage_instructions')
-                            ->label('Usage Instructions')
-                            ->placeholder('Step by step guide on how to use this product...')
-                            ->visible(fn () => \Illuminate\Support\Facades\Schema::hasColumn('products', 'usage_instructions'))
-                            ->columnSpanFull(),
-
-                        RichEditor::make('nutrition_facts')
-                            ->label('Nutrition Facts')
-                            ->placeholder('Nutrition details, vitamins, etc...')
-                            ->visible(fn () => \Illuminate\Support\Facades\Schema::hasColumn('products', 'nutrition_facts'))
-                            ->columnSpanFull(),
-
-                        Select::make('related_products')
-                            ->label('Cross-Sell Picker (You May Also Like)')
-                            ->multiple()
-                            ->options(\App\Models\Product::query()->pluck('name', 'slug')->toArray())
-                            ->afterStateHydrated(function ($component, $state) {
-                                if (is_string($state) && !empty($state)) {
-                                    $component->state(array_map('trim', explode(',', $state)));
-                                }
-                            })
-                            ->dehydrateStateUsing(fn ($state) => is_array($state) ? implode(',', $state) : $state)
-                            ->helperText('Manually choose which products appear in the "You May Also Like" section.')
-                            ->columnSpanFull(),
-
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('rating')
-                                    ->numeric()
-                                    ->step(0.1)
-                                    ->readOnly()
-                                    ->helperText('Auto-managed by customer reviews.'),
-                                TextInput::make('reviews')
-                                    ->label('Reviews Count')
-                                    ->numeric()
-                                    ->readOnly()
-                                    ->helperText('Auto-managed by customer reviews.'),
-                            ]),
                     ]),
                 Section::make('Live Preview & Tools')
                     ->collapsed()

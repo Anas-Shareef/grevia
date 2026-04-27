@@ -8,17 +8,15 @@ import {
   Star, 
   Leaf, 
   Zap, 
-  Droplets, 
-  Sprout,
-  ArrowRight,
-  Check
+  Activity,
+  Award,
+  ChevronRight,
+  Check,
+  Heart
 } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription,
   DialogClose
 } from "@/components/ui/dialog";
 import { Product, ProductVariant } from "@/types";
@@ -27,8 +25,6 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Heart } from "lucide-react";
-
 
 interface QuickViewModalProps {
   product: Product;
@@ -36,10 +32,10 @@ interface QuickViewModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const HealthBadge = ({ icon: Icon, label }: { icon: any, label: string }) => (
-  <div className="flex items-center gap-1.5 bg-[#729855]/10 px-3 py-1.5 rounded-full">
-    <Icon className="w-3 h-3 text-[#729855]" />
-    <span className="text-[10px] font-bold uppercase tracking-wider text-[#2E4D31]">{label}</span>
+const BenefitChip = ({ icon: Icon, text }: { icon: any, text: string }) => (
+  <div className="flex items-center gap-1.5 bg-[#F0FAE8] border border-[#77CB4D] rounded-full px-3 py-1 transition-all hover:shadow-sm">
+    <Icon className="w-3 h-3 text-[#2E4D31]" />
+    <span className="text-[10px] font-bold text-[#2E4D31] Montserrat uppercase tracking-wider">{text}</span>
   </div>
 );
 
@@ -49,303 +45,208 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   
-  const isWishlisted = isInWishlist(String(product.dbId || product.id));
+  const isWishlisted = isInWishlist(String(product.id));
   
   const defaultVariant = product.variants?.find(v => v.status === 'active') || product.variants?.[0];
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(defaultVariant);
-  const [activeImage, setActiveImage] = useState(product.image_url || product.image);
+  const [activeImage, setActiveImage] = useState(product.image);
 
-
-  // Sync active image with variant if variant has specific image
   useEffect(() => {
-    if (selectedVariant?.image_url) {
-      setActiveImage(selectedVariant.image_url);
+    if (open) {
+      setQuantity(1);
+      setIsAdded(false);
+      setSelectedVariant(defaultVariant);
+      setActiveImage(product.image);
     }
-  }, [selectedVariant]);
+  }, [open, product, defaultVariant]);
 
   const handleAddToCart = () => {
-    if (!selectedVariant) return;
-    
-    addToCart(product, quantity, selectedVariant.id);
+    const variantId = selectedVariant?.id || product.variants?.[0]?.id;
+    addToCart(product, quantity, variantId);
     setIsAdded(true);
-    toast.success(`Added ${quantity} × ${product.name} (${selectedVariant.weight}) to cart!`);
+    toast.success(`${product.name} Added!`, {
+      style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' }
+    });
     
-    // Reset added state after 2 seconds
     setTimeout(() => {
       setIsAdded(false);
       onOpenChange(false);
     }, 1500);
   };
 
-  const images = product.gallery?.length 
-    ? product.gallery.sort((a, b) => a.sort_order - b.sort_order).map(g => g.url)
-    : [product.image_url || product.image];
+  const galleryImages = (product.gallery && product.gallery.length > 0)
+    ? product.gallery.map(g => g.url)
+    : [product.image].filter(Boolean);
+
+  const toggleWishlist = () => {
+    if (isWishlisted) {
+      removeFromWishlist(String(product.id));
+      toast.success('Removed from wishlist');
+    } else {
+      addToWishlist(product);
+      toast.success('Added to wishlist ❤️');
+    }
+  };
+
+  const concentrationOptions = product.concentration_options || ['1:10', '1:50', '1:100'];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden bg-[#F9F9EB] border-none rounded-[32px] sm:rounded-[40px] shadow-2xl">
-        <div className="flex flex-col md:flex-row h-full max-h-[90vh] overflow-y-auto md:overflow-hidden">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white border-none rounded-[32px] shadow-2xl Montserrat">
+        <div className="flex flex-col md:flex-row h-full max-h-[90vh] overflow-y-auto no-scrollbar">
           
-          {/* Left Column: Media Gallery */}
-          <div className="w-full md:w-[45%] bg-[#F3F4ED] relative p-6 md:p-8 flex flex-col items-center justify-center min-h-[350px] md:min-h-full">
-            {/* Background Wash Effect */}
-            <div className="absolute inset-0 bg-[#729855]/5 opacity-50 z-0" />
-            
-            <div className="relative z-10 flex flex-row md:flex-row gap-4 w-full h-full items-center">
-              {/* Vertical Thumbnails (Desktop-only on left) */}
-              {images.length > 1 && (
-                <div className="hidden md:flex flex-col gap-3 z-20">
-                  {images.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveImage(img)}
-                      className={cn(
-                        "w-16 h-16 rounded-[20px] overflow-hidden border-2 transition-all p-1.5 bg-white",
-                        activeImage === img ? "border-[#729855] shadow-lg scale-105" : "border-transparent opacity-60 hover:opacity-100"
-                      )}
-                    >
-                      <img 
-                        src={img} 
-                        alt="" 
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
-                          e.currentTarget.onerror = null;
-                        }}
-                        className="w-full h-full object-cover rounded-xl" 
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-              
-              {/* Main Image Display */}
-              <div className="flex-1 relative flex items-center justify-center p-4">
-                <motion.div 
-                  key={activeImage}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full aspect-square relative rounded-[40px] overflow-hidden shadow-soft group"
-                >
-                  <img 
+          {/* Left: Media Area */}
+          <div className="w-full md:w-[45%] bg-[#F8F5F0] relative p-8 flex flex-col items-center justify-center min-h-[400px]">
+             {/* Main Image */}
+             <div className="relative w-full aspect-square flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.img 
+                    key={activeImage}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
                     src={activeImage} 
                     alt={product.name} 
-                    onError={(e) => {
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
-                      e.currentTarget.onerror = null;
-                    }}
-                    className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700" 
+                    className="w-full h-full object-contain mix-blend-multiply drop-shadow-xl" 
                   />
-                </motion.div>
-              </div>
-            </div>
+                </AnimatePresence>
+             </div>
 
-            {/* Mobile Thumbnails (Horizontal) */}
-            <div className="flex md:hidden gap-2 mt-4 z-20 overflow-x-auto pb-2 no-scrollbar px-4">
-               {images.map((img, idx) => (
+             {/* Thumbnails */}
+             {galleryImages.length > 1 && (
+               <div className="flex gap-3 mt-8 overflow-x-auto pb-2 scrollbar-hide px-4 max-w-full">
+                  {galleryImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveImage(img)}
                       className={cn(
-                        "w-12 h-12 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all p-0.5 bg-white",
-                        activeImage === img ? "border-[#2E4D31]" : "border-transparent opacity-60"
+                        "w-16 h-16 flex-shrink-0 rounded-[12px] overflow-hidden border-2 transition-all bg-white",
+                        activeImage === img ? "border-[#2E4D31] shadow-md" : "border-transparent opacity-60 hover:opacity-100"
                       )}
                     >
-                      <img 
-                        src={img} 
-                        alt="" 
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1502741126161-b048400d085d?q=80&w=2000&auto=format&fit=crop';
-                          e.currentTarget.onerror = null;
-                        }}
-                        className="w-full h-full object-cover rounded-[10px]" 
-                      />
+                      <img src={img} alt="" className="w-full h-full object-cover" />
                     </button>
                   ))}
-            </div>
+               </div>
+             )}
           </div>
 
-          {/* Right Column: Product Story */}
-          <div className="w-full md:w-[55%] p-8 md:p-12 flex flex-col bg-white overflow-y-auto no-scrollbar">
-            <div className="mb-6">
-               <div className="flex items-center gap-2 mb-3">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-[#0E0E0E] text-[#0E0E0E]" />
-                  ))}
+          {/* Right: Content Area */}
+          <div className="w-full md:w-[55%] p-10 md:p-12 flex flex-col bg-white">
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex text-[#F59E0B]">
+                  {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-current" />)}
                 </div>
-                <span className="text-[10px] font-bold text-[#0E0E0E]/60 uppercase tracking-widest">(128 Reviews)</span>
+                <span className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Premium Quality</span>
               </div>
               
-              <h2 className="text-3xl md:text-4xl font-black tracking-tight text-[#2E4D31] font-display mb-2 leading-tight">
+              <h2 className="text-[28px] md:text-[36px] font-bold text-[#2E4D31] leading-[1.1] mb-4">
                 {product.name}
               </h2>
               
-              <div className="flex items-center gap-3 mb-6">
-                <p className="text-2xl font-black text-[#2E4D31]">
-                  ₹{selectedVariant?.discount_price || selectedVariant?.price || product.price}
-                </p>
-                {selectedVariant?.discount_price && (
-                  <>
-                    <p className="text-sm text-[#2E4D31]/40 line-through">₹{selectedVariant.price}</p>
-                    <div className="bg-[#729855]/10 px-2 py-0.5 rounded text-[10px] font-black text-[#729855] uppercase">
-                      Save {Math.round(((selectedVariant.price - selectedVariant.discount_price) / selectedVariant.price) * 100)}%
-                    </div>
-                  </>
-                )}
+              <div className="flex items-center gap-4 mb-6">
+                <span className="text-[28px] font-black text-[#2E4D31]">
+                  ₹{selectedVariant?.price || product.price}
+                </span>
+                <BenefitChip icon={Award} text="100% Organic" />
               </div>
 
               <div className="flex flex-wrap gap-2 mb-8">
-                <HealthBadge icon={Droplets} label="Zero Glycemic" />
-                <HealthBadge icon={Zap} label="Keto Friendly" />
-                <HealthBadge icon={Leaf} label="100% Natural" />
-                {product.ratio && (
-                  <div className="flex items-center gap-1.5 bg-[#2E4D31]/5 px-3 py-1.5 rounded-full border border-[#2E4D31]/10">
-                    <span className="text-[10px] font-bold text-[#2E4D31]/40 uppercase tracking-widest">Ratio:</span>
-                    <span className="text-[10px] font-black text-[#2E4D31]">{product.ratio}</span>
-                  </div>
-                )}
+                <BenefitChip icon={Zap} text="Keto-Friendly" />
+                <BenefitChip icon={Activity} text="Zero-Glycemic" />
               </div>
 
-              <p className="text-[#2E4D31]/70 text-sm leading-relaxed mb-8 font-medium italic">
-                {product.description || "Experience the pure, plant-based sweetness of Grevia. Crafted for those who refuse to compromise on taste or health."}
+              <p className="text-gray-500 text-[14px] leading-relaxed mb-8 italic">
+                {product.description || "Experience the pure, plant-based sweetness of Grevia."}
               </p>
 
-              {/* Selection Section */}
-              <div className="space-y-6 mb-10">
-                {/* Strength Ratio (if applicable) */}
-                {product.form && (
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31]/40 mb-3">Format</p>
-                    <div className="flex items-center gap-2">
-                       <div className="px-4 py-2 bg-[#F3F4ED] rounded-xl text-xs font-bold text-[#2E4D31] border border-[#E4ECE6]">
-                         {product.form}
-                       </div>
-                    </div>
+              {/* Selection Pills */}
+              <div className="space-y-8 mb-10">
+                {/* Concentration (if applicable) */}
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-4">Concentration</p>
+                  <div className="flex flex-wrap gap-2">
+                     {concentrationOptions.map(r => (
+                       <button
+                         key={r}
+                         className={cn(
+                           "h-10 px-6 rounded-full text-[12px] font-bold border-2 transition-all",
+                           (product.concentration || product.ratio) === r
+                             ? "bg-[#EAF2EB] text-[#2E4D31] border-[#2E4D31]"
+                             : "bg-white text-gray-400 border-[#E5E7EB]"
+                         )}
+                       >
+                         {r}
+                       </button>
+                     ))}
                   </div>
-                )}
+                </div>
 
-                {/* Variant Selection (Pack Size) */}
+                {/* Pack Size */}
                 {product.variants && product.variants.length > 0 && (
                   <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31]/40">Pack Size</p>
-                      <p className="text-[10px] font-bold text-[#729855]">{selectedVariant?.stock_quantity ? `${selectedVariant.stock_quantity} in stock` : 'Available'}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-3">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-4">Select Pack Size</p>
+                    <div className="flex flex-wrap gap-2">
                        {product.variants.map((v) => (
                          <button
                            key={v.id}
                            onClick={() => setSelectedVariant(v)}
-                           disabled={v.status === 'inactive' || v.stock_quantity === 0}
                            className={cn(
-                             "relative px-6 py-3 rounded-2xl text-xs font-bold transition-all border-2 flex flex-col items-center min-w-[80px]",
+                             "h-10 px-6 rounded-full text-[12px] font-bold border-2 transition-all",
                              selectedVariant?.id === v.id
-                               ? "bg-[#2E4D31] text-white border-[#2E4D31] shadow-xl shadow-[#2E4D31]/20 scale-105"
-                               : "bg-white text-[#2E4D31] border-[#E4ECE6] hover:border-[#2E4D31]/30",
-                             (v.status === 'inactive' || v.stock_quantity === 0) && "opacity-40 pointer-events-none"
+                               ? "bg-[#2E4D31] text-white border-[#2E4D31] shadow-lg shadow-[#2E4D31]/20"
+                               : "bg-white text-[#2E4D31] border-[#E5E7EB] hover:border-[#2E4D31]"
                            )}
                          >
-                           <span>{v.weight}</span>
-                           {v.discount_price && selectedVariant?.id !== v.id && (
-                             <span className="text-[9px] opacity-60 mt-0.5 line-through">₹{v.price}</span>
-                           )}
-                           {selectedVariant?.id === v.id && (
-                             <motion.div 
-                               layoutId="active-variant"
-                               className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#729855] rounded-full flex items-center justify-center border-2 border-white"
-                             >
-                               <Check className="w-2 h-2 text-white" />
-                             </motion.div>
-                           )}
+                           {v.weight}
                          </button>
                        ))}
                     </div>
                   </div>
                 )}
 
-
-                {/* Buy Box */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-                  <div className="flex items-center gap-1 bg-[#F3F4ED] border border-[#E4ECE6] rounded-[20px] p-1 h-14 w-full sm:w-auto">
-                    <button 
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-10 h-10 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-2xl transition-colors active:scale-90"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <input 
-                      type="number"
-                      value={quantity}
-                      readOnly
-                      className="w-12 text-center bg-transparent font-black text-[#2E4D31] text-sm focus:outline-none"
-                    />
-                    <button 
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="w-10 h-10 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-2xl transition-colors active:scale-90"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                {/* Actions */}
+                <div className="flex items-center gap-4 pt-4">
+                  <div className="flex items-center bg-[#F8F5F0] rounded-full p-1 border border-[#E5E7EB]">
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-10 h-10 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-full transition-all"><Minus className="w-4 h-4" /></button>
+                    <span className="w-10 text-center font-bold text-sm">{quantity}</span>
+                    <button onClick={() => setQuantity(q => q + 1)} className="w-10 h-10 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-full transition-all"><Plus className="w-4 h-4" /></button>
                   </div>
 
                   <button 
                     onClick={handleAddToCart}
-                    disabled={isAdded || !selectedVariant}
-                    className={cn(
-                      "flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 w-full",
-                      isAdded 
-                        ? "bg-[#729855] text-white" 
-                        : "bg-[#2E4D31] text-white hover:bg-[#1a2d1d] hover:shadow-xl hover:shadow-[#2E4D31]/20 active:scale-95 shadow-button"
-                    )}
+                    disabled={isAdded}
+                    className="flex-1 h-14 bg-[#77CB4D] hover:bg-[#5fb33a] text-white rounded-full font-black text-[12px] uppercase tracking-widest transition-all shadow-lg shadow-[#77CB4D]/25 active:scale-95"
                   >
-                    {isAdded ? (
-                      <>
-                        <Check className="w-5 h-5" />
-                        Added
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBag className="w-4 h-4" />
-                        Add to Cart
-                      </>
-                    )}
+                    {isAdded ? "Added to Cart" : "Add to Cart"}
                   </button>
 
-                  <button
-                    onClick={() => isWishlisted ? removeFromWishlist(String(product.dbId || product.id)) : addToWishlist(product)}
+                  <button 
+                    onClick={toggleWishlist}
                     className={cn(
-                      "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border-2",
-                      isWishlisted 
-                        ? "bg-red-50 border-red-100 text-red-500 shadow-sm" 
-                        : "bg-white border-[#E4ECE6] text-[#2E4D31] hover:border-[#2E4D31]/30 hover:bg-[#F3F4ED]"
+                      "w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all",
+                      isWishlisted ? "bg-white border-red-100 text-red-500 shadow-sm" : "bg-white border-[#E5E7EB] text-gray-300 hover:border-[#2E4D31]"
                     )}
                   >
-                    <Heart className={cn("w-5 h-5 transition-transform duration-300", isWishlisted && "fill-current scale-110")} />
+                    <Heart className={cn("w-5 h-5", isWishlisted && "fill-current")} />
                   </button>
                 </div>
-
               </div>
 
-              {/* Modal Footer */}
-              <div className="mt-auto pt-8 border-t border-forest/5 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sprout className="w-5 h-5 text-[#729855]" />
-                  <p className="text-[10px] font-black uppercase tracking-wider text-[#2E4D31]">Pure Plant-Based Goodness</p>
-                </div>
-                <Link 
-                  to={`/products/${product.slug || product.id}`} 
-                  className="group flex items-center gap-1.5 text-xs font-bold text-[#2E4D31] hover:text-[#729855] transition-colors"
-                >
-                  Full Details
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              {/* Footer Links */}
+              <div className="mt-auto pt-8 border-t border-gray-100 flex items-center justify-between">
+                <Link to={`/products/${product.slug || product.id}`} onClick={() => onOpenChange(false)} className="text-[13px] font-bold text-[#2E4D31] flex items-center gap-2 group">
+                  View Full Product Story
+                  <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Custom Close Button */}
-        <DialogClose className="absolute right-6 top-6 z-[60] w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#2E4D31] shadow-lg hover:bg-white hover:rotate-90 transition-all duration-500 border border-forest/10">
+        {/* Close Button */}
+        <DialogClose className="absolute right-6 top-6 z-50 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-[#2E4D31] shadow-lg hover:bg-white transition-all">
           <X className="w-5 h-5" />
         </DialogClose>
       </DialogContent>

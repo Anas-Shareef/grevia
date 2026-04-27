@@ -97,6 +97,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/reviews', [ReviewController::class, 'index']); // Public reviews list
 Route::post('/reviews', [ReviewController::class, 'store']); // Public submit (handles guest/auth)
+Route::post('/reviews/{id}/helpful', [ReviewController::class, 'helpful']); // Vote helpful
 Route::get('/shipping-methods', [App\Http\Controllers\Api\ShippingMethodController::class, 'index']);
 
 // Contact (Public)
