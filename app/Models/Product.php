@@ -51,7 +51,7 @@ class Product extends Model
         'tags' => 'array',
         'price' => 'decimal:2',
         'original_price' => 'decimal:2',
-        'rating' => 'decimal:2',
+        'rating' => 'decimal:1',
         'in_stock' => 'boolean',
         'is_featured' => 'boolean',
         'concentration_options' => 'array',

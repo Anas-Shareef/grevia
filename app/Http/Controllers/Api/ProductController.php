@@ -157,28 +157,28 @@ class ProductController extends Controller
         $minPrice = Product::where('in_stock', true)->min('price') ?? 0;
         $maxPrice = Product::where('in_stock', true)->max('price') ?? 1000;
 
-        // ── 14. Build a CONTEXT-AWARE base query for facet counting ──────
-        // We clone the query at this point (after category/search/region filters,
-        // but BEFORE form/ratio/size are applied) so each facet group can see
-        // how many products are available in the current browsing context.
-        // This is what makes zero-count graying accurate and contextual.
-        $facetBase = clone $query;
-        // Strip the active attribute filters from the facet base so they
-        // don't falsely zero-out their own sibling options.
-        // (The pagination query keeps them for the actual product grid.)
-
         $products = $query->paginate($request->get('per_page', 12));
 
-        // ── Forms (Format) ── dynamic, context-aware ────────────────────
+        // ── 14. Build Dynamic Facets ────────────────────────────────────
+        // To build accurate counts, we need a base query that has category/search 
+        // but NOT the specific facet filter itself.
+        
+        $baseFacetQuery = Product::where('in_stock', true);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $baseFacetQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        if ($cat) {
+            $baseFacetQuery->whereIn('category_id', $cat->getAllDescendantIds());
+        }
+
+        // Forms (Format)
         $formValues = ['powder', 'drops', 'tablets', 'liquid', 'jar'];
         $formLabels = ['powder' => 'Powder', 'drops' => 'Drops', 'tablets' => 'Tablets', 'liquid' => 'Liquid', 'jar' => 'Jar'];
-        $formBase = clone $facetBase;
-        // Remove format filter from itself so siblings are visible
-        $formBase->getQuery()->wheres = collect($formBase->getQuery()->wheres)->reject(function ($where) {
-            return ($where['column'] ?? '') === 'format';
-        })->values()->all();
-
-        $formCounts = $formBase
+        $formCounts = (clone $baseFacetQuery)
             ->whereNotNull('format')
             ->groupBy('format')
             ->selectRaw('format as lbl, count(*) as cnt')
@@ -191,19 +191,14 @@ class ProductController extends Controller
             'disabled' => (($formCounts[$f] ?? 0) === 0),
         ])->values()->toArray();
 
-        // ── Ratios (Concentration) ── dynamic, context-aware ────────────
+        // Ratios (Concentration)
         $ratioDefinitions = [
             '1:10'  => '1:10 (High Potency)',
             '1:50'  => '1:50 (Medium)',
             '1:100' => '1:100 (Mild)',
             '1:200' => '1:200 (Extra Mild)',
         ];
-        $ratioBase = clone $facetBase;
-        $ratioBase->getQuery()->wheres = collect($ratioBase->getQuery()->wheres)->reject(function ($where) {
-            return ($where['column'] ?? '') === 'concentration';
-        })->values()->all();
-
-        $ratioCounts = $ratioBase
+        $ratioCounts = (clone $baseFacetQuery)
             ->whereNotNull('concentration')
             ->groupBy('concentration')
             ->selectRaw('concentration as lbl, count(*) as cnt')
@@ -216,14 +211,8 @@ class ProductController extends Controller
             'disabled' => (($ratioCounts[$value] ?? 0) === 0),
         ])->values()->toArray();
 
-        // ── Pack Sizes ── dynamic from size_label column ─────────────────
-        $sizeBase = clone $facetBase;
-        $sizeBase->getQuery()->wheres = collect($sizeBase->getQuery()->wheres)->reject(function ($where) {
-            return ($where['column'] ?? '') === 'size_label';
-        })->values()->all();
-
-        // Pull all size_labels
-        $allSizes = $sizeBase
+        // Pack Sizes
+        $allSizes = (clone $baseFacetQuery)
             ->whereNotNull('size_label')
             ->pluck('size_label');
 
@@ -231,27 +220,19 @@ class ProductController extends Controller
         foreach ($allSizes as $labelGroup) {
             $parts = array_map('trim', explode(',', $labelGroup));
             foreach ($parts as $part) {
-                // Normalize by making lowercase and removing spaces (e.g. "1 kg" -> "1kg")
                 $normalized = strtolower(str_replace(' ', '', $part));
                 if (!empty($normalized)) {
-                    if (!isset($sizeMap[$normalized])) {
-                        $sizeMap[$normalized] = 0;
-                    }
-                    $sizeMap[$normalized]++;
+                    $sizeMap[$normalized] = ($sizeMap[$normalized] ?? 0) + 1;
                 }
             }
         }
-
-        // Sort sizes naturally (e.g. 50g before 100g)
         $sizeValues = array_keys($sizeMap);
         natsort($sizeValues);
-
-        $sizes = collect($sizeValues)
-            ->map(fn($s) => [
-                'label'    => $s,
-                'count'    => (int) $sizeMap[$s],
-                'disabled' => false,
-            ])->values()->toArray();
+        $sizes = collect($sizeValues)->map(fn($s) => [
+            'label'    => $s,
+            'count'    => (int) $sizeMap[$s],
+            'disabled' => false,
+        ])->values()->toArray();
 
         // ── Category tree with icon_url ──────────────────────────────────
         $categoryTree = Category::where('show_in_filter', true)

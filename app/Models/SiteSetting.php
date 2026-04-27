@@ -10,6 +10,8 @@ class SiteSetting extends Model
         'key',
         'value',
         'type',
+        'group',
+        'label',
     ];
 
     protected $casts = [
