@@ -12,6 +12,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         try {
+            \Log::info("ProductController Index: Start", ['url' => $request->fullUrl(), 'method' => $request->method()]);
             $query = Product::with(['category', 'gallery', 'mainImage'])
                 ->where('in_stock', true);
 
@@ -254,11 +255,19 @@ class ProductController extends Controller
                 ],
             ]);
         } catch (\Throwable $e) {
-            \Log::error("ProductController Index Error: " . $e->getMessage(), [
+            \Log::error("ProductController Index CRASH: " . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
                 'request' => $request->all()
             ]);
-            return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'error' => 'Internal Server Error', 
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 

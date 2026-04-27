@@ -209,7 +209,7 @@ class ProductForm
                             ->columnSpanFull(),
 
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 TagsInput::make('concentration_options')
                                     ->label('Available Concentrations')
                                     ->placeholder('e.g. 1:10, 1:50')
@@ -217,7 +217,11 @@ class ProductForm
                                     ->separator(','),
                                 Select::make('concentration')
                                     ->label('Default Concentration')
-                                    ->options(fn ($get) => array_combine($get('concentration_options') ?? [], $get('concentration_options') ?? []))
+                                    ->options(function ($get) {
+                                        $options = $get('concentration_options');
+                                        if (!is_array($options)) return [];
+                                        return array_combine($options, $options);
+                                    })
                                     ->helperText('Pre-selected concentration pill on page load.'),
                             ]),
 

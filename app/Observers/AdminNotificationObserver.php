@@ -237,6 +237,7 @@ class AdminNotificationObserver
     private function sendRaw(Notification $notification, $recipients)
     {
         try {
+            \Log::info("AdminNotificationObserver: Sending notification", ['title' => $notification->getTitle()]);
             $data = $notification->getDatabaseMessage();
             $now = now();
             
@@ -253,7 +254,11 @@ class AdminNotificationObserver
                 ]);
             }
         } catch (\Throwable $e) {
-            \Log::error("AdminNotificationObserver Failed: " . $e->getMessage());
+            \Log::error("AdminNotificationObserver Failed: " . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 }
