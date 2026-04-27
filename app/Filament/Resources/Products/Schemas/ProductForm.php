@@ -193,19 +193,19 @@ class ProductForm
                     ->description('Detailed content for the Product Detail Page accordions and trust signals.')
                     ->collapsible()
                     ->components([
-                        RichEditor::make('product_description')
-                            ->label('Story / Detailed Description')
-                            ->helperText('Accordion 1: The premium story of the product.')
+                         RichEditor::make('product_description')
+                            ->label('The Story (Accordion 1)')
+                            ->helperText('Detailed narrative about the product.')
                             ->columnSpanFull(),
                         
                         RichEditor::make('ingredients')
-                            ->label('Ingredients List')
-                            ->helperText('Accordion 2: Detailed list of ingredients.')
+                            ->label('Ingredients & Sourcing (Accordion 2)')
+                            ->helperText('List of ingredients and quality standards.')
                             ->columnSpanFull(),
                             
                         RichEditor::make('usage_instructions')
-                            ->label('How to Use')
-                            ->helperText('Accordion 3: Step-by-step instructions.')
+                            ->label('How to Use (Accordion 3)')
+                            ->helperText('Step-by-step usage instructions.')
                             ->columnSpanFull(),
 
                         Grid::make(2)
