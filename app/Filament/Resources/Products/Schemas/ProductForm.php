@@ -189,11 +189,11 @@ class ProductForm
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
                             ->collapsible(),
                     ]),
-                Section::make('🛒 PDP Content & Attributes')
+                Section::make('PDP Content & Attributes')
                     ->description('Detailed content for the Product Detail Page accordions and trust signals.')
                     ->collapsible()
                     ->components([
-                         RichEditor::make('product_description')
+                        RichEditor::make('product_description')
                             ->label('The Story (Accordion 1)')
                             ->helperText('Detailed narrative about the product.')
                             ->columnSpanFull(),
@@ -209,7 +209,7 @@ class ProductForm
                             ->columnSpanFull(),
 
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 TagsInput::make('concentration_options')
                                     ->label('Available Concentrations')
                                     ->placeholder('e.g. 1:10, 1:50')
