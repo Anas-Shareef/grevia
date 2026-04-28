@@ -147,4 +147,14 @@ class Product extends Model
     {
         return $this->hasMany(ProductReview::class);
     }
+
+    public static function getConcentrationOptions(string $concentration): array
+    {
+        return match($concentration) {
+            '10:1' => ['Standard' => 'Standard', 'Premium' => 'Premium'],
+            '15:1' => ['High' => 'High', 'Ultra' => 'Ultra'],
+            '25:1' => ['Max' => 'Max', 'Extreme' => 'Extreme'],
+            default => ['Default' => 'Default'],
+        };
+    }
 }

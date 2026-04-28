@@ -194,17 +194,12 @@ class ProductForm
                     ->collapsible()
                     ->components([
                         RichEditor::make('product_description')
-                            ->label('The Story (Accordion 1)')
+                            ->label('Product Story & Narrative')
                             ->helperText('Detailed narrative about the product.')
-                            ->columnSpanFull(),
-                        
-                        RichEditor::make('ingredients')
-                            ->label('Ingredients & Sourcing (Accordion 2)')
-                            ->helperText('List of ingredients and quality standards.')
                             ->columnSpanFull(),
                             
                         RichEditor::make('usage_instructions')
-                            ->label('How to Use (Accordion 3)')
+                            ->label('Usage & Preparation')
                             ->helperText('Step-by-step usage instructions.')
                             ->columnSpanFull(),
 
