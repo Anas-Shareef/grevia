@@ -148,23 +148,7 @@ const ProductDetailPage = () => {
     );
   }
 
-  if (!product) {
-    return (
-      <div className="bg-white min-h-screen Montserrat">
-        <Header />
-        <div className="container mx-auto px-4 pt-48 pb-32 text-center">
-          <div className="w-24 h-24 bg-[#F0FAE8] rounded-full flex items-center justify-center mx-auto mb-8">
-            <Leaf className="w-12 h-12 text-[#2E4D31]" />
-          </div>
-          <h2 className="text-3xl font-bold text-[#2E4D31] mb-6">Product not found</h2>
-          <Link to="/collections/all" className="inline-flex items-center justify-center bg-[#2E4D31] text-white h-14 px-10 rounded-full font-bold transition-all hover:bg-[#1a3320]">
-            Browse All Collections
-          </Link>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+
 
   const concentrationOptions = product.concentration_options || ['1:10', '1:50', '1:100', '1:200'];
   const displayPrice = selectedVariant ? selectedVariant.price : product.price;
@@ -194,6 +178,25 @@ const ProductDetailPage = () => {
       metaDesc.setAttribute('content', product.description || `Buy ${product.name} from Grevia. Zero calories, 100% organic.`);
     }
   }, [product]);
+
+  // Early return after all hooks have been called
+  if (!product) {
+    return (
+      <div className="bg-white min-h-screen Montserrat">
+        <Header />
+        <div className="container mx-auto px-4 pt-48 pb-32 text-center">
+          <div className="w-24 h-24 bg-[#F0FAE8] rounded-full flex items-center justify-center mx-auto mb-8">
+            <Leaf className="w-12 h-12 text-[#2E4D31]" />
+          </div>
+          <h2 className="text-3xl font-bold text-[#2E4D31] mb-6">Product not found</h2>
+          <Link to="/collections/all" className="inline-flex items-center justify-center bg-[#2E4D31] text-white h-14 px-10 rounded-full font-bold transition-all hover:bg-[#1a3320]">
+            Browse All Collections
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
