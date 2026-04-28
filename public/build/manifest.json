@@ -3,16 +3,26 @@
     "file": "assets/hero-bg-D-TWzogc.jpg",
     "src": "resources/js/react/assets/hero-bg.jpg"
   },
+  "resources/js/react/assets/monkfruit.jpg": {
+    "file": "assets/monkfruit-BcPixUuC.jpg",
+    "src": "resources/js/react/assets/monkfruit.jpg"
+  },
+  "resources/js/react/assets/stevia-plant.jpg": {
+    "file": "assets/stevia-plant-ByWZWqgP.jpg",
+    "src": "resources/js/react/assets/stevia-plant.jpg"
+  },
   "resources/js/react/main.tsx": {
-    "file": "assets/main-CX4W7DuX.js",
+    "file": "assets/main-C5JOqr_u.js",
     "name": "main",
     "src": "resources/js/react/main.tsx",
     "isEntry": true,
     "css": [
-      "assets/main-BnBq1zUZ.css"
+      "assets/main-2irGXveo.css"
     ],
     "assets": [
-      "assets/hero-bg-D-TWzogc.jpg"
+      "assets/hero-bg-D-TWzogc.jpg",
+      "assets/stevia-plant-ByWZWqgP.jpg",
+      "assets/monkfruit-BcPixUuC.jpg"
     ]
   }
 }
