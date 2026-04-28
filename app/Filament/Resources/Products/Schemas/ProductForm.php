@@ -90,6 +90,15 @@ class ProductForm
                 Section::make('Product Gallery')
                     ->description('Manage main and additional photos for this product.')
                     ->components([
+                        Placeholder::make('image_warning')
+                            ->label('')
+                            ->content(function ($record) {
+                                if ($record && $record->relationLoaded('gallery') && $record->gallery->isEmpty()) {
+                                    return new \Illuminate\Support\HtmlString('<div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 12px; color: #92400E; border-radius: 4px; font-weight: 500;">⚠️ No images uploaded — storefront will show a placeholder.</div>');
+                                }
+                                return '';
+                            })
+                            ->visible(fn ($record) => $record !== null),
                         Repeater::make('gallery')
                             ->relationship('gallery')
                             ->schema([
@@ -274,19 +283,19 @@ class ProductForm
                 Section::make('Live Preview & Tools')
                     ->collapsed()
                     ->components([
-                        /* Placeholder::make('preview_card')
-                            ->label('Store View')
+                        Placeholder::make('preview_card')
+                            ->label('Store View Preview')
                             ->content(fn ($get, $record) => view('filament.products.preview-card', [
                                 'getState' => fn () => [
                                     'name' => $get('name'),
                                     'price' => $get('price'),
                                     'badge' => $get('badge'),
                                 ],
-                                'getRecord' => fn () => $record ?? $schema->getModelInstance(),
-                            ])), */
+                                'getRecord' => fn () => $record ?? new \App\Models\Product(),
+                            ])),
                         Placeholder::make('meta_info')
                             ->label('Metadata')
-                            ->content(fn ($get, $record) => $record ? "Created: " . $record?->created_at?->format('M d, Y') : "New Product"),
+                            ->content(fn ($get, $record) => $record && $record->created_at ? "Created: " . $record->created_at->format('M d, Y') : "New Product"),
                     ]),
             ]);
     }

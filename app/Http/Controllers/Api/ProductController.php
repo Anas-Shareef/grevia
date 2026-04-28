@@ -21,7 +21,9 @@ class ProductController extends Controller
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhereJsonContains('tags', strtolower($search))
+                      ->orWhere('subcategory', 'like', "%{$search}%");
                 });
             }
 
@@ -284,6 +286,23 @@ class ProductController extends Controller
         $product = Product::with($relationships)
             ->where('slug', $slug)
             ->firstOrFail();
+
+        // Fix 5: Attach admin-picked related products
+        if (!empty($product->related_product_ids) && is_array($product->related_product_ids)) {
+            $product->related_products = Product::with(['gallery', 'mainImage', 'variants'])
+                ->whereIn('id', $product->related_product_ids)
+                ->where('in_stock', true)
+                ->limit(8)
+                ->get();
+        } else {
+            // Fallback: same-category products
+            $product->related_products = Product::with(['gallery', 'mainImage', 'variants'])
+                ->where('category_id', $product->category_id)
+                ->where('id', '!=', $product->id)
+                ->where('in_stock', true)
+                ->limit(8)
+                ->get();
+        }
 
         return response()->json($product);
     }

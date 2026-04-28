@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShoppingCart, Star, Heart, Check, Truck, RotateCcw, 
-  Info, ChevronRight, Minus, Plus, ChevronDown, 
+  Info, ChevronRight, Minus, Plus, ChevronDown, Sparkles,
   Award, Shield, Zap, Activity, Leaf, Camera, Video
 } from "lucide-react";
 import Header from "@/components/Header";
@@ -113,6 +113,11 @@ const ProductDetailPage = () => {
     }
   }, [product]);
 
+  // Fix 2: Reset thumbnail index when variant changes so gallery starts at first image
+  useEffect(() => {
+    setSelectedThumb(0);
+  }, [selectedVariant]);
+
   useEffect(() => {
     const handleScroll = () => {
       const cartBtn = document.getElementById('main-add-to-cart');
@@ -167,11 +172,28 @@ const ProductDetailPage = () => {
   const discountPercent = originalPrice && displayPrice ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) : 0;
   const wishlisted = isInWishlist(String(product.id));
 
-  const galleryImages = (product.gallery && product.gallery.length > 0)
-    ? product.gallery.map(g => g.url)
+  // Fix 2: Variant-specific gallery — prefer variant images when a variant is selected
+  const variantGallery = selectedVariant?.variant_images?.map((vImg: any) => vImg.url || (vImg.image_path ? `/storage/${vImg.image_path}` : null)).filter(Boolean) || [];
+  const baseGallery = (product.gallery && product.gallery.length > 0)
+    ? product.gallery.map((g: any) => g.url)
     : [product.image].filter(Boolean);
-  
-  const mainImageUrl = galleryImages[selectedThumb] || product.image;
+  const galleryImages = variantGallery.length > 0 ? variantGallery : baseGallery;
+
+  const mainImageUrl = galleryImages[selectedThumb] || (variantGallery[0] ?? product.image);
+
+  // Fix 7: Dynamic SEO meta
+  useEffect(() => {
+    if (product?.name) {
+      document.title = `${product.name} | Grevia — Premium Natural Sweeteners`;
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.setAttribute('name', 'description');
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.setAttribute('content', product.description || `Buy ${product.name} from Grevia. Zero calories, 100% organic.`);
+    }
+  }, [product]);
 
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
@@ -192,7 +214,15 @@ const ProductDetailPage = () => {
     }
   };
 
-  const relatedProducts = allProducts.filter(p => p.id !== product.id).slice(0, 8);
+  // Fix 5: Prefer admin-picked related products; fallback to same-category then random
+  const relatedProducts = (() => {
+    if (product.related_products && product.related_products.length > 0) {
+      return product.related_products;
+    }
+    const sameCategory = allProducts.filter(p => p.id !== product.id && p.category_id === product.category_id);
+    if (sameCategory.length > 0) return sameCategory.slice(0, 8);
+    return allProducts.filter(p => p.id !== product.id).slice(0, 8);
+  })();
 
   return (
     <div className="bg-white min-h-screen text-[#313131] Montserrat">
@@ -275,12 +305,21 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* Benefit Chips */}
+            {/* Fix 1: Dynamic Health Benefit Chips from admin */}
             <div className="flex flex-wrap gap-2 mb-8">
-              <BenefitChip icon={Zap} text="Keto-Friendly" />
-              <BenefitChip icon={Activity} text="Zero-Glycemic" />
-              <BenefitChip icon={Award} text="100% Organic" />
-              <BenefitChip icon={Shield} text="Diabetic-Safe" />
+              {Array.isArray(product.health_benefits) && product.health_benefits.length > 0 ? (
+                product.health_benefits.map((benefit: string, idx: number) => {
+                  const icons = [Zap, Activity, Award, Shield, Leaf, Sparkles];
+                  return <BenefitChip key={idx} icon={icons[idx % icons.length]} text={benefit} />;
+                })
+              ) : (
+                <>
+                  <BenefitChip icon={Zap} text="Keto-Friendly" />
+                  <BenefitChip icon={Activity} text="Zero-Glycemic" />
+                  <BenefitChip icon={Award} text="100% Organic" />
+                  <BenefitChip icon={Shield} text="Diabetic-Safe" />
+                </>
+              )}
             </div>
 
             {/* Concentration Selector */}
@@ -307,7 +346,7 @@ const ProductDetailPage = () => {
               <div className="mb-10">
                 <label className="text-[12px] font-bold text-[#1F2937] uppercase tracking-wider mb-4 block Montserrat">Select Pack Size</label>
                 <div className="flex flex-wrap gap-2.5">
-                  {product.variants.map(v => (
+                  {product.variants.map((v: any) => (
                     <button
                       key={v.id}
                       onClick={() => setSelectedVariant(v)}
@@ -317,6 +356,21 @@ const ProductDetailPage = () => {
                     </button>
                   ))}
                 </div>
+                {/* Fix 3: Stock Urgency Badge */}
+                {selectedVariant && selectedVariant.stock_quantity > 0 && selectedVariant.stock_quantity < 10 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-3 inline-flex items-center gap-2 bg-[#FEF3C7] border border-[#F59E0B] rounded-full px-4 py-1.5"
+                  >
+                    <span className="text-[12px] font-bold text-[#92400E] Montserrat">🔥 Only {selectedVariant.stock_quantity} left in stock!</span>
+                  </motion.div>
+                )}
+                {selectedVariant && selectedVariant.stock_quantity === 0 && (
+                  <div className="mt-3 inline-flex items-center gap-2 bg-red-50 border border-red-300 rounded-full px-4 py-1.5">
+                    <span className="text-[12px] font-bold text-red-600 Montserrat">Sold Out</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -368,10 +422,22 @@ const ProductDetailPage = () => {
               </AccordionItem>
               
               <AccordionItem title="Ingredients" icon={Info}>
-                <div 
-                  className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed" 
-                  dangerouslySetInnerHTML={{ __html: product.ingredients || "Organic Stevia Leaf Extract, Purified Water." }} 
-                />
+                {/* Fix 4: Handle ingredients as JSON array (TagsInput) or HTML string */}
+                {Array.isArray(product.ingredients) ? (
+                  <ul className="list-none space-y-2">
+                    {product.ingredients.map((ing: string, idx: number) => (
+                      <li key={idx} className="flex items-center gap-2 Montserrat text-gray-600">
+                        <Leaf className="w-3.5 h-3.5 text-[#77CB4D] flex-shrink-0" />
+                        <span className="text-[14px] font-medium">{ing}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div 
+                    className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed" 
+                    dangerouslySetInnerHTML={{ __html: product.ingredients || "Organic Stevia Leaf Extract, Purified Water." }} 
+                  />
+                )}
               </AccordionItem>
               
               <AccordionItem title="How to Use" icon={Check}>
