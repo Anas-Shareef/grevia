@@ -130,23 +130,7 @@ const ProductDetailPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="bg-white min-h-screen Montserrat">
-        <Header />
-        <div className="container mx-auto px-4 pt-32 pb-16">
-          <div className="flex flex-col lg:flex-row gap-12 animate-pulse">
-            <div className="aspect-square w-full lg:w-1/2 rounded-[24px] bg-[#F8F5F0]" />
-            <div className="space-y-6 w-full lg:w-1/2">
-              <div className="h-4 w-32 bg-gray-100 rounded-full" />
-              <div className="h-10 w-3/4 bg-gray-100 rounded-[20px]" />
-              <div className="h-24 w-full bg-gray-100 rounded-[24px]" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+
 
 
 
@@ -178,6 +162,25 @@ const ProductDetailPage = () => {
       metaDesc.setAttribute('content', product.description || `Buy ${product.name} from Grevia. Zero calories, 100% organic.`);
     }
   }, [product]);
+
+  if (isLoading) {
+    return (
+      <div className="bg-white min-h-screen Montserrat">
+        <Header />
+        <div className="container mx-auto px-4 pt-32 pb-16">
+          <div className="flex flex-col lg:flex-row gap-12 animate-pulse">
+            <div className="aspect-square w-full lg:w-1/2 rounded-[24px] bg-[#F8F5F0]" />
+            <div className="space-y-6 w-full lg:w-1/2">
+              <div className="h-4 w-32 bg-gray-100 rounded-full" />
+              <div className="h-10 w-3/4 bg-gray-100 rounded-[20px]" />
+              <div className="h-24 w-full bg-gray-100 rounded-[24px]" />
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   // Early return after all hooks have been called
   if (!product) {
