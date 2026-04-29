@@ -225,23 +225,23 @@ class ProductForm
     ->components([
         Select::make('format')
             ->label('Format')
-            ->options(fn () => \App\Models\Attribute::where('name', 'format')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'format')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
             ->searchable()
             ->required(),
         Select::make('concentration')
             ->label('Concentration')
-            ->options(fn () => \App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
             ->searchable()
             ->required(),
         Select::make('pack_size')
             ->label('Pack Size')
             ->multiple()
-            ->options(fn () => \App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
             ->searchable(),
         Select::make('trust_badges')
             ->label('Trust Badges')
             ->multiple()
-            ->options(fn () => \App\Models\Attribute::where('name', 'trust_badges')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'trust_badges')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
             ->searchable(),
     ]),
 Section::make('Content Fields')

@@ -27,6 +27,16 @@ class AttributeResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return \Illuminate\Support\Facades\Schema::hasTable('attributes');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return \Illuminate\Support\Facades\Schema::hasTable('attributes');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
