@@ -9,6 +9,62 @@ Route::get('/', function () { return view('app'); });
 Route::get('/sweeteners', function() { return redirect('/collections?' . request()->getQueryString(), 301); });
 Route::get('/products/sweeteners', function() { return redirect('/collections?' . request()->getQueryString(), 301); });
 
+Route::get('/build-eav-tables', function () {
+    try {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('attributes')) {
+            \Illuminate\Support\Facades\Schema::create('attributes', function ($table) {
+                $table->id();
+                $table->string('name', 100)->unique();
+                $table->string('label', 100);
+                $table->string('display_type')->default('text_label');
+                $table->string('filter_type')->default('single_select');
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_required')->default(false);
+                $table->timestamps();
+            });
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('attribute_values')) {
+            \Illuminate\Support\Facades\Schema::create('attribute_values', function ($table) {
+                $table->id();
+                $table->foreignId('attribute_id')->constrained('attributes')->cascadeOnDelete();
+                $table->string('value_text', 150);
+                $table->string('icon_url', 500)->nullable();
+                $table->string('slug', 150);
+                $table->integer('sort_order')->default(0);
+                $table->timestamps();
+            });
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('product_attribute_value')) {
+            \Illuminate\Support\Facades\Schema::create('product_attribute_value', function ($table) {
+                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+                $table->foreignId('value_id')->constrained('attribute_values')->restrictOnDelete();
+                $table->primary(['product_id', 'value_id']);
+            });
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('product_content')) {
+            \Illuminate\Support\Facades\Schema::create('product_content', function ($table) {
+                $table->foreignId('product_id')->primary()->constrained('products')->cascadeOnDelete();
+                $table->longText('attr_product_story')->nullable();
+                $table->longText('attr_usage_prep')->nullable();
+                $table->timestamps();
+            });
+        }
+        
+        // Seed logic directly
+        \App\Models\Attribute::firstOrCreate(['name' => 'format'], ['label' => 'Format', 'display_type' => 'text_label', 'filter_type' => 'single_select']);
+        \App\Models\Attribute::firstOrCreate(['name' => 'concentration'], ['label' => 'Concentration', 'display_type' => 'text_label', 'filter_type' => 'single_select']);
+        \App\Models\Attribute::firstOrCreate(['name' => 'pack_size'], ['label' => 'Pack Size', 'display_type' => 'text_label', 'filter_type' => 'multi_select']);
+        \App\Models\Attribute::firstOrCreate(['name' => 'trust_badges'], ['label' => 'Trust Badges', 'display_type' => 'icon_text', 'filter_type' => 'not_filtered']);
+
+        return 'EAV tables and seed criteria generated successfully!';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
 Route::get('/test-email', function () {
     try {
         \Illuminate\Support\Facades\Mail::raw('This is a test email from Hostinger SMTP.', function ($message) {
