@@ -222,27 +222,90 @@ class ProductForm
                     ]),
                 Section::make('Dynamic Attributes')
     ->columns(2)
-    ->components([
-        Select::make('format')
+         Select::make('format')
             ->label('Format')
             ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'format')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
             ->searchable()
-            ->required(),
+            ->required()
+            ->afterStateHydrated(function ($state, $record, $set) {
+                if (!$record) return;
+                $val = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'format'))->first();
+                $set('format', $val?->slug);
+            })
+            ->saveRelationshipsUsing(function ($state, $record) {
+                if (!$record) return;
+                $attr = \App\Models\Attribute::where('name', 'format')->first();
+                if (!$attr) return;
+                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
+                if ($state) {
+                    $val = \App\Models\AttributeValue::where('attribute_id', $attr->id)->where('slug', $state)->first();
+                    if ($val) \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $val->id]);
+                }
+            }),
         Select::make('concentration')
             ->label('Concentration')
             ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
             ->searchable()
-            ->required(),
+            ->required()
+            ->afterStateHydrated(function ($state, $record, $set) {
+                if (!$record) return;
+                $val = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'concentration'))->first();
+                $set('concentration', $val?->slug);
+            })
+            ->saveRelationshipsUsing(function ($state, $record) {
+                if (!$record) return;
+                $attr = \App\Models\Attribute::where('name', 'concentration')->first();
+                if (!$attr) return;
+                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
+                if ($state) {
+                    $val = \App\Models\AttributeValue::where('attribute_id', $attr->id)->where('slug', $state)->first();
+                    if ($val) \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $val->id]);
+                }
+            }),
         Select::make('pack_size')
             ->label('Pack Size')
             ->multiple()
             ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
-            ->searchable(),
+            ->searchable()
+            ->afterStateHydrated(function ($state, $record, $set) {
+                if (!$record) return;
+                $vals = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'pack_size'))->pluck('slug')->toArray();
+                $set('pack_size', $vals);
+            })
+            ->saveRelationshipsUsing(function ($state, $record) {
+                if (!$record) return;
+                $attr = \App\Models\Attribute::where('name', 'pack_size')->first();
+                if (!$attr) return;
+                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
+                if (!empty($state) && is_array($state)) {
+                    $valIds = \App\Models\AttributeValue::where('attribute_id', $attr->id)->whereIn('slug', $state)->pluck('id')->toArray();
+                    foreach ($valIds as $vId) {
+                        \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $vId]);
+                    }
+                }
+            }),
         Select::make('trust_badges')
             ->label('Trust Badges')
             ->multiple()
             ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'trust_badges')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
-            ->searchable(),
+            ->searchable()
+            ->afterStateHydrated(function ($state, $record, $set) {
+                if (!$record) return;
+                $vals = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'trust_badges'))->pluck('slug')->toArray();
+                $set('trust_badges', $vals);
+            })
+            ->saveRelationshipsUsing(function ($state, $record) {
+                if (!$record) return;
+                $attr = \App\Models\Attribute::where('name', 'trust_badges')->first();
+                if (!$attr) return;
+                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
+                if (!empty($state) && is_array($state)) {
+                    $valIds = \App\Models\AttributeValue::where('attribute_id', $attr->id)->whereIn('slug', $state)->pluck('id')->toArray();
+                    foreach ($valIds as $vId) {
+                        \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $vId]);
+                    }
+                }
+            }),
     ]),
 Section::make('Content Fields')
     ->columns(1)
