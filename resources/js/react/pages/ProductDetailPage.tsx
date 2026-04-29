@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useState, useEffect, useRef } from "react";
 import ReviewsSection from "@/components/ReviewsSection";
 import { ProductCard } from "@/components/ProductCard";
+import { api } from "@/lib/api";
 
 // --- Components ---
 
@@ -65,7 +66,10 @@ const AccordionItem = ({ title, children, defaultOpen = false, icon: Icon }: { t
 };
 
 const SubstitutionTip = ({ ratio }: { ratio: string }) => {
-  const x = ratio.split(':')[1] || '10';
+  const parts = ratio.split(':');
+  const multiplier = parts.length > 1 ? parts[1] : '10';
+  const tip = `1g replaces ${multiplier}g of sugar`;
+
   return (
     <motion.div 
       key={ratio}
@@ -75,7 +79,7 @@ const SubstitutionTip = ({ ratio }: { ratio: string }) => {
     >
       <Leaf className="w-4 h-4 text-[#2E4D31] flex-shrink-0" />
       <p className="text-[14px] font-semibold text-[#2E4D31] Montserrat">
-        1g replaces {x}g of sugar
+        {tip}
       </p>
     </motion.div>
   );
@@ -190,9 +194,16 @@ const ProductDetailPage = () => {
   const originalPrice = selectedVariant?.discount_price ? selectedVariant.price : product.original_price;
   const discountPercent = originalPrice && displayPrice ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) : 0;
   const wishlisted = isInWishlist(String(product.id));
+  
+  const dynamicTrustBadges = (product as any).attribute_values?.filter(
+    (av: any) => av.attribute?.name === 'trust_badges'
+  ) || [];
 
   // Fix 2: Variant-specific gallery — prefer variant images when a variant is selected
-  const variantGallery = selectedVariant?.variant_images?.map((vImg: any) => vImg.url || (vImg.image_path ? `/storage/${vImg.image_path}` : null)).filter(Boolean) || [];
+  const variantGallery = [
+    selectedVariant?.image_path ? (selectedVariant.image_path.startsWith('http') ? selectedVariant.image_path : `/storage/${selectedVariant.image_path}`) : null,
+    ...(selectedVariant?.variant_images?.map((vImg: any) => vImg.url || (vImg.image_path ? `/storage/${vImg.image_path}` : null)) || [])
+  ].filter(Boolean);
   const baseGallery = (product.gallery && product.gallery.length > 0)
     ? product.gallery.map((g: any) => g.url)
     : [product.image].filter(Boolean);
@@ -431,9 +442,24 @@ const ProductDetailPage = () => {
 
               {/* Trust signals */}
               <div className="flex flex-wrap gap-3 mt-2">
-                <TrustChip icon={Truck} text="Free Shipping above ₹499" />
-                <TrustChip icon={RotateCcw} text="7-Day Hassle-Free Returns" />
-                <TrustChip icon={Award} text="100% Organic Certified" />
+                {dynamicTrustBadges.length > 0 ? (
+                  dynamicTrustBadges.map((tb: any, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2 bg-[#F0FAE8] border border-[#77CB4D] rounded-full px-3 py-1.5 transition-all hover:bg-[#EAF2EB]">
+                      {tb.icon_url ? (
+                        <img src={`/storage/${tb.icon_url}`} alt={tb.value_text} className="w-4 h-4 object-contain flex-shrink-0" />
+                      ) : (
+                        <Award className="w-4 h-4 text-[#2E4D31] flex-shrink-0" />
+                      )}
+                      <span className="text-xs font-bold text-[#2E4D31] Montserrat whitespace-nowrap">{tb.value_text}</span>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <TrustChip icon={Truck} text="Free Shipping above ₹499" />
+                    <TrustChip icon={RotateCcw} text="7-Day Hassle-Free Returns" />
+                    <TrustChip icon={Award} text="100% Organic Certified" />
+                  </>
+                )}
               </div>
             </div>
             
@@ -442,7 +468,7 @@ const ProductDetailPage = () => {
               <AccordionItem title="Product Story" defaultOpen={true} icon={Leaf}>
                 <div 
                   className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed" 
-                  dangerouslySetInnerHTML={{ __html: product.product_description || product.description || "Experience the pure taste of nature with Grevia's premium sweetener." }} 
+                  dangerouslySetInnerHTML={{ __html: (product as any).product_content?.attr_product_story || product.product_description || product.description || "Experience the pure taste of nature with Grevia's premium sweetener." }} 
                 />
               </AccordionItem>
               
@@ -468,7 +494,7 @@ const ProductDetailPage = () => {
               <AccordionItem title="How to Use" icon={Check}>
                 <div 
                   className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed" 
-                  dangerouslySetInnerHTML={{ __html: product.usage_instructions || "Add 2-3 drops to your coffee or tea. Stir and enjoy!" }} 
+                  dangerouslySetInnerHTML={{ __html: (product as any).product_content?.attr_usage_prep || product.usage_instructions || "Add 2-3 drops to your coffee or tea. Stir and enjoy!" }} 
                 />
               </AccordionItem>
               
@@ -482,7 +508,7 @@ const ProductDetailPage = () => {
 
         {/* Dynamic Reviews Section */}
         <div className="mt-24 border-t border-[#E5E7EB] pt-20">
-           <ReviewsSection productId={String(product.id)} />
+           <ReviewsSection productId={String(product.dbId || product.id)} />
         </div>
 
         {/* Related Products Slider */}

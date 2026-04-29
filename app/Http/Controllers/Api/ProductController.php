@@ -96,6 +96,17 @@ class ProductController extends Controller
                 });
             }
 
+            // ── 10. Dynamic EAV Attribute Filters ──────────────────────────
+            $dynamicAttributes = ['format', 'concentration', 'pack_size', 'trust_badges'];
+            foreach ($dynamicAttributes as $attrName) {
+                if ($request->filled($attrName)) {
+                    $values = is_array($request->get($attrName)) ? $request->get($attrName) : explode(',', $request->get($attrName));
+                    $query->whereHas('attributeValues', function ($q) use ($values) {
+                        $q->whereIn('slug', $values);
+                    });
+                }
+            }
+
             // ── 12. Sorting ────────────────────────────────────────────────
             $sortBy = $request->get('sort_by', 'newest');
             switch ($sortBy) {
@@ -249,11 +260,6 @@ class ProductController extends Controller
                     'forms'  => $forms,
                     'ratios' => $ratios,
                     'sizes'  => $sizes,
-                    'certifications' => [
-                        ['label' => 'cert-organic', 'display' => '100% Organic',  'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-organic')->count(), 'disabled' => false],
-                        ['label' => 'cert-nongmo',  'display' => 'Non-GMO',       'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-nongmo')->count(),  'disabled' => false],
-                        ['label' => 'cert-vegan',   'display' => 'Vegan',         'count' => Product::where('in_stock', true)->whereJsonContains('tags', 'cert-vegan')->count(),   'disabled' => false],
-                    ],
                 ],
             ]);
         } catch (\Throwable $e) {
@@ -275,7 +281,7 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        $relationships = ['category', 'gallery', 'mainImage', 'reviews.user', 'reviews.images'];
+        $relationships = ['category', 'gallery', 'mainImage', 'reviews.user', 'reviews.images', 'attributeValues.attribute', 'productContent'];
 
         if (\Illuminate\Support\Facades\Schema::hasTable('variant_images')) {
             $relationships[] = 'variants.variantImages';
@@ -305,5 +311,19 @@ class ProductController extends Controller
         }
 
         return response()->json($product);
+    }
+
+    public function getSubstitutionTip(Request $request)
+    {
+        $ratio = $request->query('ratio', '1:10');
+        $parts = explode(':', $ratio);
+        $multiplier = count($parts) > 1 ? (int)$parts[1] : 10;
+        
+        return response()->json([
+            'success' => true,
+            'ratio' => $ratio,
+            'multiplier' => $multiplier,
+            'tip' => "1g replaces {$multiplier}g of sugar"
+        ]);
     }
 }
