@@ -221,8 +221,9 @@ class ProductForm
                             ->collapsible(),
                     ]),
                 Section::make('Dynamic Attributes')
-    ->columns(2)
-         Select::make('format')
+                    ->columns(2)
+                    ->components([
+                        Select::make('format')
             ->label('Format')
             ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'format')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
             ->searchable()
