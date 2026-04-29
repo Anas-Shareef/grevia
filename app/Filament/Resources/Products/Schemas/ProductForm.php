@@ -22,6 +22,28 @@ class ProductForm
     {
         return $schema
             ->components([
+                Section::make('Pinned Product Metafields')
+                    ->description('Core operational attributes mapped to front-end AJAX hooks.')
+                    ->columns(2)
+                    ->components([
+                        TagsInput::make('concentration_options')
+                            ->label('Concentration Ratios')
+                            ->placeholder('e.g. 1:10, 1:50')
+                            ->helperText('These drive the selectable potency pills on the store frontend.')
+                            ->separator(','),
+                        Select::make('concentration')
+                            ->label('Default Concentration')
+                            ->options(function ($get) {
+                                $options = $get('concentration_options');
+                                if (!is_array($options)) return [];
+                                return array_combine($options, $options);
+                            })
+                            ->helperText('Pre-selected value on load.'),
+                        TextInput::make('sweetness_description')
+                            ->label('Substitution Value')
+                            ->placeholder('e.g. 1g replaces 10g of sugar')
+                            ->helperText('Overrides dynamic calculations if provided.'),
+                    ]),
                 Section::make('General Information')
                     ->columns(2)
                     ->components([
@@ -198,7 +220,41 @@ class ProductForm
                             ->itemLabel(fn (array $state): ?string => ($state['weight'] ?? '') . ' - Pack of ' . ($state['pack_size'] ?? '1'))
                             ->collapsible(),
                     ]),
-                Section::make('PDP Content & Attributes')
+                Section::make('Dynamic Attributes')
+    ->columns(2)
+    ->components([
+        Select::make('format')
+            ->label('Format')
+            ->options(fn () => \App\Models\Attribute::where('name', 'format')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->searchable()
+            ->required(),
+        Select::make('concentration')
+            ->label('Concentration')
+            ->options(fn () => \App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->searchable()
+            ->required(),
+        Select::make('pack_size')
+            ->label('Pack Size')
+            ->multiple()
+            ->options(fn () => \App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->searchable(),
+        Select::make('trust_badges')
+            ->label('Trust Badges')
+            ->multiple()
+            ->options(fn () => \App\Models\Attribute::where('name', 'trust_badges')->first()?->values->pluck('value_text','slug')->toArray() ?? [])
+            ->searchable(),
+    ]),
+Section::make('Content Fields')
+    ->columns(1)
+    ->components([
+        RichEditor::make('attr_product_story')
+            ->label('Product Story')
+            ->toolbarButtons(['bold','italic','underline','strike','link','bulletList','orderedList','heading','blockquote','code','codeBlock','clean']),
+        RichEditor::make('attr_usage_prep')
+            ->label('Usage & Preparation')
+            ->toolbarButtons(['bold','italic','underline','strike','link','bulletList','orderedList','heading','blockquote','code','codeBlock','clean']),
+    ]),
+Section::make('PDP Content & Attributes')
                     ->description('Detailed content for the Product Detail Page accordions and trust signals.')
                     ->collapsible()
                     ->components([

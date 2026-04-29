@@ -157,4 +157,14 @@ class Product extends Model
             default => ['Default' => 'Default'],
         };
     }
+
+    public function attributeValues(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(AttributeValue::class, 'product_attribute_value', 'product_id', 'value_id');
+    }
+
+    public function productContent(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ProductContent::class, 'product_id');
+    }
 }
