@@ -115,7 +115,7 @@ class AttributeResource extends Resource
                                     ->helperText('e.g. "1g replaces 10g of sugar" — shown in PDP info box')
                                     ->rows(2)
                                     ->columnSpan(2)
-                                    ->visible(fn (Get $get): bool =>
+                                    ->visible(fn ($get): bool =>
                                         $get('../../display_type') === 'bubble_pill'
                                     ),
 
@@ -123,7 +123,7 @@ class AttributeResource extends Resource
                                     ->label('Set as PDP Default?')
                                     ->helperText('Pre-selects this pill when customers view the product page')
                                     ->columnSpan(2)
-                                    ->visible(fn (Get $get): bool =>
+                                    ->visible(fn ($get): bool =>
                                         $get('../../display_type') === 'bubble_pill'
                                     ),
 
@@ -136,7 +136,7 @@ class AttributeResource extends Resource
                                     ->maxSize(50)
                                     ->helperText('32×32px recommended. Shown on PDP and Quick Shop.')
                                     ->columnSpan(2)
-                                    ->visible(fn (Get $get): bool =>
+                                    ->visible(fn ($get): bool =>
                                         $get('../../display_type') === 'icon_text'
                                     ),
 
