@@ -248,11 +248,9 @@ Section::make('Content Fields')
     ->columns(1)
     ->components([
         RichEditor::make('attr_product_story')
-            ->label('Product Story')
-            ->toolbarButtons(['bold','italic','underline','strike','link','bulletList','orderedList','blockquote','code','codeBlock','clean']),
+            ->label('Product Story'),
         RichEditor::make('attr_usage_prep')
-            ->label('Usage & Preparation')
-            ->toolbarButtons(['bold','italic','underline','strike','link','bulletList','orderedList','blockquote','code','codeBlock','clean']),
+            ->label('Usage & Preparation'),
     ]),
 Section::make('PDP Content & Attributes')
                     ->description('Detailed content for the Product Detail Page accordions and trust signals.')
