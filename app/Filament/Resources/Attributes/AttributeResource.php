@@ -7,6 +7,7 @@ use App\Models\Attribute;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
@@ -30,9 +31,9 @@ class AttributeResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Attribute Configuration')
+                Section::make('Attribute Configuration')
                     ->columns(2)
-                    ->schema([
+                    ->components([
                         TextInput::make('name')
                             ->required()
                             ->unique(ignoreRecord: true),
@@ -60,8 +61,8 @@ class AttributeResource extends Resource
                         Toggle::make('is_required')
                             ->default(false),
                     ]),
-                Forms\Components\Section::make('Attribute Values')
-                    ->schema([
+                Section::make('Attribute Values')
+                    ->components([
                         Repeater::make('values')
                             ->relationship('values')
                             ->schema([
