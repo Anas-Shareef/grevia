@@ -107,6 +107,14 @@ class ProductController extends Controller
                 }
             }
 
+            // ── 11. Size Filter from Variants ──────────────────────────────
+            if ($request->filled('size')) {
+                $sizes = is_array($request->get('size')) ? $request->get('size') : explode(',', $request->get('size'));
+                $query->whereHas('variants', function ($q) use ($sizes) {
+                    $q->whereIn('weight', $sizes);
+                });
+            }
+
             // ── 12. Sorting ────────────────────────────────────────────────
             $sortBy = $request->get('sort_by', 'newest');
             switch ($sortBy) {
@@ -222,9 +230,9 @@ class ProductController extends Controller
             if (\Illuminate\Support\Facades\Schema::hasTable('product_variants')) {
                 $packSizeRows = \DB::table('product_variants')
                     ->whereIn('product_id', $basePids)
-                    ->select('title', \DB::raw('COUNT(DISTINCT product_id) as total'), \DB::raw('SUM(CASE WHEN stock_quantity > 0 THEN 1 ELSE 0 END) as in_stock_count'))
-                    ->groupBy('title')
-                    ->orderBy('title')
+                    ->select('weight as title', \DB::raw('COUNT(DISTINCT product_id) as total'), \DB::raw('SUM(CASE WHEN stock_quantity > 0 THEN 1 ELSE 0 END) as in_stock_count'))
+                    ->groupBy('weight')
+                    ->orderBy('weight')
                     ->get();
                 $sizes = $packSizeRows->map(fn($row) => [
                     'label'    => $row->title,
