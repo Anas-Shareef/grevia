@@ -113,8 +113,8 @@ class AttributeResource extends Resource
                     ->counts('values'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                \Filament\Actions\EditAction::make(),
+                \Filament\Actions\DeleteAction::make()
                     ->before(function ($record, $action) {
                         $usageCount = \DB::table('product_attribute_value')->whereIn('value_id', $record->values->pluck('id'))->count();
                         if ($usageCount > 0) {
