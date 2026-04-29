@@ -25,7 +25,7 @@ class AttributeResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+
 
     protected static ?string $navigationLabel = 'Attributes';
 
