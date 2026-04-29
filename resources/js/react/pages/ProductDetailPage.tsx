@@ -195,9 +195,52 @@ const ProductDetailPage = () => {
   const discountPercent = originalPrice && displayPrice ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) : 0;
   const wishlisted = isInWishlist(String(product.id));
   
-  const dynamicTrustBadges = (product as any).attribute_values?.filter(
-    (av: any) => av.attribute?.name === 'trust_badges'
-  ) || [];
+  // Structured EAV attributes from new API response
+  const attrs = (product as any).attributes || {};
+  const formatAttr   = attrs.format || null;
+  const concentrations: any[] = attrs.concentrations || [];
+  const trustBadges: any[]    = attrs.trust_badges || [];
+
+  // Fallback: if no EAV concentrations, use legacy concentration_options
+  const legacyConcOptions: string[] = (product as any).concentration_options || [];
+  const hasEavConcentrations = concentrations.length > 0;
+
+  // Trust badges: prefer new EAV, fallback to old attribute_values
+  const dynamicTrustBadges = trustBadges.length > 0
+    ? trustBadges
+    : ((product as any).attribute_values?.filter((av: any) => av.attribute?.name === 'trust_badges') || []);
+
+  // Dynamic info box for concentration
+  const [infoBoxText, setInfoBoxText] = useState<string | null>(null);
+  const [infoBoxVisible, setInfoBoxVisible] = useState(false);
+  const [infoBoxOpacity, setInfoBoxOpacity] = useState(1);
+
+  useEffect(() => {
+    if (hasEavConcentrations) {
+      const defaultConc = concentrations.find((c: any) => c.is_default) || concentrations[0];
+      if (defaultConc) {
+        setSelectedRatio(defaultConc.slug || defaultConc.value || '');
+        if (defaultConc.substitution_text) {
+          setInfoBoxText(defaultConc.substitution_text);
+          setInfoBoxVisible(true);
+        }
+      }
+    }
+  }, [hasEavConcentrations, concentrations.length]);
+
+  const handleConcentrationClick = (conc: any) => {
+    setInfoBoxOpacity(0);
+    setTimeout(() => {
+      setSelectedRatio(conc.slug || conc.value || '');
+      if (conc.substitution_text) {
+        setInfoBoxText(conc.substitution_text);
+        setInfoBoxVisible(true);
+      } else {
+        setInfoBoxVisible(false);
+      }
+      setInfoBoxOpacity(1);
+    }, 120);
+  };
 
   // Fix 2: Variant-specific gallery — prefer variant images when a variant is selected
   const variantGallery = [
@@ -358,16 +401,55 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* Concentration Selector */}
-            {concentrationOptions.length > 0 && (
+            {/* Format Display */}
+            {formatAttr && (
+              <p className="text-[13px] text-[#5A5A5A] Montserrat mb-4">
+                <span className="font-medium">Format:</span> {formatAttr.value}
+              </p>
+            )}
+
+            {/* Concentration / Potency — EAV Bubble Pills */}
+            {hasEavConcentrations ? (
               <div className="mb-8">
-                <label className="text-[12px] font-bold text-[#1F2937] uppercase tracking-wider mb-4 block Montserrat">Concentration / Potency</label>
+                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Concentration / Potency</label>
                 <div className="flex flex-wrap gap-2.5">
-                  {concentrationOptions.map(r => (
+                  {concentrations.map((conc: any) => {
+                    const isActive = selectedRatio === (conc.slug || conc.value);
+                    return (
+                      <button
+                        key={conc.id}
+                        onClick={() => handleConcentrationClick(conc)}
+                        className={`h-11 px-6 rounded-[100px] text-[13px] border transition-all duration-200 Montserrat ${
+                          isActive
+                            ? 'bg-[#1E3A1F] border-[#1E3A1F] text-white font-semibold'
+                            : 'bg-white border-[#C0C0C0] text-[#1C1C1C] font-medium hover:border-[#4A8C4B] hover:bg-[#F1F8F1] hover:text-[#2E5D2F]'
+                        }`}
+                      >
+                        {conc.label || conc.value}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Dynamic Info Box with substitution_text */}
+                {infoBoxVisible && infoBoxText && (
+                  <div
+                    className="flex items-center gap-3 mt-3 px-5 py-3 rounded-[12px] border border-[#77CB4D] bg-[#EBF5EB]"
+                    style={{ opacity: infoBoxOpacity, transition: 'opacity 200ms ease' }}
+                  >
+                    <Leaf className="w-4 h-4 text-[#4A8C4B] flex-shrink-0" />
+                    <span className="text-[14px] text-[#1C1C1C] Montserrat">{infoBoxText}</span>
+                  </div>
+                )}
+              </div>
+            ) : legacyConcOptions.length > 0 ? (
+              <div className="mb-8">
+                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Concentration / Potency</label>
+                <div className="flex flex-wrap gap-2.5">
+                  {legacyConcOptions.map((r: string) => (
                     <button
                       key={r}
                       onClick={() => setSelectedRatio(r)}
-                      className={`h-11 px-6 rounded-[24px] font-bold text-[13px] border-2 transition-all Montserrat ${selectedRatio === r ? 'bg-[#EAF2EB] text-[#2E4D31] border-[#2E4D31] shadow-sm' : 'bg-white text-[#313131] border-[#E5E7EB] hover:border-[#2E4D31] hover:bg-[#F0FAE8]'}`}
+                      className={`h-11 px-6 rounded-[100px] font-bold text-[13px] border-2 transition-all Montserrat ${selectedRatio === r ? 'bg-[#1E3A1F] text-white border-[#1E3A1F]' : 'bg-white text-[#313131] border-[#E5E7EB] hover:border-[#2E4D31] hover:bg-[#F0FAE8]'}`}
                     >
                       {r}
                     </button>
@@ -375,31 +457,41 @@ const ProductDetailPage = () => {
                 </div>
                 <SubstitutionTip ratio={selectedRatio} />
               </div>
-            )}
+            ) : null}
 
-            {/* Pack Size Selector */}
+            {/* Pack Size Selector — Grevia light-green selected style, out-of-stock dimmed */}
             {product.variants && product.variants.length > 0 && (
               <div className="mb-10">
-                <label className="text-[12px] font-bold text-[#1F2937] uppercase tracking-wider mb-4 block Montserrat">Select Pack Size</label>
+                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Select Pack Size</label>
                 <div className="flex flex-wrap gap-2.5">
-                  {product.variants.map((v: any) => (
-                    <button
-                      key={v.id}
-                      onClick={() => setSelectedVariant(v)}
-                      className={`h-11 px-6 rounded-[24px] font-bold text-[13px] border-2 transition-all Montserrat ${selectedVariant?.id === v.id ? 'bg-[#EAF2EB] text-[#2E4D31] border-[#2E4D31] shadow-sm' : 'bg-white text-[#313131] border-[#E5E7EB] hover:border-[#2E4D31] hover:bg-[#F0FAE8]'}`}
-                    >
-                      {v.weight}
-                    </button>
-                  ))}
+                  {product.variants.map((v: any) => {
+                    const isAvailable = (v.is_available !== false) && (v.stock_quantity === undefined || v.stock_quantity > 0);
+                    const isSelected = selectedVariant?.id === v.id;
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => isAvailable && setSelectedVariant(v)}
+                        disabled={!isAvailable}
+                        title={!isAvailable ? 'Out of Stock' : undefined}
+                        className={`h-11 px-6 rounded-[100px] text-[13px] transition-all duration-200 Montserrat ${
+                          !isAvailable
+                            ? 'opacity-40 cursor-not-allowed bg-[#F4F4F4] border border-[#E0E0E0] text-[#AAAAAA] font-normal'
+                            : isSelected
+                              ? 'bg-[#EBF5EB] border-[1.5px] border-[#4A8C4B] text-[#1E3A1F] font-bold'
+                              : 'bg-white border border-[#C0C0C0] text-[#1C1C1C] font-medium hover:border-[#4A8C4B] hover:bg-[#F1F8F1]'
+                        }`}
+                      >
+                        {v.title || v.weight}
+                      </button>
+                    );
+                  })}
                 </div>
-                {/* Fix 3: Stock Urgency Badge */}
-                {selectedVariant && selectedVariant.stock_quantity > 0 && selectedVariant.stock_quantity < 10 && (
+                {selectedVariant && (selectedVariant.stock_quantity ?? 1) > 0 && (selectedVariant.stock_quantity ?? 1) < 10 && (
                   <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
                     className="mt-3 inline-flex items-center gap-2 bg-[#FEF3C7] border border-[#F59E0B] rounded-full px-4 py-1.5"
                   >
-                    <span className="text-[12px] font-bold text-[#92400E] Montserrat">🔥 Only {selectedVariant.stock_quantity} left in stock!</span>
+                    <span className="text-[12px] font-bold text-[#92400E] Montserrat">🔥 Only {selectedVariant.stock_quantity} left!</span>
                   </motion.div>
                 )}
                 {selectedVariant && selectedVariant.stock_quantity === 0 && (
@@ -411,28 +503,28 @@ const ProductDetailPage = () => {
             )}
 
             {/* Buy Box */}
-            <div className="flex flex-col gap-4 mb-10">
+            <div className="flex flex-col gap-4 mb-6">
               <div className="flex items-center gap-4">
                 <div className="flex items-center bg-[#F8F5F0] rounded-full p-1.5 border border-[#E5E7EB]">
-                  <button 
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))} 
+                  <button
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
                     className="w-10 h-10 flex items-center justify-center hover:bg-white transition-all rounded-full text-[#2E4D31]"
                     disabled={quantity <= 1}
                   >
                     <Minus className="w-4 h-4" />
                   </button>
                   <span className="w-12 text-center font-bold text-[16px] Montserrat">{quantity}</span>
-                  <button 
-                    onClick={() => setQuantity(q => q + 1)} 
+                  <button
+                    onClick={() => setQuantity(q => q + 1)}
                     className="w-10 h-10 flex items-center justify-center hover:bg-white transition-all rounded-full text-[#2E4D31]"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
 
-                <button 
+                <button
                   id="main-add-to-cart"
-                  onClick={handleAddToCart} 
+                  onClick={handleAddToCart}
                   className="flex-1 h-14 bg-[#77CB4D] hover:bg-[#5fb33a] text-white rounded-full flex items-center justify-center gap-3 font-bold text-[14px] uppercase Montserrat transition-all active:scale-[0.98] shadow-lg shadow-[#77CB4D]/25"
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -440,66 +532,100 @@ const ProductDetailPage = () => {
                 </button>
               </div>
 
-              {/* Trust signals */}
-              <div className="flex flex-wrap gap-3 mt-2">
-                {dynamicTrustBadges.length > 0 ? (
-                  dynamicTrustBadges.map((tb: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-2 bg-[#F0FAE8] border border-[#77CB4D] rounded-full px-3 py-1.5 transition-all hover:bg-[#EAF2EB]">
-                      {tb.icon_url ? (
-                        <img src={`/storage/${tb.icon_url}`} alt={tb.value_text} className="w-4 h-4 object-contain flex-shrink-0" />
-                      ) : (
-                        <Award className="w-4 h-4 text-[#2E4D31] flex-shrink-0" />
-                      )}
-                      <span className="text-xs font-bold text-[#2E4D31] Montserrat whitespace-nowrap">{tb.value_text}</span>
-                    </div>
-                  ))
-                ) : (
-                  <>
-                    <TrustChip icon={Truck} text="Free Shipping above ₹499" />
-                    <TrustChip icon={RotateCcw} text="7-Day Hassle-Free Returns" />
-                    <TrustChip icon={Award} text="100% Organic Certified" />
-                  </>
-                )}
-              </div>
+              {/* Trust Badges — PRD §4.3: vertical icon stack below Add to Cart */}
+              {dynamicTrustBadges.length > 0 ? (
+                <div className="mt-4">
+                  <p className="text-[10px] font-bold text-[#5A5A5A] uppercase tracking-[0.12em] Montserrat mb-3">Quality Promise</p>
+                  <div className="flex flex-wrap gap-4">
+                    {dynamicTrustBadges.map((tb: any, idx: number) => (
+                      <div key={idx} className="flex flex-col items-center gap-1.5" style={{ minWidth: '60px', maxWidth: '72px' }}>
+                        {(tb.icon || tb.icon_url) ? (
+                          <img
+                            src={tb.icon || `/storage/${tb.icon_url}`}
+                            alt={tb.label || tb.value_text}
+                            className="w-8 h-8 object-contain"
+                          />
+                        ) : (
+                          <Award className="w-8 h-8 text-[#2E5D2F]" />
+                        )}
+                        <span className="text-[10px] font-medium text-[#1E3A1F] Montserrat uppercase tracking-[0.08em] text-center leading-tight">
+                          {tb.label || tb.value_text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-3 mt-2">
+                  <TrustChip icon={Truck} text="Free Shipping above ₹499" />
+                  <TrustChip icon={RotateCcw} text="7-Day Returns" />
+                  <TrustChip icon={Award} text="100% Organic" />
+                </div>
+              )}
             </div>
             
-            {/* Accordions */}
-            <div className="space-y-1">
-              <AccordionItem title="Product Story" defaultOpen={true} icon={Leaf}>
-                <div 
-                  className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed" 
-                  dangerouslySetInnerHTML={{ __html: (product as any).product_content?.attr_product_story || product.product_description || product.description || "Experience the pure taste of nature with Grevia's premium sweetener." }} 
-                />
-              </AccordionItem>
-              
-              <AccordionItem title="Ingredients" icon={Info}>
-                {/* Fix 4: Handle ingredients as JSON array (TagsInput) or HTML string */}
-                {Array.isArray(product.ingredients) ? (
-                  <ul className="list-none space-y-2">
-                    {product.ingredients.map((ing: string, idx: number) => (
-                      <li key={idx} className="flex items-center gap-2 Montserrat text-gray-600">
-                        <Leaf className="w-3.5 h-3.5 text-[#77CB4D] flex-shrink-0" />
-                        <span className="text-[14px] font-medium">{ing}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div 
-                    className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed" 
-                    dangerouslySetInnerHTML={{ __html: product.ingredients || "Organic Stevia Leaf Extract, Purified Water." }} 
-                  />
-                )}
-              </AccordionItem>
-              
-              <AccordionItem title="How to Use" icon={Check}>
-                <div 
-                  className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed" 
-                  dangerouslySetInnerHTML={{ __html: (product as any).product_content?.attr_usage_prep || product.usage_instructions || "Add 2-3 drops to your coffee or tea. Stir and enjoy!" }} 
-                />
-              </AccordionItem>
-              
+            {/* Accordions — conditional per PRD §4.4 */}
+            <div className="space-y-1 mt-8">
+              {/* Product Story — only if content exists */}
+              {(() => {
+                const storyContent =
+                  (product as any).content?.attr_product_story?.trim() ||
+                  (product as any).product_content?.attr_product_story?.trim() ||
+                  product.product_description?.trim() ||
+                  product.description?.trim();
+                return storyContent ? (
+                  <AccordionItem title="Product Story" defaultOpen={true} icon={Leaf}>
+                    <div
+                      className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: storyContent }}
+                    />
+                  </AccordionItem>
+                ) : null;
+              })()}
+
+              {/* Ingredients — only if present */}
+              {(product.ingredients && (Array.isArray(product.ingredients) ? product.ingredients.length > 0 : String(product.ingredients).trim())) && (
+                <AccordionItem title="Ingredients" icon={Info}>
+                  {Array.isArray(product.ingredients) ? (
+                    <ul className="list-none space-y-2">
+                      {product.ingredients.map((ing: string, idx: number) => (
+                        <li key={idx} className="flex items-center gap-2 Montserrat text-gray-600">
+                          <Leaf className="w-3.5 h-3.5 text-[#77CB4D] flex-shrink-0" />
+                          <span className="text-[14px] font-medium">{ing}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div
+                      className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: product.ingredients }}
+                    />
+                  )}
+                </AccordionItem>
+              )}
+
+              {/* Usage & Preparation — only if content exists */}
+              {(() => {
+                const usageContent =
+                  (product as any).content?.attr_usage_prep?.trim() ||
+                  (product as any).product_content?.attr_usage_prep?.trim() ||
+                  product.usage_instructions?.trim();
+                return usageContent ? (
+                  <AccordionItem title="How to Use" icon={Check}>
+                    <div
+                      className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: usageContent }}
+                    />
+                  </AccordionItem>
+                ) : null;
+              })()}
+
+              {/* Shipping & Returns — always shown */}
               <AccordionItem title="Shipping & Returns" icon={Truck}>
-                <p>Standard delivery takes 3-5 business days. We offer free shipping on orders above ₹499. Returns accepted within 7 days for unopened products.</p>
+                <p className="Montserrat text-[14px] text-gray-600 leading-relaxed">
+                  Standard delivery takes 3–5 business days. Free shipping on orders above ₹499.
+                  Returns accepted within 7 days for unopened products.
+                </p>
               </AccordionItem>
             </div>
 

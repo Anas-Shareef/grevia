@@ -25,6 +25,7 @@ Route::get('/user', function (Request $request) {
 // Public Routes
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
+Route::get('/products/substitution-tip', [ProductController::class, 'getSubstitutionTip']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/settings', [SiteSettingController::class, 'index']);

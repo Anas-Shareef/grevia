@@ -51,7 +51,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
   };
 
   useEffect(() => {
-    if (productId && productId !== "undefined") {
+    if (productId && productId !== "undefined" && /^\d+$/.test(productId)) {
       fetchReviews();
     }
   }, [productId]);
@@ -59,13 +59,39 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      setFiles(prev => [...prev, ...newFiles]);
+      const currentImages = files.filter(f => f.type.startsWith('image')).length;
+      const currentVideos = files.filter(f => f.type.startsWith('video')).length;
       
-      const newPreviews = newFiles.map(file => ({
-        url: URL.createObjectURL(file),
-        type: file.type.startsWith('video') ? 'video' : 'image'
-      }));
-      setPreviews(prev => [...prev, ...newPreviews]);
+      let newImages = 0;
+      let newVideos = 0;
+      const acceptedFiles: File[] = [];
+
+      newFiles.forEach(file => {
+        if (file.type.startsWith('image')) {
+          if (currentImages + newImages < 3) {
+            acceptedFiles.push(file);
+            newImages++;
+          } else {
+            toast.error("Maximum 3 images allowed per review.");
+          }
+        } else if (file.type.startsWith('video')) {
+          if (currentVideos + newVideos < 1) {
+            acceptedFiles.push(file);
+            newVideos++;
+          } else {
+            toast.error("Maximum 1 video allowed per review.");
+          }
+        }
+      });
+
+      if (acceptedFiles.length > 0) {
+        setFiles(prev => [...prev, ...acceptedFiles]);
+        const newPreviews = acceptedFiles.map(file => ({
+          url: URL.createObjectURL(file),
+          type: file.type.startsWith('video') ? 'video' : 'image'
+        }));
+        setPreviews(prev => [...prev, ...newPreviews]);
+      }
     }
   };
 

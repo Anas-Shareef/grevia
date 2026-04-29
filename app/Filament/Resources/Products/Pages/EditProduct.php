@@ -75,9 +75,84 @@ class EditProduct extends EditRecord
                     }
                 }),
 
-            DeleteAction::make(),
+        DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        $record = $this->record;
+        $data   = $this->data;
+
+        if (!Schema::hasTable('product_attribute_value') || !Schema::hasTable('attribute_values')) {
+            return;
+        }
+
+        $this->saveEavAttribute($record, 'format',        $data['attr_format'] ?? null,             false);
+        $this->saveEavAttribute($record, 'concentration',  $data['attr_concentration'] ?? [],         true);
+        $this->saveEavAttribute($record, 'trust_badges',   $data['attr_trust_badges'] ?? [],          true);
+
+        // Set is_default_concentration
+        if (!empty($data['attr_default_concentration']) && Schema::hasColumn('product_attribute_value', 'is_default_concentration')) {
+            $concAttr = \App\Models\Attribute::where('name', 'concentration')->first();
+            if ($concAttr) {
+                // Reset all concentrations for this product
+                DB::table('product_attribute_value')
+                    ->where('product_id', $record->id)
+                    ->whereIn('value_id', $concAttr->values->pluck('id'))
+                    ->update(['is_default_concentration' => 0]);
+
+                // Set the chosen default
+                $defaultVal = \App\Models\AttributeValue::where('attribute_id', $concAttr->id)
+                    ->where('slug', $data['attr_default_concentration'])
+                    ->first();
+                if ($defaultVal) {
+                    DB::table('product_attribute_value')
+                        ->where('product_id', $record->id)
+                        ->where('value_id', $defaultVal->id)
+                        ->update(['is_default_concentration' => 1]);
+                }
+            }
+        }
+    }
+
+    private function saveEavAttribute(\App\Models\Product $record, string $attrName, mixed $state, bool $multiple): void
+    {
+        $attr = \App\Models\Attribute::where('name', $attrName)->first();
+        if (!$attr) return;
+
+        // Remove existing assignments for this attribute
+        DB::table('product_attribute_value')
+            ->where('product_id', $record->id)
+            ->whereIn('value_id', $attr->values->pluck('id'))
+            ->delete();
+
+        if ($multiple) {
+            if (!empty($state) && is_array($state)) {
+                $valIds = \App\Models\AttributeValue::where('attribute_id', $attr->id)
+                    ->whereIn('slug', $state)
+                    ->pluck('id');
+                foreach ($valIds as $vId) {
+                    DB::table('product_attribute_value')->insertOrIgnore([
+                        'product_id' => $record->id,
+                        'value_id'   => $vId,
+                    ]);
+                }
+            }
+        } else {
+            if (!empty($state)) {
+                $val = \App\Models\AttributeValue::where('attribute_id', $attr->id)
+                    ->where('slug', $state)
+                    ->first();
+                if ($val) {
+                    DB::table('product_attribute_value')->insertOrIgnore([
+                        'product_id' => $record->id,
+                        'value_id'   => $val->id,
+                    ]);
+                }
+            }
+        }
     }
 }

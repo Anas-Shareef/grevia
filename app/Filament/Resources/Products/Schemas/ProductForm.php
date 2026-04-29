@@ -222,151 +222,86 @@ class ProductForm
                     ]),
                 Section::make('Dynamic Attributes')
                     ->columns(2)
+                    ->description('Assign EAV attributes — powers filter sidebar and PDP display. Pack Size is automatic from Variants.')
                     ->components([
-                        Select::make('format')
-            ->label('Format')
-            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'format')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
-            ->searchable()
-            ->required()
-            ->afterStateHydrated(function ($state, $record, $set) {
-                if (!$record) return;
-                $val = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'format'))->first();
-                $set('format', $val?->slug);
-            })
-            ->saveRelationshipsUsing(function ($state, $record) {
-                if (!$record) return;
-                $attr = \App\Models\Attribute::where('name', 'format')->first();
-                if (!$attr) return;
-                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
-                if ($state) {
-                    $val = \App\Models\AttributeValue::where('attribute_id', $attr->id)->where('slug', $state)->first();
-                    if ($val) \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $val->id]);
-                }
-            }),
-        Select::make('concentration')
-            ->label('Concentration')
-            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
-            ->searchable()
-            ->required()
-            ->afterStateHydrated(function ($state, $record, $set) {
-                if (!$record) return;
-                $val = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'concentration'))->first();
-                $set('concentration', $val?->slug);
-            })
-            ->saveRelationshipsUsing(function ($state, $record) {
-                if (!$record) return;
-                $attr = \App\Models\Attribute::where('name', 'concentration')->first();
-                if (!$attr) return;
-                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
-                if ($state) {
-                    $val = \App\Models\AttributeValue::where('attribute_id', $attr->id)->where('slug', $state)->first();
-                    if ($val) \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $val->id]);
-                }
-            }),
-        Select::make('pack_size')
-            ->label('Pack Size')
-            ->multiple()
-            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
-            ->searchable()
-            ->afterStateHydrated(function ($state, $record, $set) {
-                if (!$record) return;
-                $vals = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'pack_size'))->pluck('slug')->toArray();
-                $set('pack_size', $vals);
-            })
-            ->saveRelationshipsUsing(function ($state, $record) {
-                if (!$record) return;
-                $attr = \App\Models\Attribute::where('name', 'pack_size')->first();
-                if (!$attr) return;
-                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
-                if (!empty($state) && is_array($state)) {
-                    $valIds = \App\Models\AttributeValue::where('attribute_id', $attr->id)->whereIn('slug', $state)->pluck('id')->toArray();
-                    foreach ($valIds as $vId) {
-                        \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $vId]);
-                    }
-                }
-            }),
-        Select::make('trust_badges')
-            ->label('Trust Badges')
-            ->multiple()
-            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes') ? (\App\Models\Attribute::where('name', 'trust_badges')->first()?->values->pluck('value_text','slug')->toArray() ?? []) : [])
-            ->searchable()
-            ->afterStateHydrated(function ($state, $record, $set) {
-                if (!$record) return;
-                $vals = $record->attributeValues()->whereHas('attribute', fn($q) => $q->where('name', 'trust_badges'))->pluck('slug')->toArray();
-                $set('trust_badges', $vals);
-            })
-            ->saveRelationshipsUsing(function ($state, $record) {
-                if (!$record) return;
-                $attr = \App\Models\Attribute::where('name', 'trust_badges')->first();
-                if (!$attr) return;
-                \DB::table('product_attribute_value')->where('product_id', $record->id)->whereIn('value_id', $attr->values->pluck('id'))->delete();
-                if (!empty($state) && is_array($state)) {
-                    $valIds = \App\Models\AttributeValue::where('attribute_id', $attr->id)->whereIn('slug', $state)->pluck('id')->toArray();
-                    foreach ($valIds as $vId) {
-                        \DB::table('product_attribute_value')->insert(['product_id' => $record->id, 'value_id' => $vId]);
-                    }
-                }
-            }),
-    ]),
-Section::make('Content Fields')
-    ->columns(1)
-    ->components([
-        RichEditor::make('attr_product_story')
-            ->label('Product Story'),
-        RichEditor::make('attr_usage_prep')
-            ->label('Usage & Preparation'),
-    ]),
-Section::make('PDP Content & Attributes')
-                    ->description('Detailed content for the Product Detail Page accordions and trust signals.')
-                    ->collapsible()
-                    ->components([
-                        RichEditor::make('product_description')
-                            ->label('Product Story & Narrative')
-                            ->helperText('Detailed narrative about the product.')
-                            ->columnSpanFull(),
-                            
-                        RichEditor::make('usage_instructions')
-                            ->label('Usage & Preparation')
-                            ->helperText('Step-by-step usage instructions.')
-                            ->columnSpanFull(),
-
-                        Grid::make(2)
-                            ->components([
-                                TagsInput::make('concentration_options')
-                                    ->label('Available Concentrations')
-                                    ->placeholder('e.g. 1:10, 1:50')
-                                    ->helperText('Type a ratio and press enter. These become selectable pills on the PDP.')
-                                    ->separator(','),
-                                Select::make('concentration')
-                                    ->label('Default Concentration')
-                                    ->options(function ($get) {
-                                        $options = $get('concentration_options');
-                                        if (!is_array($options)) return [];
-                                        return array_combine($options, $options);
-                                    })
-                                    ->helperText('Pre-selected concentration pill on page load.'),
-                            ]),
-
-                        TagsInput::make('health_benefits')
-                            ->label('Health Benefit Chips')
-                            ->placeholder('e.g. Keto-Friendly, Zero-Glycemic')
-                            ->helperText('Type a benefit and press enter. Renders as premium chips on the PDP.')
-                            ->columnSpanFull(),
-
-                        Select::make('related_product_ids')
-                            ->label('Cross-Sell Picker (You May Also Like)')
-                            ->multiple()
-                            ->options(fn () => \App\Models\Product::pluck('name', 'id')->toArray())
+                        Select::make('attr_format')
+                            ->label('Format')
+                            ->helperText('e.g. Powder, Jar, Drops')
+                            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
+                                ? (\App\Models\Attribute::where('name', 'format')->first()?->values->pluck('value_text', 'slug')->toArray() ?? [])
+                                : [])
                             ->searchable()
-                            ->preload()
-                            ->helperText('Choose up to 8 products to show in the related products slider.')
-                            ->columnSpanFull(),
+                            ->afterStateHydrated(function ($state, $record, $set) {
+                                if (!$record || !\Illuminate\Support\Facades\Schema::hasTable('attribute_values')) return;
+                                $val = $record->attributeValues()
+                                    ->whereHas('attribute', fn($q) => $q->where('name', 'format'))
+                                    ->first();
+                                $set('attr_format', $val?->slug);
+                            }),
 
-                        Toggle::make('enable_guest_reviews')
-                            ->label('Enable Guest Reviews')
-                            ->default(true)
-                            ->helperText('If OFF, only verified customers who purchased the product can leave reviews.'),
+                        Select::make('attr_concentration')
+                            ->label('Concentration (multi)')
+                            ->helperText('All concentrations this product offers')
+                            ->multiple()
+                            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
+                                ? (\App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text', 'slug')->toArray() ?? [])
+                                : [])
+                            ->searchable()
+                            ->afterStateHydrated(function ($state, $record, $set) {
+                                if (!$record || !\Illuminate\Support\Facades\Schema::hasTable('attribute_values')) return;
+                                $vals = $record->attributeValues()
+                                    ->whereHas('attribute', fn($q) => $q->where('name', 'concentration'))
+                                    ->pluck('slug')->toArray();
+                                $set('attr_concentration', $vals);
+                            }),
+
+                        Select::make('attr_default_concentration')
+                            ->label('Default Concentration (PDP pre-select)')
+                            ->helperText('Pre-selected pill when customer views product page')
+                            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
+                                ? (\App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text', 'slug')->toArray() ?? [])
+                                : [])
+                            ->afterStateHydrated(function ($state, $record, $set) {
+                                if (!$record || !\Illuminate\Support\Facades\Schema::hasTable('product_attribute_value')) return;
+                                if (!\Illuminate\Support\Facades\Schema::hasColumn('product_attribute_value', 'is_default_concentration')) return;
+                                $val = $record->attributeValues()
+                                    ->whereHas('attribute', fn($q) => $q->where('name', 'concentration'))
+                                    ->wherePivot('is_default_concentration', 1)
+                                    ->first();
+                                $set('attr_default_concentration', $val?->slug);
+                            }),
+
+                        Select::make('attr_trust_badges')
+                            ->label('Trust Badges')
+                            ->helperText('Quality badges shown on PDP and Quick Shop')
+                            ->multiple()
+                            ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
+                                ? (\App\Models\Attribute::where('name', 'trust_badges')->first()?->values->pluck('value_text', 'slug')->toArray() ?? [])
+                                : [])
+                            ->searchable()
+                            ->afterStateHydrated(function ($state, $record, $set) {
+                                if (!$record || !\Illuminate\Support\Facades\Schema::hasTable('attribute_values')) return;
+                                $vals = $record->attributeValues()
+                                    ->whereHas('attribute', fn($q) => $q->where('name', 'trust_badges'))
+                                    ->pluck('slug')->toArray();
+                                $set('attr_trust_badges', $vals);
+                            }),
                     ]),
+                Section::make('Content Fields — Accordions')
+                    ->columns(1)
+                    ->description('Content shown in PDP accordions. Leave blank to hide the accordion.')
+                    ->components([
+                        \Filament\Forms\Components\RichEditor::make('product_description')
+                            ->label('Product Story')
+                            ->helperText('Shown in "Product Story" accordion. Leave blank to hide.')
+                            ->columnSpanFull(),
+                        \Filament\Forms\Components\RichEditor::make('usage_instructions')
+                            ->label('Usage & Preparation')
+                            ->helperText('Shown in "How to Use" accordion. Leave blank to hide.')
+                            ->columnSpanFull(),
+                    ]),
+
+
                 Section::make('🔍 Search & Filter Attributes')
                     ->description('These fields directly power the sidebar filters on the Collections page.')
                     ->collapsible()

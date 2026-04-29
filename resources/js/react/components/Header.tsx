@@ -111,8 +111,7 @@ const Header = () => {
 
   const navLinks: NavLink[] = [
     { label: 'Home', href: '/' },
-    // 'Shop All' is now a standalone link — NOT inside the mega-menu dropdown
-    { label: 'Shop All', href: '/collections' },
+    { label: 'Shop All', href: '/collections/all' },
     shopItem,
     { label: 'Benefits', href: '/benefits' },
     { label: 'Contact', href: '/contact' },

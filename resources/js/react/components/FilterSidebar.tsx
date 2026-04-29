@@ -100,48 +100,24 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                 </div>
             )}
 
-            <Accordion type="multiple" defaultValue={["type", "format", "concentration", "size"]} className="w-full border-none">
+            <Accordion type="multiple" defaultValue={["type", "concentration", "size"]} className="w-full border-none">
                 {/* Product Type Filter */}
                 {meta?.types && (
                     <AccordionItem value="type" className="border-b border-white/5 mb-2">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Product Type</AccordionTrigger>
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-[#77cb4d] transition-colors">Product Type</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.types.map((t) => (
                                     <div key={t.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("type", filters.type === t.label ? "" : t.label)}>
                                         <div className="flex items-center space-x-3">
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.type === t.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
-                                                {filters.type === t.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.type === t.label ? "bg-[#2E4D31] border-[#2E4D31]" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
+                                                {filters.type === t.label && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                                             </div>
                                             <span className={`text-sm font-bold transition-colors capitalize ${filters.type === t.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
                                                 {t.label.replace('-', ' ')}
                                             </span>
                                         </div>
-                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{t.count}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                )}
-
-                {/* Form Filter */}
-                {meta?.forms && (
-                    <AccordionItem value="format" className="border-b border-white/5 mb-2">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Format</AccordionTrigger>
-                        <AccordionContent>
-                            <div className="space-y-3 pb-4">
-                                {meta.forms.map((f) => (
-                                    <div key={f.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("format", filters.format === f.label ? "" : f.label)}>
-                                        <div className="flex items-center space-x-3">
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${filters.format === f.label ? "bg-lime border-lime" : "bg-transparent border-white/20 group-hover:border-white/40"}`}>
-                                                {filters.format === f.label && <div className="w-1.5 h-1.5 bg-black rounded-full" />}
-                                            </div>
-                                            <span className={`text-sm font-bold transition-colors capitalize ${filters.format === f.label ? "text-white" : "text-white/50 group-hover:text-white"}`}>
-                                                {f.label}
-                                            </span>
-                                        </div>
-                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{f.count}</span>
+                                        <span className="text-[10px] font-mono text-white/20 group-hover:text-[#77cb4d]/50 transition-colors">{t.count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -152,7 +128,7 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                 {/* Concentration Filter */}
                 {meta?.ratios && (
                     <AccordionItem value="concentration" className="border-b border-white/5 mb-2">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Concentration</AccordionTrigger>
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-[#77cb4d] transition-colors">Concentration</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.ratios.map((r) => {
@@ -160,12 +136,12 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                                     return (
                                         <div key={r.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("concentration", isSelected ? "" : r.label)}>
                                             <div className="flex items-center space-x-3">
-                                                <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-lime data-[state=checked]:border-lime" />
+                                                <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#2E4D31] data-[state=checked]:border-[#2E4D31]" />
                                                 <span className={`text-sm font-bold transition-colors ${isSelected ? "text-white" : "text-white/50 group-hover:text-white"}`}>
                                                     {r.label}
                                                 </span>
                                             </div>
-                                            <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{r.count}</span>
+                                            <span className="text-[10px] font-mono text-white/20 group-hover:text-[#77cb4d]/50 transition-colors">{r.count}</span>
                                         </div>
                                     );
                                 })}
@@ -176,7 +152,7 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
 
                 {/* Use-Case Filter */}
                 <AccordionItem value="use-case" className="border-b border-white/5 mb-2">
-                    <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Best For</AccordionTrigger>
+                    <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-[#77cb4d] transition-colors">Best For</AccordionTrigger>
                     <AccordionContent>
                         <div className="space-y-3 pb-4">
                             {[
@@ -194,7 +170,7 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                                         setFilter("tags", newTags);
                                     }}>
                                         <div className="flex items-center space-x-3">
-                                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-lime data-[state=checked]:border-lime" />
+                                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#2E4D31] data-[state=checked]:border-[#2E4D31]" />
                                             <span className={`text-sm font-bold transition-colors ${isSelected ? "text-white" : "text-white/50 group-hover:text-white"}`}>
                                                 {u.label}
                                             </span>
@@ -209,7 +185,7 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                 {/* Pack Size Filter */}
                 {meta?.sizes && (
                     <AccordionItem value="size" className="border-b border-white/5">
-                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-lime transition-colors">Pack Size</AccordionTrigger>
+                        <AccordionTrigger className="hover:no-underline py-4 px-0 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-[#77cb4d] transition-colors">Pack Size</AccordionTrigger>
                         <AccordionContent>
                             <div className="space-y-3 pb-4">
                                 {meta.sizes.map((s) => {
@@ -217,12 +193,12 @@ const FilterContent = ({ filters, setFilter, meta, currentCategory }: FilterSide
                                     return (
                                         <div key={s.label} className="flex items-center justify-between group cursor-pointer" onClick={() => setFilter("size", isSelected ? "" : s.label)}>
                                             <div className="flex items-center space-x-3">
-                                                <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-lime data-[state=checked]:border-lime" />
+                                                <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#2E4D31] data-[state=checked]:border-[#2E4D31]" />
                                                 <span className={`text-sm font-bold transition-colors ${isSelected ? "text-white" : "text-white/50 group-hover:text-white"}`}>
                                                     {s.label}
                                                 </span>
                                             </div>
-                                            <span className="text-[10px] font-mono text-white/20 group-hover:text-lime/50 transition-colors">{s.count}</span>
+                                            <span className="text-[10px] font-mono text-white/20 group-hover:text-[#77cb4d]/50 transition-colors">{s.count}</span>
                                         </div>
                                     );
                                 })}
