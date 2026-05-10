@@ -178,8 +178,8 @@ const Header = () => {
                           className="fixed left-1/2 -translate-x-1/2 z-[9999]"
                           style={{ 
                             top: scrolled ? '56px' : '64px',
-                            width: link.megaMenu ? '95vw' : 'auto',
-                            maxWidth: link.megaMenu ? '1400px' : 'none'
+                            width: 'auto',
+                            maxWidth: '95vw'
                           }}
                         >
                           <motion.div
@@ -192,14 +192,14 @@ const Header = () => {
                             }}
                             onMouseLeave={handleMouseLeave}
                             className={[
-                              'bg-white mt-3', // Solid white background
-                              'shadow-[0_20px_50px_rgba(0,0,0,0.1)]', // Soft premium shadow
-                              'border border-gray-100/60 rounded-[32px] overflow-visible',
-                              link.megaMenu ? 'p-10' : 'p-2 min-w-[240px]',
+                              'bg-white mt-3',
+                              'shadow-[0_20px_50px_rgba(0,0,0,0.15)]',
+                              'border border-gray-100/80 rounded-[32px] overflow-visible',
+                              link.megaMenu ? 'p-8 md:p-10' : 'p-2 min-w-[240px]',
                             ].join(' ')}
                             style={{ fontFamily: "'Montserrat', sans-serif" }}
                           >
-                            {/* Tooltip Arrow — Anchored to the navbar button center */}
+                            {/* Tooltip Arrow */}
                             <div
                               className="absolute -top-[7px] w-3.5 h-3.5 bg-white rotate-45 border-l border-t border-gray-100/70"
                               style={{
@@ -211,9 +211,9 @@ const Header = () => {
                             />
 
                             {link.megaMenu ? (
-                              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-10 gap-y-10 justify-items-start">
+                              <div className="flex flex-wrap gap-x-20 gap-y-12 justify-center mx-auto min-w-[320px] max-w-screen-xl">
                                 {link.megaMenu.map((column) => (
-                                  <div key={column.title} className="w-full space-y-6">
+                                  <div key={column.title} className="min-w-[220px] max-w-[280px] space-y-6">
 
                                     {/* Column Header — Montserrat Bold 14px */}
                                     <div className="flex items-center gap-2.5 pb-4 border-b border-[#2E4D31]/10">

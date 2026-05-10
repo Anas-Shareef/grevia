@@ -13,15 +13,17 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::where('availability_status', '!=', 'hidden')
-            ->whereNull('parent_id')
+        $categories = Category::where('show_in_filter', true)
+            ->where('availability_status', '!=', 'hidden')
+            ->where(fn ($q) => $q->whereNull('parent_id')->orWhere('parent_id', 0))
             ->with(['children' => function ($q) {
-                $q->where('status', true)
+                $q->where('show_in_filter', true)
+                  ->where('status', true)
                   ->withCount('products')
                   ->orderBy('order');
             }])
             ->withCount('products')
-            ->orderBy('order') // Replaced 'sort_order' with 'order' if that's the existing column, but let's check migration
+            ->orderBy('order')
             ->get();
 
         return response()->json($categories);
