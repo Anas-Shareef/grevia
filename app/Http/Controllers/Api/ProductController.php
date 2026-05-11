@@ -110,8 +110,13 @@ class ProductController extends Controller
             // ── 11. Size Filter from Variants ──────────────────────────────
             if ($request->filled('size')) {
                 $sizes = is_array($request->get('size')) ? $request->get('size') : explode(',', $request->get('size'));
-                $query->whereHas('attributeValues', function ($q) use ($sizes) {
-                    $q->whereIn('slug', $sizes);
+                $query->where(function($q) use ($sizes) {
+                    $q->whereHas('attributeValues', function ($sq) use ($sizes) {
+                        $sq->whereIn('slug', $sizes);
+                    })->orWhereHas('variants', function ($sq) use ($sizes) {
+                        // For variants, we try to match the slug directly (e.g. '100g')
+                        $sq->whereIn('weight', $sizes);
+                    });
                 });
             }
 
@@ -235,13 +240,17 @@ class ProductController extends Controller
                         ->orderBy('sort_order')
                         ->get()
                         ->map(function ($av) use ($basePids) {
-                            $count = \DB::table('product_attribute_value')
-                                ->where('value_id', $av->id)
-                                ->whereIn('product_id', $basePids)
-                                ->count();
+                            // Count products that either have the EAV attribute assigned
+                            // OR have a variant with a weight matching the attribute value
+                            $count = \App\Models\Product::whereIn('id', $basePids)
+                                ->where(function($q) use ($av) {
+                                    $q->whereHas('attributeValues', fn($sq) => $sq->where('attribute_values.id', $av->id))
+                                      ->orWhereHas('variants', fn($sq) => $sq->where('weight', $av->value_text));
+                                })->count();
+
                             return [
-                                'slug'     => $av->slug,
-                                'label'    => $av->value_text,
+                                'label'    => $av->slug,
+                                'display'  => $av->value_text,
                                 'count'    => $count,
                                 'disabled' => $count === 0,
                             ];
