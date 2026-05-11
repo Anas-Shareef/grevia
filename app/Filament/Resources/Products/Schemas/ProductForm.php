@@ -157,10 +157,14 @@ class ProductForm
                         Repeater::make('variants')
                             ->relationship()
                             ->schema([
-                                TextInput::make('weight')
-                                    ->placeholder('e.g. 100g, 250g, 1kg')
+                                Select::make('weight')
+                                    ->label('Weight / Size')
+                                    ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
+                                        ? (\App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? [])
+                                        : [])
                                     ->required()
-                                    ->helperText('This value automatically appears as a Pack Size filter option on the collections page. Always use a number followed immediately by the unit: 50g, 250g, 1kg, 30ml. No spaces between number and unit. If left blank, this variant will NOT appear in the Pack Size filter.'),
+                                    ->searchable()
+                                    ->helperText('Select a size from your defined Attributes. This ensures the sidebar filters match your product buttons.'),
                                 TextInput::make('pack_size')
                                     ->label('Pack Size')
                                     ->numeric()
