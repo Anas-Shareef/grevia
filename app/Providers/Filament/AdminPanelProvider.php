@@ -36,6 +36,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->favicon(asset('build/assets/grevia-logo-CY32JlmK (1).ico'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->discoverResources(in: app_path('Filament/Resources/Orders'), for: 'App\Filament\Resources\Orders')
+            ->discoverResources(in: app_path('Filament/Resources/Shipments'), for: 'App\Filament\Resources\Shipments')
+            ->discoverResources(in: app_path('Filament/Resources/Invoices'), for: 'App\Filament\Resources\Invoices')
+            ->discoverResources(in: app_path('Filament/Resources/Refunds'), for: 'App\Filament\Resources\Refunds')
+            ->discoverResources(in: app_path('Filament/Resources/Transactions'), for: 'App\Filament\Resources\Transactions')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,
