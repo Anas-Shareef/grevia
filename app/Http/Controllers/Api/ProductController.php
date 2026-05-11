@@ -110,12 +110,16 @@ class ProductController extends Controller
             // ── 11. Size Filter from Variants ──────────────────────────────
             if ($request->filled('size')) {
                 $sizes = is_array($request->get('size')) ? $request->get('size') : explode(',', $request->get('size'));
-                $query->where(function($q) use ($sizes) {
+                
+                // Fetch the actual display labels for these slugs to match variants
+                $displayTexts = \App\Models\AttributeValue::whereIn('slug', $sizes)->pluck('value_text')->toArray();
+                
+                $query->where(function($q) use ($sizes, $displayTexts) {
                     $q->whereHas('attributeValues', function ($sq) use ($sizes) {
                         $sq->whereIn('slug', $sizes);
-                    })->orWhereHas('variants', function ($sq) use ($sizes) {
-                        // For variants, we try to match the slug directly (e.g. '100g')
-                        $sq->whereIn('weight', $sizes);
+                    })->orWhereHas('variants', function ($sq) use ($sizes, $displayTexts) {
+                        // Match variants by either the slug OR the display text (e.g. 100g or 100G)
+                        $sq->whereIn('weight', array_merge($sizes, $displayTexts));
                     });
                 });
             }
