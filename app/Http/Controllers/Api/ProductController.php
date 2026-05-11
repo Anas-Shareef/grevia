@@ -97,7 +97,7 @@ class ProductController extends Controller
             }
 
             // ── 10. Dynamic EAV Attribute Filters (Format, Concentration) ──
-            $dynamicAttributes = ['format', 'concentration', 'store_policies', 'trust_badges'];
+            $dynamicAttributes = ['format', 'concentration', 'trust_badges'];
             foreach ($dynamicAttributes as $attrName) {
                 if ($request->filled($attrName)) {
                     $values = is_array($request->get($attrName)) ? $request->get($attrName) : explode(',', $request->get($attrName));

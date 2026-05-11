@@ -515,34 +515,6 @@ const ProductDetailPage = () => {
                   Add to Cart
                 </button>
               </div>
-
-              {/* Store Policies — Dynamic from admin, fallback to hardcoded */}
-              {(() => {
-                const policies = (product as any).attribute_values?.filter((av: any) => av.attribute?.name === 'store_policies') || [];
-                
-                if (policies.length > 0) {
-                  return (
-                    <div className="flex flex-wrap gap-3 mt-2">
-                      {policies.map((p: any, idx: number) => (
-                        <TrustChip 
-                          key={idx} 
-                          icon={p.attribute_value?.icon_url ? () => <img src={`/storage/${p.attribute_value.icon_url}`} className="w-4 h-4" /> : Truck} 
-                          text={p.value_text} 
-                        />
-                      ))}
-                    </div>
-                  );
-                }
-
-                return (
-                  <div className="flex flex-wrap gap-3 mt-2">
-                    <TrustChip icon={Truck} text="Free Shipping above ₹499" />
-                    <TrustChip icon={RotateCcw} text="7-Day Returns" />
-                    <TrustChip icon={Award} text="100% Organic" />
-                  </div>
-                );
-              })()}
-
               {/* Trust Badges — PRD §4.3: Quality Promise section */}
               {dynamicTrustBadges.length > 0 && (
                 <div className="mt-4">
