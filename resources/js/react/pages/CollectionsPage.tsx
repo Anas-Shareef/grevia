@@ -47,8 +47,8 @@ const CollectionsPage = () => {
       key: 'format' as const,
       label: 'Format',
       options: (response?.filters?.forms || []).map((f: any) => ({
-        label: f.display || (f.label.charAt(0).toUpperCase() + f.label.slice(1)),
-        value: f.label,
+        label: f.label,
+        value: f.slug,
         count: f.count,
         disabled: (f.count ?? 0) === 0,
       })),
@@ -58,8 +58,8 @@ const CollectionsPage = () => {
       key: 'concentration' as const,
       label: 'Concentration',
       options: (response?.filters?.ratios || []).map((r: any) => ({
-        label: r.display || r.label,
-        value: r.label,
+        label: r.label,
+        value: r.slug,
         count: r.count,
         disabled: (r.count ?? 0) === 0,
       })),
@@ -70,7 +70,7 @@ const CollectionsPage = () => {
       label: 'Pack Size',
       options: (response?.filters?.sizes || []).map((s: any) => ({
         label: s.label,
-        value: s.label,
+        value: s.slug,
         count: s.count,
         disabled: (s.count ?? 0) === 0,
       })),
