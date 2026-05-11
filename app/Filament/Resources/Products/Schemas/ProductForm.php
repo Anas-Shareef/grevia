@@ -25,6 +25,7 @@ class ProductForm
                 Section::make('Pinned Product Metafields')
                     ->description('Core operational attributes mapped to front-end AJAX hooks.')
                     ->columns(2)
+                    ->hidden() // Redundant with Dynamic Attributes (EAV)
                     ->components([
                         TagsInput::make('concentration_options')
                             ->label('Concentration Ratios')
@@ -65,7 +66,8 @@ class ProductForm
                             ->columnSpanFull()
                             ->required(),
                         RichEditor::make('long_description')
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->hidden(), // Preferred: "Product Story" in Accordions section
                         TagsInput::make('ingredients')
                             ->placeholder('Add ingredient')
                             ->helperText('Press enter after each ingredient')
@@ -77,6 +79,7 @@ class ProductForm
                     ]),
                 Section::make('Pricing & Inventory (Default)')
                     ->description('These values serve as defaults if no variants are specified.')
+                    ->collapsed() // Hidden by default as Variants are preferred
                     ->columns(3)
                     ->components([
                         TextInput::make('price')
@@ -304,6 +307,7 @@ class ProductForm
 
                 Section::make('🔍 Search & Filter Attributes')
                     ->description('These fields directly power the sidebar filters on the Collections page.')
+                    ->hidden() // Redundant: Now powered by Variants (Pack Size) and Dynamic Attributes (EAV)
                     ->collapsible()
                     ->columns(3)
                     ->components([
