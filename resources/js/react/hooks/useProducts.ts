@@ -116,7 +116,8 @@ export const useProducts = (filters?: Partial<FilterState>) => {
                 return {
                     data: response.data.map(transformProduct),
                     meta: response.meta,
-                    filters: response.filters
+                    filters: response.filters,
+                    current_category: response.current_category
                 };
             }
 
