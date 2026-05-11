@@ -117,6 +117,29 @@ const ProductDetailPage = () => {
     }
   }, [product]);
 
+  // Dynamic info box for concentration
+  const [infoBoxText, setInfoBoxText] = useState<string | null>(null);
+  const [infoBoxVisible, setInfoBoxVisible] = useState(false);
+  const [infoBoxOpacity, setInfoBoxOpacity] = useState(1);
+
+  // Structured EAV attributes from new API response
+  const attrs = (product as any)?.attributes || {};
+  const concentrations: any[] = attrs.concentrations || [];
+  const hasEavConcentrations = concentrations.length > 0;
+
+  useEffect(() => {
+    if (hasEavConcentrations) {
+      const defaultConc = concentrations.find((c: any) => c.is_default) || concentrations[0];
+      if (defaultConc) {
+        setSelectedRatio(defaultConc.slug || defaultConc.value || '');
+        if (defaultConc.substitution_text) {
+          setInfoBoxText(defaultConc.substitution_text);
+          setInfoBoxVisible(true);
+        }
+      }
+    }
+  }, [hasEavConcentrations, concentrations.length]);
+
   // Fix 2: Reset thumbnail index when variant changes so gallery starts at first image
   useEffect(() => {
     setSelectedThumb(0);
@@ -195,38 +218,16 @@ const ProductDetailPage = () => {
   const discountPercent = originalPrice && displayPrice ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) : 0;
   const wishlisted = isInWishlist(String(product.id));
   
-  // Structured EAV attributes from new API response
-  const attrs = (product as any).attributes || {};
   const formatAttr   = attrs.format || null;
-  const concentrations: any[] = attrs.concentrations || [];
   const trustBadges: any[]    = attrs.trust_badges || [];
 
   // Fallback: if no EAV concentrations, use legacy concentration_options
   const legacyConcOptions: string[] = (product as any).concentration_options || [];
-  const hasEavConcentrations = concentrations.length > 0;
 
   // Trust badges: prefer new EAV, fallback to old attribute_values
   const dynamicTrustBadges = trustBadges.length > 0
     ? trustBadges
     : ((product as any).attribute_values?.filter((av: any) => av.attribute?.name === 'trust_badges') || []);
-
-  // Dynamic info box for concentration
-  const [infoBoxText, setInfoBoxText] = useState<string | null>(null);
-  const [infoBoxVisible, setInfoBoxVisible] = useState(false);
-  const [infoBoxOpacity, setInfoBoxOpacity] = useState(1);
-
-  useEffect(() => {
-    if (hasEavConcentrations) {
-      const defaultConc = concentrations.find((c: any) => c.is_default) || concentrations[0];
-      if (defaultConc) {
-        setSelectedRatio(defaultConc.slug || defaultConc.value || '');
-        if (defaultConc.substitution_text) {
-          setInfoBoxText(defaultConc.substitution_text);
-          setInfoBoxVisible(true);
-        }
-      }
-    }
-  }, [hasEavConcentrations, concentrations.length]);
 
   const handleConcentrationClick = (conc: any) => {
     setInfoBoxOpacity(0);
@@ -255,24 +256,7 @@ const ProductDetailPage = () => {
   const mainImageUrl = galleryImages[selectedThumb] || (variantGallery[0] ?? product.image);
 
 
-  // Early return after all hooks have been called
-  if (!product) {
-    return (
-      <div className="bg-white min-h-screen Montserrat">
-        <Header />
-        <div className="container mx-auto px-4 pt-48 pb-32 text-center">
-          <div className="w-24 h-24 bg-[#F0FAE8] rounded-full flex items-center justify-center mx-auto mb-8">
-            <Leaf className="w-12 h-12 text-[#2E4D31]" />
-          </div>
-          <h2 className="text-3xl font-bold text-[#2E4D31] mb-6">Product not found</h2>
-          <Link to="/collections/all" className="inline-flex items-center justify-center bg-[#2E4D31] text-white h-14 px-10 rounded-full font-bold transition-all hover:bg-[#1a3320]">
-            Browse All Collections
-          </Link>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+
 
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
