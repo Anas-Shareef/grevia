@@ -58,34 +58,43 @@ class ProductsTable
                     ->sortable(),
 
                 // ── Filter Attributes — Power the Collections sidebar ────
-                TextColumn::make('format')
+                TextColumn::make('format_badge')
                     ->label('Format')
-                    ->badge()
-                    ->color(fn (?string $state): string => match($state) {
-                        'powder'  => 'success',
-                        'drops'   => 'info',
-                        'tablets' => 'warning',
-                        'liquid'  => 'info',
-                        'jar'     => 'gray',
-                        default   => 'gray',
+                    ->state(function (Model $record): ?string {
+                        return $record->attributeValues()
+                            ->whereHas('attribute', fn($q) => $q->where('name', 'format'))
+                            ->first()?->value_text;
                     })
-                    ->formatStateUsing(fn (?string $state): string => $state ? ucfirst($state) : '—')
-                    ->sortable()
+                    ->badge()
+                    ->color('gray')
+                    ->placeholder('—')
                     ->toggleable(),
 
-                TextColumn::make('concentration')
+                TextColumn::make('concentration_badge')
                     ->label('Concentration')
+                    ->state(function (Model $record): string {
+                        return $record->attributeValues()
+                            ->whereHas('attribute', fn($q) => $q->where('name', 'concentration'))
+                            ->pluck('value_text')
+                            ->join(', ') ?: '—';
+                    })
                     ->badge()
                     ->color('warning')
-                    ->formatStateUsing(fn (?string $state): string => $state ?: '—')
-                    ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('size_label')
+                TextColumn::make('pack_size_badge')
                     ->label('Pack Size')
+                    ->state(function (Model $record): string {
+                        // Prefer manual EAV Pack Size, fallback to first variant weight
+                        $eav = $record->attributeValues()
+                            ->whereHas('attribute', fn($q) => $q->where('name', 'pack_size'))
+                            ->pluck('value_text')
+                            ->join(', ');
+                        
+                        return $eav ?: ($record->variants->first()?->weight ?? '—');
+                    })
                     ->badge()
                     ->color('primary')
-                    ->formatStateUsing(fn (?string $state): string => $state ?: '—')
                     ->toggleable(),
 
                 // ── Status Columns ────────────────────────────────────────
@@ -197,6 +206,8 @@ class ProductsTable
                                 ->placeholder('Add size')
                                 ->separator(','),
                         ])
+                        // Hidden: Legacy bulk action no longer needed with EAV system
+                        ->hidden()
                         ->action(function (Collection $records, array $data): void {
                             $updates = array_filter([
                                 'format'     => $data['format'] ?? null,
