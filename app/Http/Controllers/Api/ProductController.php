@@ -96,8 +96,8 @@ class ProductController extends Controller
                 });
             }
 
-            // ── 10. Dynamic EAV Attribute Filters ──────────────────────────
-            $dynamicAttributes = ['format', 'concentration', 'pack_size', 'trust_badges'];
+            // ── 10. Dynamic EAV Attribute Filters (Format, Concentration) ──
+            $dynamicAttributes = ['format', 'concentration', 'trust_badges'];
             foreach ($dynamicAttributes as $attrName) {
                 if ($request->filled($attrName)) {
                     $values = is_array($request->get($attrName)) ? $request->get($attrName) : explode(',', $request->get($attrName));
@@ -107,19 +107,22 @@ class ProductController extends Controller
                 }
             }
 
-            // ── 11. Size Filter from Variants ──────────────────────────────
-            if ($request->filled('size')) {
-                $sizes = is_array($request->get('size')) ? $request->get('size') : explode(',', $request->get('size'));
+            // ── 11. Unified Size Filter (Size or Pack Size) ─────────────────
+            $sizeInput = $request->get('size') ?: $request->get('pack_size');
+            if ($sizeInput) {
+                $sizes = is_array($sizeInput) ? $sizeInput : explode(',', $sizeInput);
                 
-                // Fetch the actual display labels for these slugs to match variants
-                $displayTexts = \App\Models\AttributeValue::whereIn('slug', $sizes)->pluck('value_text')->toArray();
+                // Fetch display labels for matching variants (case-insensitive)
+                $displayTexts = \App\Models\AttributeValue::whereIn('slug', $sizes)
+                    ->pluck('value_text')
+                    ->toArray();
                 
                 $query->where(function($q) use ($sizes, $displayTexts) {
                     $q->whereHas('attributeValues', function ($sq) use ($sizes) {
                         $sq->whereIn('slug', $sizes);
                     })->orWhereHas('variants', function ($sq) use ($sizes, $displayTexts) {
-                        // Match variants by either the slug OR the display text (e.g. 100g or 100G)
-                        $sq->whereIn('weight', array_merge($sizes, $displayTexts));
+                        // Match variants by either the slug OR the display text
+                        $sq->whereIn(\DB::raw('LOWER(weight)'), array_map('strtolower', array_merge($sizes, $displayTexts)));
                     });
                 });
             }
