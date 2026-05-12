@@ -97,16 +97,17 @@ class RazorpayController extends Controller
                         }
                     }
 
-                    $order->orderItems()->create([
-                        'product_id' => $product->id,
-                        'variant_id' => $variant ? $variant->id : null,
-                        'product_name' => $product->name,
-                        'weight' => $weight,
-                        'pack_size' => $packSize,
-                        'price' => $price,
-                        'quantity' => $item['quantity'],
-                        'total' => $price * $item['quantity'],
-                    ]);
+                        $order->orderItems()->create([
+                            'product_id' => $product->id,
+                            'variant_id' => $variant ? $variant->id : null,
+                            'product_name' => $product->name,
+                            'weight' => $weight,
+                            'pack_size' => $packSize ?? $weight,
+                            'price' => $price,
+                            'quantity' => $item['quantity'],
+                            'total' => $price * $item['quantity'],
+                            'selected_attributes' => $item['selected_attributes'] ?? null,
+                        ]);
                 }
             }
 

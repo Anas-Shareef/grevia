@@ -105,9 +105,9 @@ class CartController extends Controller
         $rules = [
             'product_id' => 'required',
             'quantity' => 'required|integer|min:1',
+            'selected_attributes' => 'nullable|array',
         ];
 
-        // Only validate exists if table exists
         if (\Schema::hasTable('product_variants')) {
             $rules['variant_id'] = 'nullable|exists:product_variants,id';
         } else {
@@ -140,6 +140,7 @@ class CartController extends Controller
                 'user_id' => $user->id,
                 'product_id' => $product->id,
                 'variant_id' => $validated['variant_id'],
+                'selected_attributes' => $validated['selected_attributes'] ?? null,
             ],
             [
                 'quantity' => $validated['quantity'],
