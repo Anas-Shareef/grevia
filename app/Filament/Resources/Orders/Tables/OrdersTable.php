@@ -72,7 +72,15 @@ class OrdersTable
                             $html .= '<span class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[250px]" title="' . $productName . '">' . $productName . '</span>';
                             
                             // SKU and Qty
-                            $html .= '<span class="text-xs text-gray-500 dark:text-gray-400">SKU: ' . $sku . ' • Qty: ' . $item->quantity . '</span>';
+                            $html .= '<span class="text-xs text-gray-500 dark:text-gray-400">SKU: ' . $sku . ' • Qty: ' . $item->quantity;
+                            
+                            // Add Concentration if present
+                            $selectedAttributes = $item->selected_attributes;
+                            if (!empty($selectedAttributes['concentration'])) {
+                                $html .= ' • <span class="font-black text-[#2E4D31] bg-[#F0FAE8] px-1 rounded border border-[#77CB4D]/30">' . $selectedAttributes['concentration'] . '</span>';
+                            }
+                            
+                            $html .= '</span>';
                             $html .= '</div>';
                             
                             $html .= '</div>';
