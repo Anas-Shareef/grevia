@@ -72,7 +72,7 @@ const EditorialCard = ({ category, index }: { category: Category, index: number 
         <div className="mt-8">
           <Link
             to={`/collections?category=${category.slug}`}
-            className="inline-flex items-center justify-center gap-3 border-2 border-white/92 text-white font-bold rounded-full hover:bg-white hover:text-[#2E4D31] transition-all duration-300 h-14 px-10 text-[14px] tracking-wide"
+            className="inline-flex items-center justify-center gap-3 text-sm font-bold bg-[#2E4D31] text-white hover:bg-[#2E4D31]/90 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 h-14 px-10 transition-all duration-300 tracking-wide"
           >
             Explore Products
             <ArrowRight className="w-4 h-4" />
