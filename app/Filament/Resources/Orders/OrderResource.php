@@ -122,6 +122,10 @@ class OrderResource extends Resource
                                         TextEntry::make('quantity')
                                             ->label('Quantity'),
 
+                                        TextEntry::make('pack_size')
+                                            ->label('Pack Size')
+                                            ->state(fn ($record) => $record->pack_size ? $record->pack_size . 'g' : 'N/A'),
+
                                         TextEntry::make('product.sku')
                                             ->label('SKU')
                                             ->default('N/A'),

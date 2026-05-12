@@ -74,6 +74,11 @@ class OrdersTable
                             // SKU and Qty
                             $html .= '<span class="text-xs text-gray-500 dark:text-gray-400">SKU: ' . $sku . ' • Qty: ' . $item->quantity;
                             
+                            // Pack Size
+                            if ($item->pack_size) {
+                                $html .= ' • Size: ' . $item->pack_size . 'g';
+                            }
+                            
                             // Add Concentration if present
                             $selectedAttributes = $item->selected_attributes;
                             if (is_string($selectedAttributes)) {
