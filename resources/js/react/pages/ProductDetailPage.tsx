@@ -135,8 +135,9 @@ const ProductDetailPage = () => {
         setSelectedRatio(val);
         
         let tip = defaultConc.substitution_text;
-        if (!tip && val.includes(':')) {
-          const multiplier = val.split(':')[1]?.match(/\d+/)?.[0] || '10';
+        if (!tip && (val.includes(':') || val.includes('-'))) {
+          const parts = val.includes(':') ? val.split(':') : val.split('-');
+          const multiplier = parts[1]?.match(/\d+/)?.[0] || '10';
           tip = `1g replaces ${multiplier}g of sugar`;
         }
 
@@ -242,8 +243,9 @@ const ProductDetailPage = () => {
       setSelectedRatio(val);
       
       let tip = conc.substitution_text;
-      if (!tip && val.includes(':')) {
-        const multiplier = val.split(':')[1]?.match(/\d+/)?.[0] || '10';
+      if (!tip && (val.includes(':') || val.includes('-'))) {
+        const parts = val.includes(':') ? val.split(':') : val.split('-');
+        const multiplier = parts[1]?.match(/\d+/)?.[0] || '10';
         tip = `1g replaces ${multiplier}g of sugar`;
       }
 
