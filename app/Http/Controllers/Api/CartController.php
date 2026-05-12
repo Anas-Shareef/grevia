@@ -37,7 +37,7 @@ class CartController extends Controller
                     'quantity' => $item->quantity,
                     'weight' => $hasVariant ? $item->variant->weight : null,
                     'pack_size' => $hasVariant ? $item->variant->pack_size : null,
-                    'selected_attributes' => $item->selected_attributes,
+                    'selected_attributes' => is_string($item->selected_attributes) ? json_decode($item->selected_attributes, true) : $item->selected_attributes,
                 ];
             });
 

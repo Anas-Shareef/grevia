@@ -102,8 +102,15 @@ class OrderResource extends Resource
                                             ->weight('bold')
                                             ->default(fn ($record) => $record->name),
 
-                                        TextEntry::make('selected_attributes.concentration')
+                                        TextEntry::make('selected_attributes_display')
                                             ->label('Selected Potency')
+                                            ->state(function ($record) {
+                                                $attrs = $record->selected_attributes;
+                                                if (is_string($attrs)) {
+                                                    $attrs = json_decode($attrs, true);
+                                                }
+                                                return $attrs['concentration'] ?? $attrs['ratio'] ?? null;
+                                            })
                                             ->visible(fn ($state) => !empty($state))
                                             ->badge()
                                             ->color('success'),

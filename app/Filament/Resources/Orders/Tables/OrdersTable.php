@@ -76,8 +76,13 @@ class OrdersTable
                             
                             // Add Concentration if present
                             $selectedAttributes = $item->selected_attributes;
-                            if (!empty($selectedAttributes['concentration'])) {
-                                $html .= ' • <span class="font-black text-[#2E4D31] bg-[#F0FAE8] px-1 rounded border border-[#77CB4D]/30">' . $selectedAttributes['concentration'] . '</span>';
+                            if (is_string($selectedAttributes)) {
+                                $selectedAttributes = json_decode($selectedAttributes, true);
+                            }
+                            
+                            $potency = $selectedAttributes['concentration'] ?? $selectedAttributes['ratio'] ?? null;
+                            if (!empty($potency)) {
+                                $html .= ' • <span class="font-black text-[#2E4D31] bg-[#F0FAE8] px-1 rounded border border-[#77CB4D]/30">' . $potency . '</span>';
                             }
                             
                             $html .= '</span>';
