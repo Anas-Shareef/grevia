@@ -17,8 +17,11 @@ import {
 import { 
   Dialog, 
   DialogContent, 
-  DialogClose
+  DialogClose,
+  DialogTitle,
+  DialogDescription
 } from "@/components/ui/dialog";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Product, ProductVariant } from "@/types";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -93,6 +96,10 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white border-none rounded-[32px] shadow-2xl Montserrat">
+        <VisuallyHidden.Root>
+          <DialogTitle>{product.name} Quick View</DialogTitle>
+          <DialogDescription>Quickly view details and add {product.name} to your cart.</DialogDescription>
+        </VisuallyHidden.Root>
         <div className="flex flex-col md:flex-row h-full max-h-[90vh] overflow-y-auto no-scrollbar">
           
           {/* Left: Media Area */}
@@ -113,7 +120,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
              </div>
 
              {/* Thumbnails */}
-             {galleryImages.length > 1 && (
+             {Array.isArray(galleryImages) && galleryImages.length > 1 && (
                <div className="flex gap-3 mt-8 overflow-x-auto pb-2 scrollbar-hide px-4 max-w-full">
                   {galleryImages.map((img, idx) => (
                     <button
@@ -167,7 +174,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 <div>
                   <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-4">Concentration</p>
                   <div className="flex flex-wrap gap-2">
-                     {concentrationOptions.map(r => (
+                     {Array.isArray(concentrationOptions) && concentrationOptions.map(r => (
                        <button
                          key={r}
                          className={cn(
@@ -188,7 +195,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-4">Select Pack Size</p>
                     <div className="flex flex-wrap gap-2">
-                       {product.variants.map((v) => (
+                       {Array.isArray(product.variants) && product.variants.map((v) => (
                          <button
                            key={v.id}
                            onClick={() => setSelectedVariant(v)}

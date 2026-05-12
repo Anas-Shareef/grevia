@@ -507,7 +507,7 @@ const ProductDetailPage = () => {
                 </button>
               </div>
               {/* Trust Badges — PRD §4.3: Quality Promise section */}
-              {dynamicTrustBadges.length > 0 && (
+              {Array.isArray(dynamicTrustBadges) && dynamicTrustBadges.length > 0 && (
                 <div className="mt-4">
                   <p className="text-[10px] font-bold text-[#5A5A5A] uppercase tracking-[0.12em] Montserrat mb-3">Quality Promise</p>
                   <div className="flex flex-wrap gap-4">
@@ -643,7 +643,7 @@ const ProductDetailPage = () => {
             ref={scrollContainerRef}
             className="flex overflow-x-auto gap-6 pb-12 snap-x scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0"
           >
-            {relatedProducts.map(p => (
+            {Array.isArray(relatedProducts) && relatedProducts.map(p => (
               <div key={p.id} className="min-w-[260px] sm:min-w-[300px] w-full max-w-[320px] snap-start">
                 <ProductCard product={p} />
               </div>
