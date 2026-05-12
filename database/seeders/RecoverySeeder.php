@@ -25,14 +25,15 @@ class RecoverySeeder extends Seeder
             'status' => true,
         ]);
 
-        // 2. Create Products with Images and Featured status
+        // 2. Create Products using the ACTUAL images still on your server
+        // I found these image filenames in your storage folder!
         $products = [
             [
                 'name' => 'Grevia Stevia Jar',
                 'slug' => 'stevia-jar',
                 'price' => 499,
                 'category_id' => $stevia->id,
-                'image' => 'https://images.unsplash.com/photo-1589227365533-cee630bd59bd?auto=format&fit=crop&q=80&w=800',
+                'image' => 'products/01KF58XGGZXZCPHWQ77KXRFCZ1.jpeg', // Actual file!
                 'is_featured' => true,
                 'description' => 'Premium stevia in elegant glass jar',
                 'ingredients' => ['Organic Stevia Leaf Extract', 'Natural Fiber (Inulin)'],
@@ -42,7 +43,7 @@ class RecoverySeeder extends Seeder
                 'slug' => 'stevia-powder',
                 'price' => 349,
                 'category_id' => $stevia->id,
-                'image' => 'https://images.unsplash.com/photo-1622484210800-4786358cc1f3?auto=format&fit=crop&q=80&w=800',
+                'image' => 'products/01KF3XGBHBW2CRQY49NX836YJX.jpg', // Actual file!
                 'is_featured' => true,
                 'description' => 'Organic stevia in eco-friendly pouch',
                 'ingredients' => ['Organic Stevia Leaf Extract', 'Erythritol (Non-GMO)'],
@@ -52,7 +53,7 @@ class RecoverySeeder extends Seeder
                 'slug' => 'monkfruit-drops',
                 'price' => 299,
                 'category_id' => $sweeteners->id,
-                'image' => 'https://images.unsplash.com/photo-1550461716-e8220551061c?auto=format&fit=crop&q=80&w=800',
+                'image' => 'products/01KF3RTPSFH7AY0YZTRT7AXYFE.jpg', // Actual file!
                 'is_featured' => true,
                 'description' => 'Liquid sweetener for beverages',
                 'ingredients' => ['Monk Fruit Extract', 'Purified Water'],
