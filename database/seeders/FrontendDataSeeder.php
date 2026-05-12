@@ -30,6 +30,7 @@ class FrontendDataSeeder extends Seeder
         \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Product::truncate();
         Category::truncate();
+        \App\Models\ProductVariant::truncate();
         \App\Models\CartItem::truncate();
         \App\Models\OrderItem::truncate();
         \App\Models\Wishlist::truncate();
