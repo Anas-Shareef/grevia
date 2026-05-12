@@ -91,7 +91,7 @@ class OrderController extends Controller
                      if ($variant && $variant->product_id == $product->id) {
                          $price = $variant->effective_price;
                          $weight = $variant->weight;
-                         $packSize = $variant->pack_size;
+                         $packSize = $variant->pack_size ?? $variant->weight;
                          
                          // Deduct stock
                          $variant->decrement('stock_quantity', $item['quantity']);

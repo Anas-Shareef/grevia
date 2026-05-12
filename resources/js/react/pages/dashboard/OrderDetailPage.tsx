@@ -249,10 +249,10 @@ const OrderDetailPage = () => {
                                             <span className="mx-2">•</span>
                                             <span>₹{parseFloat(item.price as unknown as string).toLocaleString()} per unit</span>
                                             
-                                            {item.pack_size && (
+                                            {(item.pack_size || item.weight) && (
                                                 <>
                                                     <span className="mx-2">•</span>
-                                                    <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Size: {item.pack_size}g</span>
+                                                    <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Size: {item.pack_size || item.weight}g</span>
                                                 </>
                                             )}
                                             

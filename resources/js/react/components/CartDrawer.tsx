@@ -114,9 +114,9 @@ const CartDrawer = () => {
                               Potency: {item.selectedAttributes.concentration}
                             </span>
                           )}
-                          {variant?.weight && (
+                          {(variant?.pack_size || variant?.weight) && (
                             <span className="text-[10px] font-black uppercase tracking-widest text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
-                              Size: {variant.weight}
+                              Size: {variant?.pack_size || variant?.weight}
                             </span>
                           )}
                         </div>
