@@ -101,6 +101,16 @@ class AttributeResource extends Resource
                                     ->label('Display Label')
                                     ->required()
                                     ->helperText('e.g. "1:10 (High Potency)", "Keto Friendly"')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, $set, $get) {
+                                        if (!$state || !empty($get('meta.substitution_text'))) return;
+                                        
+                                        // If format is like "1:50" or "1:50 (Label)", extract the number
+                                        if (preg_match('/1:(\d+)/', $state, $matches)) {
+                                            $multiplier = $matches[1];
+                                            $set('meta.substitution_text', "1g replaces {$multiplier}g of sugar");
+                                        }
+                                    })
                                     ->columnSpan(1),
 
                                 TextInput::make('slug')
