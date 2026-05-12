@@ -30,9 +30,13 @@ class FrontendDataSeeder extends Seeder
         \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Product::truncate();
         Category::truncate();
+        \App\Models\CartItem::truncate();
+        \App\Models\OrderItem::truncate();
+        \App\Models\Wishlist::truncate();
         \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // 3. Create Categories
+        $categoriesMap = [];
         $categoriesData = [
             ['id_str' => 'sweeteners', 'name' => 'Premium Sweeteners', 'description' => 'Natural sweeteners for health-conscious living', 'parent' => null],
             ['id_str' => 'stevia', 'name' => 'Stevia Sweeteners', 'description' => 'Pure stevia-based natural sweeteners', 'parent' => 'sweeteners'],
@@ -41,7 +45,6 @@ class FrontendDataSeeder extends Seeder
             ['id_str' => 'pickles', 'name' => 'Pickles & Preserves', 'description' => 'Traditional recipes crafted with natural ingredients and no artificial preservatives.', 'parent' => null],
         ];
 
-        $categoriesMap = [];
         foreach ($categoriesData as $c) {
             $category = Category::create([
                 'name' => $c['name'],
@@ -55,7 +58,7 @@ class FrontendDataSeeder extends Seeder
         // 4. Create Products
         $productsData = [
             [
-                'id' => 'stevia-jar',
+                'id' => 'grevia-stevia-jar',
                 'name' => 'Grevia Stevia Jar',
                 'description' => 'Premium stevia in elegant glass jar',
                 'long_description' => 'Our signature Grevia Stevia Jar contains pure, organic stevia extract sourced from the finest stevia leaves.',
@@ -68,7 +71,7 @@ class FrontendDataSeeder extends Seeder
                 'badge' => 'Best Seller',
             ],
             [
-                'id' => 'stevia-powder',
+                'id' => 'grevia-stevia-powder',
                 'name' => 'Grevia Stevia Powder',
                 'description' => 'Organic stevia in eco-friendly pouch',
                 'long_description' => 'Grevia Stevia Powder offers the same exceptional quality as our jar variant, packaged in an eco-conscious pouch.',
@@ -81,7 +84,7 @@ class FrontendDataSeeder extends Seeder
                 'badge' => 'New',
             ],
             [
-                'id' => 'monkfruit-drops',
+                'id' => 'grevia-monkfruit-drops',
                 'name' => 'Grevia Monkfruit Drops',
                 'description' => 'Liquid sweetener for beverages',
                 'long_description' => 'Our Monkfruit Drops provide a convenient liquid form of natural sweetness.',
@@ -135,7 +138,7 @@ class FrontendDataSeeder extends Seeder
             ]);
 
             // Create Variants for Stevia Jar
-            if ($p['id'] === 'stevia-jar') {
+            if ($p['id'] === 'grevia-stevia-jar') {
                 $product->variants()->create([
                     'price' => 499,
                     'weight' => '250',
