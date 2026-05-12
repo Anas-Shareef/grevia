@@ -49,6 +49,26 @@
                     Shipped ({{ $item->shipped_quantity ?? 0 }})
                     Refunded ({{ $item->refunded_quantity ?? 0 }})
                 </div>
+
+                <!-- DYNAMIC ATTRIBUTES -->
+                <div class="flex flex-wrap gap-2 pt-2">
+                    @if($item->pack_size || $item->weight)
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
+                            Size: {{ $item->pack_size ?? $item->weight }}g
+                        </span>
+                    @endif
+
+                    @php
+                        $attrs = is_string($item->selected_attributes) ? json_decode($item->selected_attributes, true) : $item->selected_attributes;
+                        $potency = $attrs['concentration'] ?? $attrs['ratio'] ?? null;
+                    @endphp
+
+                    @if($potency)
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-green-50 text-green-700 border border-green-200">
+                            Potency: {{ $potency }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
             <!-- PRICE -->
