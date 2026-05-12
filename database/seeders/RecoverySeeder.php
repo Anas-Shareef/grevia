@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Support\Str;
 
 class RecoverySeeder extends Seeder
@@ -25,48 +26,69 @@ class RecoverySeeder extends Seeder
             'status' => true,
         ]);
 
-        // 2. Create Products using the ACTUAL images still on your server
-        // I found these image filenames in your storage folder!
-        $products = [
-            [
-                'name' => 'Grevia Stevia Jar',
-                'slug' => 'stevia-jar',
-                'price' => 499,
-                'category_id' => $stevia->id,
-                'image' => 'products/01KF58XGGZXZCPHWQ77KXRFCZ1.jpeg', // Actual file!
-                'is_featured' => true,
-                'description' => 'Premium stevia in elegant glass jar',
-                'ingredients' => ['Organic Stevia Leaf Extract', 'Natural Fiber (Inulin)'],
-            ],
-            [
-                'name' => 'Grevia Stevia Powder',
-                'slug' => 'stevia-powder',
-                'price' => 349,
-                'category_id' => $stevia->id,
-                'image' => 'products/01KF3XGBHBW2CRQY49NX836YJX.jpg', // Actual file!
-                'is_featured' => true,
-                'description' => 'Organic stevia in eco-friendly pouch',
-                'ingredients' => ['Organic Stevia Leaf Extract', 'Erythritol (Non-GMO)'],
-            ],
-            [
-                'name' => 'Grevia Monkfruit Drops',
-                'slug' => 'monkfruit-drops',
-                'price' => 299,
-                'category_id' => $sweeteners->id,
-                'image' => 'products/01KF3RTPSFH7AY0YZTRT7AXYFE.jpg', // Actual file!
-                'is_featured' => true,
-                'description' => 'Liquid sweetener for beverages',
-                'ingredients' => ['Monk Fruit Extract', 'Purified Water'],
-            ],
+        // 2. Create Products with CORRECT concentrations and variants
+        $pData = [
+            'name' => 'Grevia Stevia Jar',
+            'slug' => 'stevia-jar',
+            'price' => 899,
+            'category_id' => $stevia->id,
+            'image' => 'products/01KF58XGGZXZCPHWQ77KXRFCZ1.jpeg', 
+            'is_featured' => true,
+            'description' => 'Premium stevia in elegant glass jar',
+            'ingredients' => ['Organic Stevia Leaf Extract', 'Natural Fiber (Inulin)'],
+            'concentration_options' => ['1:30', '1:20'], // Exact match to your image!
+            'ratio' => '1:30',
         ];
 
-        foreach ($products as $p) {
-            Product::updateOrCreate(['slug' => $p['slug']], array_merge($p, [
-                'long_description' => $p['description'] . ' crafted with the highest quality standards.',
-                'in_stock' => true,
-                'rating' => 4.9,
-                'reviews' => 50,
-            ]));
-        }
+        $product = Product::updateOrCreate(['slug' => $pData['slug']], array_merge($pData, [
+            'long_description' => $pData['description'] . ' crafted with the highest quality standards.',
+            'in_stock' => true,
+            'rating' => 4.9,
+            'reviews' => 12,
+        ]));
+
+        // 3. Create Accurate Variants (Removing the 500g error)
+        ProductVariant::where('product_id', $product->id)->delete();
+        
+        // Variant 1: 100g (₹899)
+        ProductVariant::create([
+            'product_id' => $product->id,
+            'weight' => '100g',
+            'pack_size' => 100,
+            'price' => 899,
+            'status' => 'active',
+            'stock_quantity' => 100,
+        ]);
+
+        // Variant 2: 250g (₹1599)
+        ProductVariant::create([
+            'product_id' => $product->id,
+            'weight' => '250g',
+            'pack_size' => 250,
+            'price' => 1599,
+            'status' => 'active',
+            'stock_quantity' => 100,
+        ]);
+
+        // 4. Other products (Powder and Drops)
+        Product::updateOrCreate(['slug' => 'stevia-powder'], [
+            'name' => 'Grevia Stevia Powder',
+            'price' => 349,
+            'category_id' => $stevia->id,
+            'image' => 'products/01KF3XGBHBW2CRQY49NX836YJX.jpg',
+            'is_featured' => true,
+            'description' => 'Organic stevia in eco-friendly pouch',
+            'in_stock' => true,
+        ]);
+
+        Product::updateOrCreate(['slug' => 'monkfruit-drops'], [
+            'name' => 'Grevia Monkfruit Drops',
+            'price' => 299,
+            'category_id' => $sweeteners->id,
+            'image' => 'products/01KF3RTPSFH7AY0YZTRT7AXYFE.jpg',
+            'is_featured' => true,
+            'description' => 'Liquid sweetener for beverages',
+            'in_stock' => true,
+        ]);
     }
 }
