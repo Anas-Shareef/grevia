@@ -147,4 +147,5 @@ export interface Product {
   related_products?: string;
   nutrition_facts?: string;
   usage_instructions?: string;
+  shipping_returns?: string;
 }

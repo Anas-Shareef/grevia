@@ -409,6 +409,7 @@ class ProductController extends Controller
         $responseData = array_merge($product->toArray(), [
             'attributes' => $structuredAttributes,
             'variants'   => $variants,
+            'shipping_returns' => $product->shipping_returns, // Explicitly pass the new field
             'content'    => [
                 'attr_product_story' => $product->productContent?->attr_product_story,
                 'attr_usage_prep'    => $product->productContent?->attr_usage_prep,
