@@ -367,6 +367,8 @@ class ProductController extends Controller
         if ($hasEav && $product->relationLoaded('attributeValues')) {
             foreach ($product->attributeValues as $av) {
                 $attrName = $av->attribute?->name;
+                if (!$attrName) continue;
+                
                 switch ($attrName) {
                     case 'format':
                         $structuredAttributes['format'] = [

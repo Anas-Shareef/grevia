@@ -123,10 +123,14 @@ class EditProduct extends EditRecord
         $attr = \App\Models\Attribute::where('name', $attrName)->first();
         if (!$attr) return;
 
-        // Remove existing assignments for this attribute
+        // Remove existing assignments for this attribute (more robustly)
         DB::table('product_attribute_value')
             ->where('product_id', $record->id)
-            ->whereIn('value_id', $attr->values->pluck('id'))
+            ->whereIn('value_id', function ($query) use ($attr) {
+                $query->select('id')
+                    ->from('attribute_values')
+                    ->where('attribute_id', $attr->id);
+            })
             ->delete();
 
         if ($multiple) {
