@@ -91,6 +91,7 @@ const transformProduct = (data: any): Product => {
         nutrition_facts: data.nutrition_facts,
         usage_instructions: data.usage_instructions,
         shipping_returns: data.shipping_returns,
+        attributes: data.attributes,
         tags: Array.isArray(data.tags) ? data.tags : [],
     };
 };

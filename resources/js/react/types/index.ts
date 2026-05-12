@@ -148,4 +148,5 @@ export interface Product {
   nutrition_facts?: string;
   usage_instructions?: string;
   shipping_returns?: string;
+  attributes?: any;
 }
