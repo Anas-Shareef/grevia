@@ -137,20 +137,20 @@ class FrontendDataSeeder extends Seeder
             // Create Variants for Stevia Jar
             if ($p['id'] === 'stevia-jar') {
                 $product->variants()->create([
-                    'title' => '250g Jar',
                     'price' => 499,
-                    'weight' => 250,
+                    'weight' => '250',
                     'pack_size' => 250,
                     'stock_quantity' => 50,
-                    'status' => 'active'
+                    'status' => 'active',
+                    'sku' => 'GREVIA-STEVIA-JAR-250',
                 ]);
                 $product->variants()->create([
-                    'title' => '500g Jar',
                     'price' => 899,
-                    'weight' => 500,
+                    'weight' => '500',
                     'pack_size' => 500,
                     'stock_quantity' => 30,
-                    'status' => 'active'
+                    'status' => 'active',
+                    'sku' => 'GREVIA-STEVIA-JAR-500',
                 ]);
             }
         }
