@@ -27,8 +27,10 @@ class FrontendDataSeeder extends Seeder
         );
 
         // 2. Clear existing data
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Product::truncate();
         Category::truncate();
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // 3. Create Categories
         $categoriesData = [
@@ -117,7 +119,7 @@ class FrontendDataSeeder extends Seeder
         ];
 
         foreach ($productsData as $p) {
-            Product::create([
+            $product = Product::create([
                 'name' => $p['name'],
                 'slug' => $p['id'],
                 'description' => $p['description'],
@@ -130,8 +132,27 @@ class FrontendDataSeeder extends Seeder
                 'subcategory' => $p['subcategory'] ?? null,
                 'badge' => $p['badge'] ?? null,
                 'in_stock' => true,
-                // No image - will be uploaded via admin panel
             ]);
+
+            // Create Variants for Stevia Jar
+            if ($p['id'] === 'stevia-jar') {
+                $product->variants()->create([
+                    'title' => '250g Jar',
+                    'price' => 499,
+                    'weight' => 250,
+                    'pack_size' => 250,
+                    'stock_quantity' => 50,
+                    'status' => 'active'
+                ]);
+                $product->variants()->create([
+                    'title' => '500g Jar',
+                    'price' => 899,
+                    'weight' => 500,
+                    'pack_size' => 500,
+                    'stock_quantity' => 30,
+                    'status' => 'active'
+                ]);
+            }
         }
 
         // 5. Create Benefits Page Content
