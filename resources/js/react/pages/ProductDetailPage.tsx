@@ -224,10 +224,8 @@ const ProductDetailPage = () => {
   // Fallback: if no EAV concentrations, use legacy concentration_options
   const legacyConcOptions: string[] = (product as any).concentration_options || [];
 
-  // Trust badges: prefer new EAV, fallback to old attribute_values
-  const dynamicTrustBadges = trustBadges.length > 0
-    ? trustBadges
-    : ((product as any).attribute_values?.filter((av: any) => av.attribute?.name === 'trust_badges') || []);
+  // Trust badges: Use only what is selected in the Admin "Dynamic Attributes" section
+  const dynamicTrustBadges = trustBadges;
 
   const handleConcentrationClick = (conc: any) => {
     setInfoBoxOpacity(0);
@@ -370,18 +368,11 @@ const ProductDetailPage = () => {
 
             {/* Fix 1: Dynamic Health Benefit Chips from admin */}
             <div className="flex flex-wrap gap-2 mb-8">
-              {Array.isArray(product.health_benefits) && product.health_benefits.length > 0 ? (
+              {Array.isArray(product.health_benefits) && product.health_benefits.length > 0 && (
                 product.health_benefits.map((benefit: string, idx: number) => {
                   const icons = [Zap, Activity, Award, Shield, Leaf, Sparkles];
                   return <BenefitChip key={idx} icon={icons[idx % icons.length]} text={benefit} />;
                 })
-              ) : (
-                <>
-                  <BenefitChip icon={Zap} text="Keto-Friendly" />
-                  <BenefitChip icon={Activity} text="Zero-Glycemic" />
-                  <BenefitChip icon={Award} text="100% Organic" />
-                  <BenefitChip icon={Shield} text="Diabetic-Safe" />
-                </>
               )}
             </div>
 
