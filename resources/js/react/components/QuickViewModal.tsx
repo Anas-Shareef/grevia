@@ -53,6 +53,9 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
   const defaultVariant = product.variants?.find(v => v.status === 'active') || product.variants?.[0];
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(defaultVariant);
   const [activeImage, setActiveImage] = useState(product.image);
+  const [selectedRatio, setSelectedRatio] = useState(product.ratio || product.concentration || '');
+  const [infoBoxText, setInfoBoxText] = useState('');
+  const [infoBoxVisible, setInfoBoxVisible] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -60,12 +63,37 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
       setIsAdded(false);
       setSelectedVariant(defaultVariant);
       setActiveImage(product.image);
+      
+      const ratio = product.ratio || product.concentration || '';
+      setSelectedRatio(ratio);
+
+      // Initial Tip
+      if (ratio && (ratio.includes(':') || ratio.includes('-'))) {
+        const parts = ratio.includes(':') ? ratio.split(':') : ratio.split('-');
+        const multiplier = parts[1]?.match(/\d+/)?.[0] || '10';
+        setInfoBoxText(`1g replaces ${multiplier}g of sugar`);
+        setInfoBoxVisible(true);
+      } else {
+        setInfoBoxVisible(false);
+      }
     }
   }, [open, product, defaultVariant]);
 
+  const handleConcentrationClick = (ratio: string) => {
+    setSelectedRatio(ratio);
+    if (ratio && (ratio.includes(':') || ratio.includes('-'))) {
+      const parts = ratio.includes(':') ? ratio.split(':') : ratio.split('-');
+      const multiplier = parts[1]?.match(/\d+/)?.[0] || '10';
+      setInfoBoxText(`1g replaces ${multiplier}g of sugar`);
+      setInfoBoxVisible(true);
+    } else {
+      setInfoBoxVisible(false);
+    }
+  };
+
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
-    addToCart(product, quantity, variantId, { concentration: product.concentration || product.ratio });
+    addToCart(product, quantity, variantId, { concentration: selectedRatio });
     setIsAdded(true);
     toast.success(`${product.name} Added!`, {
       style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' }
@@ -177,9 +205,10 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                      {Array.isArray(concentrationOptions) && concentrationOptions.map(r => (
                        <button
                          key={r}
+                         onClick={() => handleConcentrationClick(r)}
                          className={cn(
                            "h-10 px-6 rounded-full text-[12px] font-bold border-2 transition-all",
-                           (product.concentration || product.ratio) === r
+                           selectedRatio === r
                              ? "bg-[#EAF2EB] text-[#2E4D31] border-[#2E4D31]"
                              : "bg-white text-gray-400 border-[#E5E7EB]"
                          )}
@@ -188,6 +217,13 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                        </button>
                      ))}
                   </div>
+                  {/* Smart Tip */}
+                  {infoBoxVisible && infoBoxText && (
+                    <div className="flex items-center gap-3 mt-4 px-4 py-2.5 rounded-[12px] border border-[#77CB4D] bg-[#F0FAE8] animate-in fade-in slide-in-from-top-2 duration-300">
+                      <Leaf className="w-3.5 h-3.5 text-[#2E4D31] shrink-0" />
+                      <p className="text-[11px] font-bold text-[#2E4D31] Montserrat">{infoBoxText}</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Pack Size */}

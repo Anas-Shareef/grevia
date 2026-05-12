@@ -244,10 +244,24 @@ const OrderDetailPage = () => {
                                         <p className="text-sm text-gray-500 mt-1">
                                             SKU: {item.product?.slug || 'N/A'}
                                         </p>
-                                        <div className="mt-2 flex items-center text-sm text-gray-500">
+                                        <div className="mt-2 flex flex-wrap items-center gap-y-1 text-sm text-gray-500">
                                             <span>Qty: {item.quantity}</span>
                                             <span className="mx-2">•</span>
                                             <span>₹{parseFloat(item.price as unknown as string).toLocaleString()} per unit</span>
+                                            
+                                            {item.pack_size && (
+                                                <>
+                                                    <span className="mx-2">•</span>
+                                                    <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Size: {item.pack_size}g</span>
+                                                </>
+                                            )}
+                                            
+                                            {item.selected_attributes?.concentration && (
+                                                <>
+                                                    <span className="mx-2">•</span>
+                                                    <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Potency: {item.selected_attributes.concentration}</span>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
