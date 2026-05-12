@@ -543,13 +543,14 @@ const ProductDetailPage = () => {
             
             {/* Accordions — conditional per PRD §4.4 */}
             <div className="space-y-1 mt-8">
-              {/* Product Story — only if content exists */}
+              {/* Product Story — Primary from description, fallback to others */}
               {(() => {
                 const storyContent =
-                  (product as any).content?.attr_product_story?.trim() ||
-                  (product as any).product_content?.attr_product_story?.trim() ||
+                  product.description?.trim() ||
                   product.product_description?.trim() ||
-                  product.description?.trim();
+                  (product as any).content?.attr_product_story?.trim() ||
+                  (product as any).product_content?.attr_product_story?.trim();
+                  
                 return storyContent ? (
                   <AccordionItem title="Product Story" defaultOpen={true} icon={Leaf}>
                     <div
@@ -597,13 +598,26 @@ const ProductDetailPage = () => {
                 ) : null;
               })()}
 
-              {/* Shipping & Returns — always shown */}
-              <AccordionItem title="Shipping & Returns" icon={Truck}>
-                <p className="Montserrat text-[14px] text-gray-600 leading-relaxed">
-                  Standard delivery takes 3–5 business days. Free shipping on orders above ₹499.
-                  Returns accepted within 7 days for unopened products.
-                </p>
-              </AccordionItem>
+              {/* Shipping & Returns — Dynamic with hardcoded fallback */}
+              {(() => {
+                const shippingContent = (product as any).shipping_returns?.trim();
+                
+                return (
+                  <AccordionItem title="Shipping & Returns" icon={Truck}>
+                    {shippingContent ? (
+                      <div
+                        className="prose prose-sm max-w-none Montserrat text-gray-600 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: shippingContent }}
+                      />
+                    ) : (
+                      <p className="Montserrat text-[14px] text-gray-600 leading-relaxed">
+                        Standard delivery takes 3–5 business days. Free shipping on orders above ₹499.
+                        Returns accepted within 7 days for unopened products.
+                      </p>
+                    )}
+                  </AccordionItem>
+                );
+              })()}
             </div>
 
           </div>

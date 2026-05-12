@@ -43,6 +43,7 @@ class Product extends Model
         'related_product_ids',
         'enable_guest_reviews',
         'product_description',
+        'shipping_returns',
     ];
 
     protected $casts = [

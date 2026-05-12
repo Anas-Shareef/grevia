@@ -62,7 +62,9 @@ class ProductForm
                             ->preload(),
                         TextInput::make('subcategory')
                             ->placeholder('e.g. stevia, monkfruit'),
-                        Textarea::make('description')
+                        RichEditor::make('description')
+                            ->label('Product Story')
+                            ->helperText('The main narrative for this product.')
                             ->columnSpanFull()
                             ->required(),
                         RichEditor::make('long_description')
@@ -299,12 +301,18 @@ class ProductForm
                     ->description('Content shown in PDP accordions. Leave blank to hide the accordion.')
                     ->components([
                         \Filament\Forms\Components\RichEditor::make('product_description')
-                            ->label('Product Story')
-                            ->helperText('Shown in "Product Story" accordion. Leave blank to hide.')
+                            ->label('Old Product Story')
+                            ->helperText('This field is deprecated. Use the main "Product Story" field above.')
+                            ->hidden()
                             ->columnSpanFull(),
                         \Filament\Forms\Components\RichEditor::make('usage_instructions')
                             ->label('Usage & Preparation')
                             ->helperText('Shown in "How to Use" accordion. Leave blank to hide.')
+                            ->columnSpanFull(),
+                        \Filament\Forms\Components\RichEditor::make('shipping_returns')
+                            ->label('Shipping & Returns')
+                            ->helperText('Standard delivery and return policies.')
+                            ->default('Standard delivery takes 3–5 business days. Free shipping on orders above ₹499. Returns accepted within 7 days for unopened products.')
                             ->columnSpanFull(),
                     ]),
 
