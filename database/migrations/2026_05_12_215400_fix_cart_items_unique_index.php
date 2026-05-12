@@ -9,13 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cart_items', function (Blueprint $table) {
-            // Drop the restrictive old unique index
-            $table->dropUnique(['user_id', 'product_id']);
+            // MySQL needs separate indexes for foreign keys if we drop the unique one
+            $table->index('user_id');
+            $table->index('product_id');
             
-            // Add a new one that allows different variants
-            // Note: selected_attributes is JSON, so we can't easily include it in the index,
-            // but variant_id should be enough to differentiate in most cases.
-            // Or we just rely on application logic.
+            // Now drop the restrictive old unique index
+            $table->dropUnique(['user_id', 'product_id']);
         });
     }
 
