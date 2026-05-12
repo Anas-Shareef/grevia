@@ -57,17 +57,9 @@ class ViewOrder extends ViewRecord
 
                     // Create Invoice Items from Order Items
                     foreach ($record->orderItems as $item) {
-                        $attrs = is_string($item->selected_attributes) ? json_decode($item->selected_attributes, true) : $item->selected_attributes;
-                        $potency = $attrs['concentration'] ?? $attrs['ratio'] ?? null;
-                        $size = $item->pack_size ?? $item->weight;
-                        
-                        $name = $item->product->name ?? 'N/A';
-                        if ($size) $name .= " (Size: {$size}g)";
-                        if ($potency) $name .= " (Potency: {$potency})";
-
                         \App\Models\InvoiceItem::create([
                             'invoice_id' => $invoice->id,
-                            'product_name' => $name,
+                            'product_name' => $item->product->name ?? 'N/A',
                             'sku' => $item->product->sku ?? 'N/A',
                             'price' => $item->price,
                             'quantity' => $item->quantity,
