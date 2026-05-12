@@ -474,7 +474,7 @@ const ProductDetailPage = () => {
                               : 'bg-white border border-[#C0C0C0] text-[#1C1C1C] font-medium hover:border-[#4A8C4B] hover:bg-[#F1F8F1]'
                         }`}
                       >
-                        {v.title || v.weight}
+                        {v.title || (v.weight ? `${v.weight}g` : (v.pack_size ? `${v.pack_size}g` : 'N/A'))}
                       </button>
                     );
                   })}
