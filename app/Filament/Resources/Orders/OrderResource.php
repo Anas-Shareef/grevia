@@ -102,29 +102,12 @@ class OrderResource extends Resource
                                             ->weight('bold')
                                             ->default(fn ($record) => $record->name),
 
-                                        TextEntry::make('selected_attributes_display')
-                                            ->label('Selected Potency')
-                                            ->state(function ($record) {
-                                                $attrs = $record->selected_attributes;
-                                                if (is_string($attrs)) {
-                                                    $attrs = json_decode($attrs, true);
-                                                }
-                                                return $attrs['concentration'] ?? $attrs['ratio'] ?? null;
-                                            })
-                                            ->visible(fn ($state) => !empty($state))
-                                            ->badge()
-                                            ->color('success'),
-
                                         TextEntry::make('price')
                                             ->label('Price per unit')
                                             ->money('INR'),
 
                                         TextEntry::make('quantity')
                                             ->label('Quantity'),
-
-                                        TextEntry::make('pack_size')
-                                            ->label('Pack Size')
-                                            ->state(fn ($record) => ($record->pack_size ?? $record->weight) ? ($record->pack_size ?? $record->weight) . 'g' : 'N/A'),
 
                                         TextEntry::make('product.sku')
                                             ->label('SKU')

@@ -483,8 +483,6 @@ const CheckoutPage = () => {
                         </h4>
                         <p className="text-sm text-muted-foreground">
                           Qty: {item.quantity}
-                          {(item.packSize || item.weight) && ` • Size: ${item.packSize || item.weight}g`}
-                          {item.selectedAttributes?.concentration && ` • Potency: ${item.selectedAttributes.concentration}`}
                         </p>
                         <p className="text-sm font-bold text-foreground">
                           ₹{item.product.price * item.quantity}
