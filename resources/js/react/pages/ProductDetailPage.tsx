@@ -131,9 +131,17 @@ const ProductDetailPage = () => {
     if (hasEavConcentrations) {
       const defaultConc = concentrations.find((c: any) => c.is_default) || concentrations[0];
       if (defaultConc) {
-        setSelectedRatio(defaultConc.slug || defaultConc.value || '');
-        if (defaultConc.substitution_text) {
-          setInfoBoxText(defaultConc.substitution_text);
+        const val = defaultConc.slug || defaultConc.value || '';
+        setSelectedRatio(val);
+        
+        let tip = defaultConc.substitution_text;
+        if (!tip && val.includes(':')) {
+          const multiplier = val.split(':')[1]?.match(/\d+/)?.[0] || '10';
+          tip = `1g replaces ${multiplier}g of sugar`;
+        }
+
+        if (tip) {
+          setInfoBoxText(tip);
           setInfoBoxVisible(true);
         }
       }
@@ -230,9 +238,17 @@ const ProductDetailPage = () => {
   const handleConcentrationClick = (conc: any) => {
     setInfoBoxOpacity(0);
     setTimeout(() => {
-      setSelectedRatio(conc.slug || conc.value || '');
-      if (conc.substitution_text) {
-        setInfoBoxText(conc.substitution_text);
+      const val = conc.slug || conc.value || '';
+      setSelectedRatio(val);
+      
+      let tip = conc.substitution_text;
+      if (!tip && val.includes(':')) {
+        const multiplier = val.split(':')[1]?.match(/\d+/)?.[0] || '10';
+        tip = `1g replaces ${multiplier}g of sugar`;
+      }
+
+      if (tip) {
+        setInfoBoxText(tip);
         setInfoBoxVisible(true);
       } else {
         setInfoBoxVisible(false);
