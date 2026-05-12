@@ -11,10 +11,12 @@ class CartItem extends Model
         'product_id',
         'variant_id',
         'quantity',
+        'selected_attributes',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
+        'selected_attributes' => 'array',
     ];
 
     public function user()

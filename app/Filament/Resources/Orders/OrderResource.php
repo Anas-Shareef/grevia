@@ -102,6 +102,12 @@ class OrderResource extends Resource
                                             ->weight('bold')
                                             ->default(fn ($record) => $record->name),
 
+                                        TextEntry::make('selected_attributes.concentration')
+                                            ->label('Selected Potency')
+                                            ->visible(fn ($state) => !empty($state))
+                                            ->badge()
+                                            ->color('success'),
+
                                         TextEntry::make('price')
                                             ->label('Price per unit')
                                             ->money('INR'),

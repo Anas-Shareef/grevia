@@ -107,6 +107,7 @@ class OrderController extends Controller
                      'price' => $price,
                      'quantity' => $item['quantity'],
                      'total' => $price * $item['quantity'],
+                     'selected_attributes' => $item['selected_attributes'] ?? null,
                  ]);
              }
         }

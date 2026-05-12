@@ -20,10 +20,11 @@ export interface CartItem {
   weight?: string;
   packSize?: number;
   quantity: number;
+  selectedAttributes?: Record<string, any>;
 }
 export interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity?: number, variantId?: string | number) => void;
+  addToCart: (product: Product, quantity?: number, variantId?: string | number, selectedAttributes?: Record<string, any>) => void;
   removeFromCart: (productId: string | number, variantId?: string | number) => void;
   updateQuantity: (productId: string | number, quantity: number, variantId?: string | number) => void;
   clearCart: () => void;

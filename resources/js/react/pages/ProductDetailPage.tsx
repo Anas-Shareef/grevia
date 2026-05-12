@@ -276,7 +276,7 @@ const ProductDetailPage = () => {
 
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
-    addToCart(product, quantity, variantId);
+    addToCart(product, quantity, variantId, { concentration: selectedRatio });
     toast.success(`${product.name} Added!`, { 
       style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' },
       icon: <Check className="w-4 h-4" />

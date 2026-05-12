@@ -38,6 +38,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             weight: item.weight,
             packSize: item.pack_size,
             quantity: item.quantity,
+            selectedAttributes: item.selected_attributes,
           }));
 
           // Merge with localStorage cart (if any)
@@ -99,7 +100,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     [...cart1, ...cart2].forEach(item => {
       const variantKey = item.variantId ? `_${item.variantId}` : '';
-      const key = `${item.product.id}${variantKey}`;
+      const attrKey = item.selectedAttributes ? `_${JSON.stringify(item.selectedAttributes)}` : '';
+      const key = `${item.product.id}${variantKey}${attrKey}`;
 
       const existing = merged.get(key);
       if (existing) {
@@ -128,6 +130,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: item.product.id,
         variant_id: item.variantId,
         quantity: item.quantity,
+        selected_attributes: item.selectedAttributes,
       }));
 
       console.log('[CartContext] Syncing to server:', items);
@@ -148,17 +151,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const addToCart = useCallback(async (product: Product, quantity: number = 1, variantId?: string | number) => {
+  const addToCart = useCallback(async (product: Product, quantity: number = 1, variantId?: string | number, selectedAttributes?: Record<string, any>) => {
     const variant = product.variants?.find(v => v.id == variantId);
 
     const existingItem = items.find(item =>
-      String(item.product.id) === String(product.id) && String(item.variantId) === String(variantId)
+      String(item.product.id) === String(product.id) && 
+      String(item.variantId) === String(variantId) &&
+      JSON.stringify(item.selectedAttributes) === JSON.stringify(selectedAttributes)
     );
 
     let newItems: CartItem[];
     if (existingItem) {
       newItems = items.map(item =>
-        (String(item.product.id) === String(product.id) && String(item.variantId) === String(variantId))
+        (String(item.product.id) === String(product.id) && 
+         String(item.variantId) === String(variantId) &&
+         JSON.stringify(item.selectedAttributes) === JSON.stringify(selectedAttributes))
           ? { ...item, quantity: Number(item.quantity) + Number(quantity) }
           : item
       );
@@ -168,6 +175,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         product,
         quantity: Number(quantity),
         variantId,
+        selectedAttributes,
         weight: variant?.weight,
         packSize: variant?.pack_size
       }];

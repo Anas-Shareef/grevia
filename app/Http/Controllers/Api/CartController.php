@@ -37,6 +37,7 @@ class CartController extends Controller
                     'quantity' => $item->quantity,
                     'weight' => $hasVariant ? $item->variant->weight : null,
                     'pack_size' => $hasVariant ? $item->variant->pack_size : null,
+                    'selected_attributes' => $item->selected_attributes,
                 ];
             });
 
@@ -71,7 +72,8 @@ class CartController extends Controller
             }
 
             $variantId = $item['variant_id'] ?? null;
-            $comboKey = $product->id . '_' . ($variantId ?? '0');
+            $selectedAttributes = $item['selected_attributes'] ?? null;
+            $comboKey = $product->id . '_' . ($variantId ?? '0') . '_' . json_encode($selectedAttributes);
 
             if (in_array($comboKey, $addedCombos)) {
                 continue;
@@ -82,6 +84,7 @@ class CartController extends Controller
                 'product_id' => $product->id,
                 'variant_id' => $variantId,
                 'quantity' => $item['quantity'],
+                'selected_attributes' => $selectedAttributes,
             ]);
             
             $addedCombos[] = $comboKey;

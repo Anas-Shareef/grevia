@@ -65,7 +65,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
 
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
-    addToCart(product, quantity, variantId);
+    addToCart(product, quantity, variantId, { concentration: product.concentration || product.ratio });
     setIsAdded(true);
     toast.success(`${product.name} Added!`, {
       style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' }
