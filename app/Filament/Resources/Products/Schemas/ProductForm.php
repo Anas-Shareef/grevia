@@ -163,7 +163,8 @@ class ProductForm
                                     ->label('Weight')
                                     ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
                                         ? (\App\Models\Attribute::where('name', 'weight')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? 
-                                           \App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? [])
+                                           \App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? 
+                                           \App\Models\Attribute::where('name', 'pack_wieght')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? [])
                                         : [])
                                     ->required()
                                     ->searchable()
