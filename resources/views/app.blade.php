@@ -24,6 +24,7 @@
     @viteReactRefresh
     @vite(['resources/js/react/main.tsx'])
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>console.log("Grevia Storefront Version: 1.0.5 - Feedback Route Active");</script>
   </head>
 
   <body>

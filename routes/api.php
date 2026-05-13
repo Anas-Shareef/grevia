@@ -22,6 +22,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('/debug-ping', function() {
+    return response()->json(['message' => 'API is working', 'time' => now()]);
+});
+
 // Public Routes
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
@@ -96,9 +100,9 @@ Route::middleware('auth:sanctum')->group(function () {
 // Post-Auth Public Routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/reviews', [ReviewController::class, 'index']); // Public reviews list
-Route::post('/reviews', [ReviewController::class, 'store']); // Public submit (handles guest/auth)
-Route::post('/reviews/{id}/helpful', [ReviewController::class, 'helpful']); // Vote helpful
+Route::get('/product-feedback', [ReviewController::class, 'index']); 
+Route::post('/product-feedback', [ReviewController::class, 'store']); 
+Route::post('/product-feedback/{id}/helpful', [ReviewController::class, 'helpful']);
 Route::get('/shipping-methods', [App\Http\Controllers\Api\ShippingMethodController::class, 'index']);
 
 // Contact (Public)

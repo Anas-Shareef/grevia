@@ -77,8 +77,8 @@ export const api = {
 
     // Reviews
     getReviews: async () => api.get('/my-reviews'),
-    updateReview: async (id: number, data: any) => api.put(`/reviews/${id}`, data),
-    deleteReview: async (id: number) => api.delete(`/reviews/${id}`),
+    updateReview: async (id: number, data: any) => api.put(`/product-feedback/${id}`, data),
+    deleteReview: async (id: number) => api.delete(`/product-feedback/${id}`),
 
     downloadInvoice: async (invoiceId: number) => {
         // Direct download URL from API domain

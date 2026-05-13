@@ -54,8 +54,18 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        $user = $request->user('sanctum'); // Handle optional auth
-        $product = \App\Models\Product::findOrFail($request->product_id);
+        \Log::info("Review submission attempt", $request->all());
+        $user = $request->user('sanctum'); 
+        
+        if (!$request->has('product_id')) {
+            return response()->json(['message' => 'Product ID is missing in request.'], 400);
+        }
+
+        $product = \App\Models\Product::find($request->product_id);
+        if (!$product) {
+            \Log::warning("Review failed: Product not found", ['id' => $request->product_id]);
+            return response()->json(['message' => 'Product not found (ID: ' . $request->product_id . ')'], 404);
+        }
 
         $rules = [
             'product_id' => 'required|exists:products,id',
