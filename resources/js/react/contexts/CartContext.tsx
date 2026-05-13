@@ -14,9 +14,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  const GUEST_CART_KEY = 'grevia_cart_guest';
+  const USER_CART_KEY  = 'grevia_cart_user';
+
   // Load cart from localStorage or server
   useEffect(() => {
     const loadCart = async () => {
+      if (isInitialized && user) {
+        // If we're already initialized and user changes (login), we might need to handle transition
+        // But for now, let's focus on the initial load/refresh doubling.
+      }
+
       console.log('[CartContext] Loading cart, user:', user?.email || 'guest');
 
       if (user) {
@@ -33,60 +41,63 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
               name: item.name,
               price: item.price,
               image: item.image,
+              slug: item.slug
             } as Product,
             variantId: item.variant_id,
-            // Prefer the weight string (e.g. '250g') over the numeric pack_size (e.g. 1)
             weight: item.weight || null,
             packSize: item.weight || item.pack_size || null,
-            quantity: item.quantity,
+            quantity: Number(item.quantity),
             selectedAttributes: item.selected_attributes,
           }));
 
-          // Merge with localStorage cart (if any)
-          const localCart = getLocalCart();
-          const mergedCart = mergeCart(localCart, cartItems);
-
-          // WISE FIX: Clean up old '500' ghost data immediately
-          const cleanedItems = mergedCart.filter(item => {
-            if (item.product.slug === 'stevia-jar' && (item.packSize == 500 || item.weight == '500g' || item.weight == '500')) {
-                return false;
-            }
-            return true;
-          });
-
-          setItems(cleanedItems);
-
-          // Sync merged cart back to server
-          if (cleanedItems.length > 0) {
-            await syncToServer(cleanedItems);
+          // transition logic: check if there's a guest cart to merge
+          const guestCartJson = localStorage.getItem(GUEST_CART_KEY);
+          if (guestCartJson) {
+            console.log('[CartContext] Found guest cart, merging into user account...');
+            const guestItems: CartItem[] = JSON.parse(guestCartJson);
+            const mergedCart = mergeCart(cartItems, guestItems);
+            
+            setItems(mergedCart);
+            await syncToServer(mergedCart);
+            localStorage.removeItem(GUEST_CART_KEY); // Done merging!
+            saveToLocalStorage(mergedCart);
+          } else {
+            // Regular refresh for logged in user: TRUST THE SERVER
+            setItems(cartItems);
+            saveToLocalStorage(cartItems);
           }
-
-          // Update localStorage
-          saveToLocalStorage(cleanedItems);
         } catch (error) {
           console.error('Failed to load cart from server:', error);
-          // Fallback to localStorage
-          const localCart = getLocalCart();
-          const cleanedLocal = localCart.filter(item => {
-            if (item.product.slug === 'stevia-jar' && (item.packSize == 500 || item.weight == '500')) return false;
-            return true;
-          });
-          setItems(cleanedLocal);
+          // Fallback to mirrored user cart
+          setItems(getLocalCart());
         }
       } else {
-        // Guest user: load from localStorage
+        // Guest user: load from guest storage
         const localCart = getLocalCart();
-        const cleanedLocal = localCart.filter(item => {
-          if (item.product.slug === 'stevia-jar' && (item.packSize == 500 || item.weight == '500')) return false;
-          return true;
-        });
-        setItems(cleanedLocal);
+        setItems(localCart);
       }
       setIsInitialized(true);
     };
 
     loadCart();
   }, [user]);
+
+  // Helper: Get cart from localStorage (handles both user/guest keys)
+  const getLocalCart = (): CartItem[] => {
+    try {
+      const key = user ? USER_CART_KEY : GUEST_CART_KEY;
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  // Helper: Save to localStorage (handles both user/guest keys)
+  const saveToLocalStorage = (cart: CartItem[]) => {
+    const key = user ? USER_CART_KEY : GUEST_CART_KEY;
+    localStorage.setItem(key, JSON.stringify(cart));
+  };
 
   // Clear cart when user logs out - REMOVED as it clears guest cart on init
   // logic is handled by loadCart switching to local storage on logout
@@ -119,18 +130,26 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     [...cart1, ...cart2].forEach(item => {
       const variantKey = item.variantId ? `_${item.variantId}` : '';
-      const attrKey = item.selectedAttributes ? `_${JSON.stringify(item.selectedAttributes)}` : '';
+      
+      // Sort keys to ensure consistent JSON stringification
+      const sortedAttrs = item.selectedAttributes 
+        ? Object.keys(item.selectedAttributes).sort().reduce((acc: any, key) => {
+            acc[key] = item.selectedAttributes![key];
+            return acc;
+          }, {})
+        : {};
+      
+      const attrKey = Object.keys(sortedAttrs).length > 0 ? `_${JSON.stringify(sortedAttrs)}` : '';
       const key = `${item.product.id}${variantKey}${attrKey}`;
 
       const existing = merged.get(key);
       if (existing) {
-        // Sum quantities
         merged.set(key, {
           ...existing,
-          quantity: existing.quantity + item.quantity
+          quantity: Number(existing.quantity) + Number(item.quantity)
         });
       } else {
-        merged.set(key, item);
+        merged.set(key, { ...item, quantity: Number(item.quantity) });
       }
     });
 
