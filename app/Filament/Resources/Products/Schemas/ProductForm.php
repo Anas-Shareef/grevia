@@ -160,13 +160,14 @@ class ProductForm
                             ->relationship()
                             ->schema([
                                 Select::make('weight')
-                                    ->label('Weight / Size')
+                                    ->label('Weight')
                                     ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
-                                        ? (\App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? [])
+                                        ? (\App\Models\Attribute::where('name', 'weight')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? 
+                                           \App\Models\Attribute::where('name', 'pack_size')->first()?->values->pluck('value_text', 'value_text')->toArray() ?? [])
                                         : [])
                                     ->required()
                                     ->searchable()
-                                    ->helperText('Select a size from your defined Attributes. This ensures the sidebar filters match your product buttons.'),
+                                    ->helperText('Select a weight from your defined Attributes.'),
                                 TextInput::make('pack_size')
                                     ->label('Pack Size')
                                     ->numeric()
