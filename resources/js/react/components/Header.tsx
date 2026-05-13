@@ -3,6 +3,7 @@ import { ShoppingCart, Menu, X, ChevronDown, Heart, User, Leaf, Grape, Gift, Lib
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 
@@ -43,6 +44,7 @@ const Header = () => {
   // Track the trigger button rect so the tooltip arrow aligns to it
   const [triggerRect, setTriggerRect] = useState<{ left: number; width: number } | null>(null);
   const { setIsCartOpen, getCartCount } = useCart();
+  const { getWishlistCount } = useWishlist();
   const { user } = useAuth();
   const location = useLocation();
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -300,10 +302,15 @@ const Header = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="p-2 text-foreground/60 hover:text-primary hover:bg-primary/5 rounded-full transition-all"
+              className="relative p-2 text-foreground/60 hover:text-primary hover:bg-primary/5 rounded-full transition-all"
               aria-label="Wishlist"
             >
               <Heart className="w-5 h-5" />
+              {getWishlistCount() > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-sm ring-2 ring-white">
+                  {getWishlistCount()}
+                </span>
+              )}
             </Link>
 
             {/* User / Auth */}
@@ -342,10 +349,15 @@ const Header = () => {
           <div className="lg:hidden flex items-center gap-1">
             <Link
               to="/wishlist"
-              className="p-2 text-foreground/70"
+              className="relative p-2 text-foreground/70"
               aria-label="Wishlist"
             >
               <Heart className="w-5 h-5" />
+              {getWishlistCount() > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-1 ring-white">
+                  {getWishlistCount()}
+                </span>
+              )}
             </Link>
 
             <Link
