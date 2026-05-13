@@ -481,11 +481,23 @@ const CheckoutPage = () => {
                         <h4 className="font-bold text-foreground text-sm truncate">
                           {item.product.name}
                         </h4>
-                        <p className="text-sm text-muted-foreground">
+                        <div className="flex flex-wrap gap-1 mt-0.5">
+                          {item.selectedAttributes?.concentration && (
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                              {item.selectedAttributes.concentration}
+                            </span>
+                          )}
+                          {(item.packSize || item.weight) && (
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-1.5 py-0.5 rounded border border-border">
+                              Size: {item.packSize || item.weight}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
                           Qty: {item.quantity}
                         </p>
                         <p className="text-sm font-bold text-foreground">
-                          ₹{item.product.price * item.quantity}
+                          ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
                         </p>
                       </div>
                     </div>

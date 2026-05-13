@@ -284,7 +284,19 @@
             @foreach($invoice->items as $item)
             <tr>
                 <td>{{ $item->sku ?? 'N/A' }}</td>
-                <td>{{ $item->product_name }}</td>
+                <td>
+                    <div style="font-weight: bold;">{{ $item->product_name }}</div>
+                    @if(!empty($item->selected_attributes['concentration']))
+                        <div style="font-size: 9px; color: #555; margin-top: 2px;">
+                            Concentration: {{ $item->selected_attributes['concentration'] }}
+                        </div>
+                    @endif
+                    @if(!empty($item->pack_size) || !empty($item->weight))
+                        <div style="font-size: 9px; color: #555;">
+                            Size: {{ $item->pack_size ?? $item->weight }}
+                        </div>
+                    @endif
+                </td>
                 <td>Rs. {{ number_format($item->price, 2) }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td>Rs. {{ number_format($item->total, 2) }}</td>

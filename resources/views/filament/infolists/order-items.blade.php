@@ -35,12 +35,21 @@
                     {{ $item->product->name ?? $item->name }}
                 </div>
 
-                <div class="text-sm text-gray-600">
-                    ₹{{ number_format($item->price, 2) }} × {{ $item->quantity }}
+                <div class="flex flex-wrap gap-2 pt-1">
+                    @if(!empty($item->selected_attributes['concentration']))
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-800 border border-green-200">
+                            Potency: {{ $item->selected_attributes['concentration'] }}
+                        </span>
+                    @endif
+                    @if(!empty($item->pack_size) || !empty($item->weight))
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                            Size: {{ $item->pack_size ?? $item->weight }}
+                        </span>
+                    @endif
                 </div>
 
-                <div class="text-sm text-gray-500">
-                    SKU — {{ $item->product->sku ?? 'N/A' }}
+                <div class="text-xs text-gray-500 pt-1">
+                    SKU — {{ $item->sku ?? $item->product?->sku ?? 'N/A' }}
                 </div>
 
                 <div class="text-sm text-gray-500 pt-1">
