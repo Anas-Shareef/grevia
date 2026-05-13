@@ -13,7 +13,7 @@ class ProductController extends Controller
     {
         try {
             \Log::info("ProductController Index: Start", ['url' => $request->fullUrl(), 'method' => $request->method()]);
-            $query = Product::with(['category', 'gallery', 'mainImage'])
+            $query = Product::with(['category', 'gallery', 'mainImage', 'variants', 'attributeValues.attribute'])
                 ->where('in_stock', true);
 
             // ── 1. Search ──────────────────────────────────────────────────
@@ -290,8 +290,17 @@ class ProductController extends Controller
                     return $cat;
                 });
 
+            $hasEav = \Illuminate\Support\Facades\Schema::hasTable('attribute_values')
+                   && \Illuminate\Support\Facades\Schema::hasTable('product_attribute_value');
+
+            $formattedProducts = collect($products->items())->map(function($product) use ($hasEav) {
+                $productArray = $product->toArray();
+                $productArray['attributes'] = $this->formatStructuredAttributes($product, $hasEav);
+                return $productArray;
+            });
+
             return response()->json([
-                'data' => $products->items(),
+                'data' => $formattedProducts,
                 'meta' => [
                     'current_page' => $products->currentPage(),
                     'last_page'    => $products->lastPage(),
@@ -357,7 +366,39 @@ class ProductController extends Controller
                 ->where('in_stock', true)->limit(8)->get();
         }
 
-        // ── Build structured attributes block per PRD §7.1 ───────────────
+        // Enhance variants with is_available flag
+        $variants = $product->variants->map(fn($v) => array_merge($v->toArray(), [
+            'is_available' => ($v->stock_quantity ?? 0) > 0,
+        ]))->toArray();
+
+        $responseData = array_merge($product->toArray(), [
+            'attributes' => $this->formatStructuredAttributes($product, $hasEav),
+            'variants'   => $variants,
+            'shipping_returns' => $product->shipping_returns,
+            'content'    => [
+                'attr_product_story' => $product->productContent?->attr_product_story,
+                'attr_usage_prep'    => $product->productContent?->attr_usage_prep,
+            ],
+        ]);
+
+        return response()->json($responseData);
+    }
+
+    public function getSubstitutionTip(Request $request)
+    {
+        $ratio = $request->query('ratio', '1:10');
+        $parts = explode(':', $ratio);
+        $multiplier = count($parts) > 1 ? (int)$parts[1] : 10;
+        
+        return response()->json([
+            'success' => true,
+            'ratio' => $ratio,
+            'multiplier' => $multiplier,
+            'tip' => "1g replaces {$multiplier}g of sugar"
+        ]);
+    }
+    private function formatStructuredAttributes($product, $hasEav)
+    {
         $structuredAttributes = [
             'format'        => null,
             'concentrations' => [],
@@ -366,7 +407,7 @@ class ProductController extends Controller
 
         if ($hasEav && $product->relationLoaded('attributeValues')) {
             foreach ($product->attributeValues as $av) {
-                $attrName = $av->attribute?->name;
+                $attrName = $av->attribute?->name ?? null;
                 if (!$attrName) continue;
                 
                 switch ($attrName) {
@@ -399,39 +440,8 @@ class ProductController extends Controller
                         break;
                 }
             }
-            // Sort concentrations by sort_order
-            usort($structuredAttributes['concentrations'], fn($a, $b) => 0);
         }
 
-        // Enhance variants with is_available flag
-        $variants = $product->variants->map(fn($v) => array_merge($v->toArray(), [
-            'is_available' => ($v->stock_quantity ?? 0) > 0,
-        ]))->toArray();
-
-        $responseData = array_merge($product->toArray(), [
-            'attributes' => $structuredAttributes,
-            'variants'   => $variants,
-            'shipping_returns' => $product->shipping_returns, // Explicitly pass the new field
-            'content'    => [
-                'attr_product_story' => $product->productContent?->attr_product_story,
-                'attr_usage_prep'    => $product->productContent?->attr_usage_prep,
-            ],
-        ]);
-
-        return response()->json($responseData);
-    }
-
-    public function getSubstitutionTip(Request $request)
-    {
-        $ratio = $request->query('ratio', '1:10');
-        $parts = explode(':', $ratio);
-        $multiplier = count($parts) > 1 ? (int)$parts[1] : 10;
-        
-        return response()->json([
-            'success' => true,
-            'ratio' => $ratio,
-            'multiplier' => $multiplier,
-            'tip' => "1g replaces {$multiplier}g of sugar"
-        ]);
+        return $structuredAttributes;
     }
 }
