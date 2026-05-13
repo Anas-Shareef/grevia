@@ -109,7 +109,7 @@ const ProductDetailPage = () => {
     if (product) {
       if (product.concentration) setSelectedRatio(product.concentration);
       else if (product.ratio) setSelectedRatio(product.ratio);
-      else setSelectedRatio('1:10');
+      else setSelectedRatio('');
       
       if (product.variants && product.variants.length > 0) {
         setSelectedVariant(product.variants[0]);
@@ -276,7 +276,13 @@ const ProductDetailPage = () => {
 
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
-    addToCart(product, quantity, variantId, { concentration: selectedRatio });
+    const selectedAttributes: Record<string, any> = {};
+    
+    if (selectedRatio) {
+      selectedAttributes.concentration = selectedRatio;
+    }
+
+    addToCart(product, quantity, variantId, selectedAttributes);
     toast.success(`${product.name} Added!`, { 
       style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' },
       icon: <Check className="w-4 h-4" />
