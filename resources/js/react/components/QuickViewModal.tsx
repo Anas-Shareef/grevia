@@ -164,24 +164,6 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 </span>
               </div>
               
-              <div className="flex flex-wrap gap-2 mb-8">
-                {product.attributes?.trust_badges && product.attributes.trust_badges.length > 0 ? (
-                   product.attributes.trust_badges.map((badge: any) => {
-                     const Icon = TAG_ICONS[badge.label] || TAG_ICONS[badge.slug] || Check;
-                     return <BenefitChip key={badge.id || badge.slug} icon={Icon} text={badge.label} />;
-                   })
-                ) : product.tags && product.tags.length > 0 ? (
-                  product.tags.map((tag) => {
-                    const Icon = TAG_ICONS[tag] || Check;
-                    return <BenefitChip key={tag} icon={Icon} text={tag} />;
-                  })
-                ) : (
-                  <>
-                    <BenefitChip icon={Award} text="100% Organic" />
-                    <BenefitChip icon={Zap} text="Keto-Friendly" />
-                  </>
-                )}
-              </div>
 
               <div 
                 className="text-gray-500 text-[15px] leading-relaxed mb-8 font-medium line-clamp-3 prose prose-sm max-w-none"
@@ -217,13 +199,13 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 {product.variants && product.variants.length > 0 && (
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-[#2E4D31]/40 mb-4">Select Pack Weight</p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-4">
                        {Array.isArray(product.variants) && product.variants.map((v) => (
                          <button
                            key={v.id}
                            onClick={() => setSelectedVariant(v)}
                            className={cn(
-                             "h-10 px-6 rounded-full text-[12px] font-bold border-2 transition-all",
+                             "w-14 h-14 rounded-full flex flex-col items-center justify-center text-[11px] font-bold border-2 transition-all leading-none",
                              selectedVariant?.id === v.id
                                ? "bg-[#2E4D31] text-white border-[#2E4D31] shadow-lg shadow-[#2E4D31]/20"
                                : "bg-white text-[#2E4D31] border-[#E5E7EB] hover:border-[#2E4D31]"
