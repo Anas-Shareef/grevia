@@ -363,14 +363,7 @@ const ProductDetailPage = () => {
 
           {/* Right: Product Info */}
           <div className="w-full lg:w-1/2 flex flex-col">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex text-[#F59E0B]">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} className={`w-4 h-4 ${s <= Math.round(product.rating || 5) ? 'fill-current' : ''}`} />
-                ))}
-              </div>
-              <span className="text-[13px] font-bold text-gray-500">{(product.rating || 5).toFixed(1)} / 5.0 ({product.reviews_count || 12} reviews)</span>
-            </div>
+
 
             <h1 className="text-[28px] md:text-[36px] font-bold text-[#2E4D31] mb-6 leading-[1.1] Montserrat">{product.name}</h1>
             
@@ -632,10 +625,7 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* Dynamic Reviews Section */}
-        <div className="mt-24 border-t border-[#E5E7EB] pt-20">
-           <ReviewsSection productId={String(product.dbId || product.id)} />
-        </div>
+
 
         {/* Related Products Slider */}
         <div className="mt-24 overflow-hidden">

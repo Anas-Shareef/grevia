@@ -157,16 +157,6 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         ? "w-full md:w-2/3 lg:w-3/4 flex flex-col justify-between py-2"
         : "p-3 md:p-4 flex flex-col flex-1"
       }>
-        {/* Rating */}
-        {viewMode === 'grid' && (
-          <div className="flex items-center gap-1.5 mb-1.5 md:mb-2">
-            <Star className="w-[14px] h-[14px] fill-[#D4AF37] text-[#D4AF37]" />
-            <span className="text-[12px] md:text-[13px] font-semibold text-[#1F2937]">4.9</span>
-            <span className="text-[11px] md:text-[12px] text-[#9CA3AF] hidden md:inline">(128 reviews)</span>
-            <span className="text-[11px] md:text-[12px] text-[#9CA3AF] md:hidden">(128)</span>
-          </div>
-        )}
-
         {/* Title */}
         <Link to={`/products/${product.slug || product.id}`}>
           <h3 className={viewMode === 'list'
@@ -177,16 +167,7 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
           </h3>
         </Link>
         
-        {viewMode === 'list' && (
-          <div className="flex items-center gap-2 mb-3 mt-1">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              ))}
-            </div>
-            <span className="text-sm text-gray-500">({product.reviews_count || 184} reviews)</span>
-          </div>
-        )}
+
 
         {/* Description */}
         {viewMode === 'list' ? (
