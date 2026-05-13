@@ -169,16 +169,7 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         
 
 
-        {/* Description */}
-        {viewMode === 'list' ? (
-          <p className="text-gray-500 text-[13px] mt-3 line-clamp-2 md:line-clamp-3">
-            {product.description || "Premium stevia in elegant packaging"}
-          </p>
-        ) : (
-          <p className="text-[12px] md:text-[13px] text-[#6B7280] line-clamp-1 md:line-clamp-2 mt-1 md:mt-1.5">
-            {product.description || "Premium stevia in elegant packaging"}
-          </p>
-        )}
+
 
         {/* Price + View button */}
         {viewMode === 'list' ? (
