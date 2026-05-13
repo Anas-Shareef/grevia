@@ -15,11 +15,12 @@ import {
   Heart
 } from "lucide-react";
 import { 
-  Dialog, 
-  DialogContent, 
+  Dialog,
+  DialogContent,
   DialogClose,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
+  DialogHeader
 } from "@/components/ui/dialog";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Product, ProductVariant } from "@/types";
@@ -36,11 +37,22 @@ interface QuickViewModalProps {
 }
 
 const BenefitChip = ({ icon: Icon, text }: { icon: any, text: string }) => (
-  <div className="flex items-center gap-1.5 bg-[#F0FAE8] border border-[#77CB4D] rounded-full px-3 py-1 transition-all hover:shadow-sm">
-    <Icon className="w-3 h-3 text-[#2E4D31]" />
-    <span className="text-[10px] font-bold text-[#2E4D31] Montserrat uppercase tracking-wider">{text}</span>
+  <div className="flex items-center gap-1.5 bg-[#F0FAE8]/60 backdrop-blur-sm border border-[#77CB4D]/30 rounded-full px-3 py-1.5 transition-all hover:shadow-md hover:bg-[#F0FAE8]">
+    <Icon className="w-3.5 h-3.5 text-[#2E4D31]" />
+    <span className="text-[10px] font-black text-[#2E4D31] uppercase tracking-widest">{text}</span>
   </div>
 );
+
+const TAG_ICONS: Record<string, any> = {
+  '100% Organic': Award,
+  'Keto-Friendly': Zap,
+  'Zero-Glycemic': Activity,
+  'Plant-Based': Leaf,
+  'Natural': Leaf,
+  'Stevia': Leaf,
+  'Premium': Star,
+  'New': Zap,
+};
 
 export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalProps) => {
   const { addToCart } = useCart();
@@ -146,15 +158,21 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 <span className="text-[28px] font-black text-[#2E4D31]">
                   ₹{selectedVariant?.price || product.price}
                 </span>
-                <BenefitChip icon={Award} text="100% Organic" />
               </div>
-
+              
               <div className="flex flex-wrap gap-2 mb-8">
-                <BenefitChip icon={Zap} text="Keto-Friendly" />
-                <BenefitChip icon={Activity} text="Zero-Glycemic" />
+                {product.tags?.map((tag) => {
+                  const Icon = TAG_ICONS[tag] || Check;
+                  return <BenefitChip key={tag} icon={Icon} text={tag} />;
+                }) || (
+                  <>
+                    <BenefitChip icon={Award} text="100% Organic" />
+                    <BenefitChip icon={Zap} text="Keto-Friendly" />
+                  </>
+                )}
               </div>
 
-              <p className="text-gray-500 text-[14px] leading-relaxed mb-8 italic">
+              <p className="text-gray-500 text-[15px] leading-relaxed mb-8 font-medium">
                 {product.description || "Experience the pure, plant-based sweetness of Grevia."}
               </p>
 
@@ -162,10 +180,10 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               <div className="space-y-8 mb-10">
 
 
-                {/* Pack Size */}
+                {/* Pack Weight */}
                 {product.variants && product.variants.length > 0 && (
                   <div>
-                    <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-4">Select Pack Size</p>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-[#2E4D31]/40 mb-4">Select Pack Weight</p>
                     <div className="flex flex-wrap gap-2">
                        {Array.isArray(product.variants) && product.variants.map((v) => (
                          <button
@@ -224,10 +242,9 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
           </div>
         </div>
 
-        {/* Close Button */}
-        <DialogClose className="absolute right-6 top-6 z-50 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-[#2E4D31] shadow-lg hover:bg-white transition-all">
-          <X className="w-5 h-5" />
-        </DialogClose>
+            </div>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
