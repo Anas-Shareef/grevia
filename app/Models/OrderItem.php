@@ -22,6 +22,8 @@ class OrderItem extends Model
         'selected_attributes' => 'array',
     ];
 
+    protected $appends = ['weight', 'pack_size'];
+
     public function getWeightAttribute($value)
     {
         if ($value) return $value;
