@@ -293,7 +293,7 @@
                     @endif
                     @if(!empty($item->pack_size) || !empty($item->weight))
                         <div style="font-size: 9px; color: #555;">
-                            Size: {{ $item->pack_size ?? $item->weight }}
+                            Weight: {{ $item->pack_size ?? $item->weight }}
                         </div>
                     @endif
                 </td>

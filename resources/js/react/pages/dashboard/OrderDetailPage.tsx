@@ -252,7 +252,7 @@ const OrderDetailPage = () => {
                                             )}
                                             {(item.pack_size || item.weight) && (
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
-                                                    Size: {item.pack_size || item.weight}
+                                                    Weight: {item.pack_size || item.weight}
                                                 </span>
                                             )}
                                         </div>

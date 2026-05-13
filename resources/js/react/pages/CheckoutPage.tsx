@@ -489,7 +489,7 @@ const CheckoutPage = () => {
                           )}
                           {(item.packSize || item.weight) && (
                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-1.5 py-0.5 rounded border border-border">
-                              Size: {item.packSize || item.weight}
+                              Weight: {item.packSize || item.weight}
                             </span>
                           )}
                         </div>

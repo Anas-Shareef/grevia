@@ -455,7 +455,7 @@ const ProductDetailPage = () => {
             {/* Pack Size Selector — Grevia light-green selected style, out-of-stock dimmed */}
             {product.variants && product.variants.length > 0 && (
               <div className="mb-10">
-                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Select Pack Size</label>
+                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Select Pack Weight</label>
                 <div className="flex flex-wrap gap-2.5">
                   {product.variants.map((v: any) => {
                     const isAvailable = (v.is_available !== false) && (v.stock_quantity === undefined || v.stock_quantity > 0);
