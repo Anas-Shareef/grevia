@@ -12,32 +12,37 @@ class RecoverySeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. COMPLETELY WIPE VARIANTS (To remove "Size: 1" forever)
+        // 1. NUCLEAR WIPE (Delete everything to kill the "1" and "1:10" data)
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         ProductVariant::truncate();
+        Product::truncate();
+        Category::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // 2. Ensure categories
-        $stevia = Category::updateOrCreate(['slug' => 'stevia'], [
+        // 2. Create Category
+        $stevia = Category::create([
             'name' => 'Stevia Sweeteners',
+            'slug' => 'stevia',
             'status' => true,
         ]);
 
-        // 3. Create Jar Product
-        $jar = Product::updateOrCreate(['slug' => 'stevia-jar'], [
+        // 3. Create THE JAR (The exact one from your request)
+        $jar = Product::create([
             'name' => 'Grevia Stevia Jar',
-            'price' => 600, // Starting price
+            'slug' => 'stevia-jar',
+            'price' => 600, 
             'category_id' => $stevia->id,
             'image' => 'products/01KF58XGGZXZCPHWQ77KXRFCZ1.jpeg', 
             'is_featured' => true,
             'in_stock' => true,
-            'concentration_options' => ['1:30', '1:20'],
+            'concentration_options' => ['1:30', '1:20', '1:50'],
             'ratio' => '1:30',
+            'description' => 'Premium Stevia Sweetener in a Jar',
         ]);
 
-        // 4. Create PERFECT Variants (Exactly as per your request)
+        // 4. Create THE WEIGHTS (Exact prices)
         
-        // Variant 1: 50g (₹600) - THIS IS THE ONE FROM YOUR IMAGE
+        // 50g (₹600)
         ProductVariant::create([
             'product_id' => $jar->id,
             'weight' => '50g',
@@ -47,7 +52,7 @@ class RecoverySeeder extends Seeder
             'stock_quantity' => 100,
         ]);
 
-        // Variant 2: 100g (₹899)
+        // 100g (₹899)
         ProductVariant::create([
             'product_id' => $jar->id,
             'weight' => '100g',
@@ -57,7 +62,7 @@ class RecoverySeeder extends Seeder
             'stock_quantity' => 100,
         ]);
 
-        // Variant 3: 250g (₹1599)
+        // 250g (₹1599)
         ProductVariant::create([
             'product_id' => $jar->id,
             'weight' => '250g',
@@ -66,15 +71,18 @@ class RecoverySeeder extends Seeder
             'status' => 'active',
             'stock_quantity' => 100,
         ]);
-        
-        // 5. Other products
-        Product::updateOrCreate(['slug' => 'stevia-powder'], [
+
+        // 5. Create THE POWDER
+        Product::create([
             'name' => 'Grevia Stevia Powder',
+            'slug' => 'stevia-powder',
             'price' => 349,
             'category_id' => $stevia->id,
             'image' => 'products/01KF3XGBHBW2CRQY49NX836YJX.jpg',
             'is_featured' => true,
             'in_stock' => true,
+            'concentration_options' => ['1:30'],
+            'ratio' => '1:30',
         ]);
     }
 }
