@@ -32,28 +32,53 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const response = await api.get('/cart');
           const serverItems = response.items || [];
 
-          // Convert server format to CartItem format
-          const cartItems: CartItem[] = serverItems.map((item: any) => ({
-            product: {
-              ...item,
-              id: String(item.id),
-              name: item.name,
-              price: item.price,
-              image: item.image,
-              slug: item.slug
-            } as Product,
-            variantId: item.variant_id,
-            weight: item.weight || null,
-            packSize: item.weight || item.pack_size || null,
-            quantity: Number(item.quantity),
-            selectedAttributes: item.selected_attributes,
-          }));
+          // Convert server format to CartItem format and CLEAN UP ghost potency
+          const cartItems: CartItem[] = serverItems.map((item: any) => {
+            const selectedAttributes = { ...(item.selected_attributes || {}) };
+            
+            // Fix: Remove ghost '1:10' concentration if it was added by the previous bug
+            // (Only if it's '1:10' and the product doesn't actually have concentrations in its EAV attributes)
+            const productAttrs = item.attributes || {};
+            const hasActualConcentrations = (productAttrs.concentrations && productAttrs.concentrations.length > 0);
+            
+            if (selectedAttributes.concentration === '1:10' && !hasActualConcentrations) {
+                console.log(`[CartContext] Scrubbing ghost potency from ${item.name}`);
+                delete selectedAttributes.concentration;
+            }
+
+            return {
+              product: {
+                ...item,
+                id: String(item.id),
+                name: item.name,
+                price: item.price,
+                image: item.image,
+                slug: item.slug
+              } as Product,
+              variantId: item.variant_id,
+              weight: item.weight || null,
+              packSize: item.weight || item.pack_size || null,
+              quantity: Number(item.quantity),
+              selectedAttributes,
+            };
+          });
 
           // transition logic: check if there's a guest cart to merge
           const guestCartJson = localStorage.getItem(GUEST_CART_KEY);
           if (guestCartJson) {
             console.log('[CartContext] Found guest cart, merging into user account...');
-            const guestItems: CartItem[] = JSON.parse(guestCartJson);
+            let guestItems: CartItem[] = JSON.parse(guestCartJson);
+            
+            // Also clean guest items
+            guestItems = guestItems.map(gi => {
+                if (gi.selectedAttributes?.concentration === '1:10') {
+                    const cleanAttrs = { ...gi.selectedAttributes };
+                    delete cleanAttrs.concentration;
+                    return { ...gi, selectedAttributes: cleanAttrs };
+                }
+                return gi;
+            });
+
             const mergedCart = mergeCart(cartItems, guestItems);
             
             setItems(mergedCart);

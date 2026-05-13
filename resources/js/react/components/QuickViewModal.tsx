@@ -68,12 +68,17 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
   
   const concentrationOptions = product.attributes?.concentrations || [];
   const [selectedConcentration, setSelectedConcentration] = useState(
-    concentrationOptions.find((c: any) => c.is_default)?.value || concentrationOptions[0]?.value || '1:10'
+    concentrationOptions.find((c: any) => c.is_default)?.value || concentrationOptions[0]?.value || ''
   );
 
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
-    addToCart(product, quantity, variantId, { concentration: selectedConcentration });
+    const selectedAttributes: Record<string, any> = {};
+    if (selectedConcentration) {
+      selectedAttributes.concentration = selectedConcentration;
+    }
+
+    addToCart(product, quantity, variantId, selectedAttributes);
     setIsAdded(true);
     toast.success(`${product.name} Added!`, {
       style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' }
