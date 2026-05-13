@@ -633,6 +633,11 @@ const ProductDetailPage = () => {
 
 
 
+        {/* Reviews Section */}
+        <div id="reviews-anchor">
+          <ReviewsSection productId={String(product.id)} />
+        </div>
+
         {/* Related Products Slider */}
         <div className="mt-24 overflow-hidden">
           <div className="flex items-center justify-between mb-10">

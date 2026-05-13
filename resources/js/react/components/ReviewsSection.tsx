@@ -206,8 +206,9 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
             </div>
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="w-full md:w-auto h-14 bg-[#2E4D31] hover:bg-[#1a3320] text-white px-10 rounded-full font-bold uppercase tracking-wider transition-all shadow-xl shadow-[#2E4D31]/20 active:scale-95"
+              className="w-full md:w-auto h-14 bg-[#2E4D31] hover:bg-[#1a3320] text-white px-10 rounded-full font-bold uppercase tracking-widest transition-all shadow-xl shadow-[#2E4D31]/20 active:scale-95 flex items-center justify-center gap-2"
             >
+              <Plus className="w-4 h-4" />
               Write a Review
             </button>
           </div>
@@ -304,7 +305,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
                     
                     <button 
                       onClick={() => handleHelpful(review.id)}
-                      className="flex items-center gap-2 text-[12px] font-bold text-gray-400 hover:text-[#2E4D31] transition-colors"
+                      className="flex items-center gap-2 text-[12px] font-bold text-gray-400 hover:text-[#2E4D31] transition-all hover:scale-105"
                     >
                       <ThumbsUp className="w-3.5 h-3.5" />
                       Helpful ({review.helpful_count || 0})
