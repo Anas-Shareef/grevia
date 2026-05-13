@@ -161,10 +161,12 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               </div>
               
               <div className="flex flex-wrap gap-2 mb-8">
-                {product.tags?.map((tag) => {
-                  const Icon = TAG_ICONS[tag] || Check;
-                  return <BenefitChip key={tag} icon={Icon} text={tag} />;
-                }) || (
+                {product.tags && product.tags.length > 0 ? (
+                  product.tags.map((tag) => {
+                    const Icon = TAG_ICONS[tag] || Check;
+                    return <BenefitChip key={tag} icon={Icon} text={tag} />;
+                  })
+                ) : (
                   <>
                     <BenefitChip icon={Award} text="100% Organic" />
                     <BenefitChip icon={Zap} text="Keto-Friendly" />
@@ -238,10 +240,6 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                   <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
-            </div>
-          </div>
-        </div>
-
             </div>
           </div>
         </div>
