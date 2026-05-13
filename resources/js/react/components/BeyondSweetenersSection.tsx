@@ -142,11 +142,27 @@ const BeyondSweetenersSection = () => {
         </motion.div>
 
         {/* Categories Grid - Editorial High Fidelity Cards */}
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto mb-16 md:mb-20">
           {categories.map((cat, i) => (
             <EditorialCard key={cat.id} category={cat} index={i} />
           ))}
         </div>
+
+        {/* View All Products CTA - Pill Shaped Brand Green */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-center"
+        >
+          <Link
+            to="/collections/all"
+            className="inline-flex items-center justify-center bg-[#2E4D31] text-white font-bold rounded-full shadow-lg hover:bg-[#1a3320] hover:scale-105 active:scale-95 transition-all duration-300 h-14 px-12 text-base md:text-lg Montserrat"
+          >
+            View All Products
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

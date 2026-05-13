@@ -81,7 +81,7 @@ const ProductsSection = () => {
         >
           <Link
             to="/collections/all"
-            className="inline-flex items-center justify-center text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-squircle shadow-button hover:shadow-lg hover:-translate-y-0.5 h-14 px-8 transition-all duration-300"
+            className="inline-flex items-center justify-center bg-[#2E4D31] text-white font-bold rounded-full shadow-lg hover:bg-[#1a3320] hover:scale-105 active:scale-95 transition-all duration-300 h-14 px-12 text-base md:text-lg Montserrat"
           >
             View All Products
           </Link>
