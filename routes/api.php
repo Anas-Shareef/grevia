@@ -25,6 +25,13 @@ Route::get('/user', function (Request $request) {
 Route::get('/debug-ping', function() {
     return response()->json(['message' => 'API is working', 'time' => now()]);
 });
+Route::get('/test-route', function() {
+    return response()->json(['status' => 'OK']);
+});
+
+Route::get('/product-feedback', [ReviewController::class, 'index']); 
+Route::post('/product-feedback', [ReviewController::class, 'store']); 
+Route::post('/product-feedback/{id}/helpful', [ReviewController::class, 'helpful']);
 
 // Public Routes
 Route::get('/categories', [CategoryController::class, 'index']);
@@ -100,9 +107,6 @@ Route::middleware('auth:sanctum')->group(function () {
 // Post-Auth Public Routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/product-feedback', [ReviewController::class, 'index']); 
-Route::post('/product-feedback', [ReviewController::class, 'store']); 
-Route::post('/product-feedback/{id}/helpful', [ReviewController::class, 'helpful']);
 Route::get('/shipping-methods', [App\Http\Controllers\Api\ShippingMethodController::class, 'index']);
 
 // Contact (Public)

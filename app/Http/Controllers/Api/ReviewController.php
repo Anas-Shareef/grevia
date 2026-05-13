@@ -64,7 +64,7 @@ class ReviewController extends Controller
         $product = \App\Models\Product::find($request->product_id);
         if (!$product) {
             \Log::warning("Review failed: Product not found", ['id' => $request->product_id]);
-            return response()->json(['message' => 'Product not found (ID: ' . $request->product_id . ')'], 404);
+            return response()->json(['message' => 'Product not found (ID: ' . $request->product_id . ')'], 400);
         }
 
         $rules = [
