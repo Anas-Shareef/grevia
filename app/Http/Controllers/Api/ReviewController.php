@@ -55,7 +55,8 @@ class ReviewController extends Controller
     public function store(Request $request)
     {
         \Log::info("Review submission attempt", $request->all());
-        $user = $request->user('sanctum'); 
+        // Check both Sanctum and Session auth
+        $user = $request->user('sanctum') ?? $request->user(); 
         
         if (!$request->has('product_id')) {
             return response()->json(['message' => 'Product ID is missing in request.'], 400);
