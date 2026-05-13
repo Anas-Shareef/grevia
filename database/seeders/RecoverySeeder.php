@@ -12,67 +12,39 @@ class RecoverySeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. NUCLEAR WIPE (Delete everything to kill the "1" and "1:10" data)
+        // 1. CLEAR DATA FOR CLEAN RESTORE
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         ProductVariant::truncate();
         Product::truncate();
         Category::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // 2. Create Category
-        $stevia = Category::create([
-            'name' => 'Stevia Sweeteners',
-            'slug' => 'stevia',
-            'status' => true,
-        ]);
+        // 2. Create Categories
+        $sweeteners = Category::create(['name' => 'Premium Sweeteners', 'slug' => 'sweeteners', 'status' => true]);
+        $stevia = Category::create(['name' => 'Stevia Sweeteners', 'slug' => 'stevia', 'parent_id' => $sweeteners->id, 'status' => true]);
+        $monkfruit = Category::create(['name' => 'Monkfruit Sweeteners', 'slug' => 'monkfruit', 'parent_id' => $sweeteners->id, 'status' => true]);
+        $bakery = Category::create(['name' => 'Bakery Items', 'slug' => 'bakery', 'status' => true]);
+        $pickles = Category::create(['name' => 'Pickles & Preserves', 'slug' => 'pickles', 'status' => true]);
 
-        // 3. Create THE JAR (The exact one from your request)
+        // 3. RESTORE THE JAR (With Accuracy)
         $jar = Product::create([
             'name' => 'Grevia Stevia Jar',
             'slug' => 'grevia-stevia-jar',
             'price' => 600, 
             'category_id' => $stevia->id,
-            'image' => 'products/01KF58XGGZXZCPHWQ77KXRFCZ1.jpeg', 
+            'image' => 'https://grevia.in/grevia-logo.png', // Temporary backup logo
             'is_featured' => true,
             'in_stock' => true,
             'concentration_options' => ['1:30', '1:20', '1:50'],
             'ratio' => '1:30',
-            'description' => 'Premium Stevia Sweetener in a Jar',
         ]);
 
-        // 4. Create THE WEIGHTS (Exact prices)
-        
-        // 50g (₹600)
-        ProductVariant::create([
-            'product_id' => $jar->id,
-            'weight' => '50g',
-            'pack_size' => 50,
-            'price' => 600,
-            'status' => 'active',
-            'stock_quantity' => 100,
-        ]);
+        // Jar Weights
+        ProductVariant::create(['product_id' => $jar->id, 'weight' => '50g', 'pack_size' => 50, 'price' => 600, 'status' => 'active', 'stock_quantity' => 100]);
+        ProductVariant::create(['product_id' => $jar->id, 'weight' => '100g', 'pack_size' => 100, 'price' => 899, 'status' => 'active', 'stock_quantity' => 100]);
+        ProductVariant::create(['product_id' => $jar->id, 'weight' => '250g', 'pack_size' => 250, 'price' => 1599, 'status' => 'active', 'stock_quantity' => 100]);
 
-        // 100g (₹899)
-        ProductVariant::create([
-            'product_id' => $jar->id,
-            'weight' => '100g',
-            'pack_size' => 100,
-            'price' => 899,
-            'status' => 'active',
-            'stock_quantity' => 100,
-        ]);
-
-        // 250g (₹1599)
-        ProductVariant::create([
-            'product_id' => $jar->id,
-            'weight' => '250g',
-            'pack_size' => 250,
-            'price' => 1599,
-            'status' => 'active',
-            'stock_quantity' => 100,
-        ]);
-
-        // 5. Create THE POWDER
+        // 4. RESTORE ALL OTHER PRODUCTS
         Product::create([
             'name' => 'Grevia Stevia Powder',
             'slug' => 'stevia-powder',
@@ -83,6 +55,33 @@ class RecoverySeeder extends Seeder
             'in_stock' => true,
             'concentration_options' => ['1:30'],
             'ratio' => '1:30',
+        ]);
+
+        Product::create([
+            'name' => 'Grevia Monkfruit Drops',
+            'slug' => 'monkfruit-drops',
+            'price' => 299,
+            'category_id' => $monkfruit->id,
+            'image' => 'https://placehold.co/600x600?text=Monkfruit+Drops',
+            'in_stock' => true,
+        ]);
+
+        Product::create([
+            'name' => 'Artisan Whole Grain Bread',
+            'slug' => 'whole-grain-bread',
+            'price' => 189,
+            'category_id' => $bakery->id,
+            'image' => 'https://placehold.co/600x600?text=Artisan+Bread',
+            'in_stock' => true,
+        ]);
+
+        Product::create([
+            'name' => 'Traditional Mango Pickle',
+            'slug' => 'mango-pickle',
+            'price' => 249,
+            'category_id' => $pickles->id,
+            'image' => 'https://placehold.co/600x600?text=Mango+Pickle',
+            'in_stock' => true,
         ]);
     }
 }
