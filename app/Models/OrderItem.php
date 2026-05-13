@@ -22,19 +22,31 @@ class OrderItem extends Model
         'selected_attributes' => 'array',
     ];
 
-    protected $appends = ['weight', 'pack_size'];
-
-    public function getWeightAttribute($value)
+    /**
+     * Get the display weight — DB column first, then fall back to the linked variant.
+     * Named 'display_weight' so it does NOT conflict with the DB 'weight' column.
+     */
+    public function getDisplayWeightAttribute(): ?string
     {
-        if ($value) return $value;
+        if (!empty($this->attributes['weight'])) {
+            return $this->attributes['weight'];
+        }
         return $this->variant?->weight;
     }
 
-    public function getPackSizeAttribute($value)
+    /**
+     * Get the display pack size — DB column first, then fall back to the linked variant.
+     * Named 'display_pack_size' so it does NOT conflict with the DB 'pack_size' column.
+     */
+    public function getDisplayPackSizeAttribute(): ?string
     {
-        if ($value) return $value;
-        return $this->variant?->pack_size;
+        if (!empty($this->attributes['pack_size'])) {
+            return (string) $this->attributes['pack_size'];
+        }
+        return $this->variant?->pack_size ? (string) $this->variant->pack_size : null;
     }
+
+    protected $appends = ['display_weight', 'display_pack_size'];
 
     public function order()
     {

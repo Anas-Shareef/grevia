@@ -250,9 +250,9 @@ const OrderDetailPage = () => {
                                                     Potency: {item.selected_attributes.concentration}
                                                 </span>
                                             )}
-                                            {(item.pack_size || item.weight) && (
+                                            {(item.display_weight || item.display_pack_size || item.weight || item.pack_size) && (
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
-                                                    Weight: {item.pack_size || item.weight}
+                                                    Pack Weight: {item.display_weight || item.display_pack_size || item.weight || item.pack_size}
                                                 </span>
                                             )}
                                         </div>

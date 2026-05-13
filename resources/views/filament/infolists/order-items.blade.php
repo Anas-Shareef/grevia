@@ -1,5 +1,6 @@
 @php
     $order = $getRecord();
+    $order->loadMissing('orderItems.variant', 'orderItems.product');
 @endphp
 
 <div class="space-y-4">
@@ -41,9 +42,10 @@
                             Potency: {{ $item->selected_attributes['concentration'] }}
                         </span>
                     @endif
-                    @if(!empty($item->pack_size) || !empty($item->weight))
+                    @php $displayWeight = $item->display_weight ?? $item->display_pack_size ?? null; @endphp
+                    @if($displayWeight)
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                            Weight: {{ $item->pack_size ?? $item->weight }}
+                            Pack Weight: {{ $displayWeight }}
                         </span>
                     @endif
                 </div>
