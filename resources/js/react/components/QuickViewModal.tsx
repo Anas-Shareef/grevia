@@ -182,13 +182,14 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                           key={opt.id || opt.value}
                           onClick={() => setSelectedConcentration(opt.value)}
                           className={cn(
-                            "w-12 h-12 rounded-full flex items-center justify-center text-[12px] font-bold border-2 transition-all",
+                            "w-14 h-14 rounded-full flex flex-col items-center justify-center text-[10px] font-black border-2 transition-all duration-300 transform active:scale-90",
                             selectedConcentration === opt.value
-                              ? "bg-[#77CB4D] text-white border-[#77CB4D] shadow-lg shadow-[#77CB4D]/20"
-                              : "bg-white text-[#2E4D31] border-[#E5E7EB] hover:border-[#77CB4D]"
+                              ? "bg-[#77CB4D] text-white border-[#77CB4D] shadow-xl shadow-[#77CB4D]/30 scale-110 z-10"
+                              : "bg-white text-[#2E4D31] border-[#E5E7EB] hover:border-[#77CB4D] hover:scale-105"
                           )}
                         >
-                          {opt.value}
+                          <span className="uppercase tracking-tighter opacity-60 mb-0.5">Ratio</span>
+                          <span className="text-[13px]">{opt.value}</span>
                         </button>
                       ))}
                     </div>
@@ -205,13 +206,14 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                            key={v.id}
                            onClick={() => setSelectedVariant(v)}
                            className={cn(
-                             "w-14 h-14 rounded-full flex flex-col items-center justify-center text-[11px] font-bold border-2 transition-all leading-none",
+                             "w-14 h-14 rounded-full flex flex-col items-center justify-center text-[10px] font-black border-2 transition-all duration-300 transform active:scale-90",
                              selectedVariant?.id === v.id
-                               ? "bg-[#2E4D31] text-white border-[#2E4D31] shadow-lg shadow-[#2E4D31]/20"
-                               : "bg-white text-[#2E4D31] border-[#E5E7EB] hover:border-[#2E4D31]"
+                               ? "bg-[#2E4D31] text-white border-[#2E4D31] shadow-xl shadow-[#2E4D31]/30 scale-110 z-10"
+                               : "bg-white text-[#2E4D31] border-[#E5E7EB] hover:border-[#2E4D31] hover:scale-105"
                            )}
                          >
-                           {v.weight}
+                           <span className="uppercase tracking-tighter opacity-60 mb-0.5">Weight</span>
+                           <span className="text-[12px]">{v.weight}</span>
                          </button>
                        ))}
                     </div>
