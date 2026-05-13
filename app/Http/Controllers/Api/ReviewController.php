@@ -65,19 +65,16 @@ class ReviewController extends Controller
             return response()->json(['message' => 'Product ID is missing or empty.'], 400);
         }
 
-        $productId = $request->input('product_id');
-        $product = \App\Models\Product::where('id', $productId)->first();
+        $productId = trim($request->input('product_id'));
+        $product = \App\Models\Product::where('id', (int)$productId)->first();
         
         if (!$product) {
             $allIds = \App\Models\Product::pluck('id')->toArray();
-            \Log::warning("DEBUG: Product lookup failed", [
-                'searched_id' => $productId,
-                'available_ids' => $allIds
-            ]);
             return response()->json([
                 'message' => 'Product not found in database',
                 'received_id' => $productId,
-                'available_ids' => $allIds
+                'available_ids' => $allIds,
+                'all_input_received' => $request->all()
             ], 400);
         }
 
