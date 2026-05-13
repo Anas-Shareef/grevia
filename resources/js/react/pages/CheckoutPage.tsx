@@ -152,6 +152,7 @@ const CheckoutPage = () => {
       amount: finalTotal,
       items: items.map(item => ({
         product_id: item.product.dbId || item.product.id,
+        variant_id: item.variantId,
         quantity: item.quantity,
         selected_attributes: item.selectedAttributes
       }))
@@ -195,6 +196,7 @@ const CheckoutPage = () => {
       amount: finalTotal, // Validation happens on backend too
       items: items.map(item => ({
         product_id: item.product.dbId || item.product.id,
+        variant_id: item.variantId,
         quantity: item.quantity,
         selected_attributes: item.selectedAttributes
       }))
