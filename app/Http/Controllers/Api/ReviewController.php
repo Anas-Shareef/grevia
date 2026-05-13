@@ -62,10 +62,17 @@ class ReviewController extends Controller
             return response()->json(['message' => 'Product ID is missing in request.'], 400);
         }
 
-        $product = \App\Models\Product::find($request->product_id);
+        $productId = $request->input('product_id');
+        \Log::info("Looking up product for review", ['product_id' => $productId]);
+
+        $product = \App\Models\Product::find($productId);
+        
         if (!$product) {
-            \Log::warning("Review failed: Product not found", ['id' => $request->product_id]);
-            return response()->json(['message' => 'Product not found (ID: ' . $request->product_id . ')'], 400);
+            \Log::warning("Review failed: Product not found in database", ['id' => $productId]);
+            return response()->json([
+                'message' => 'Product not found in database (ID: ' . $productId . ')',
+                'received_id' => $productId
+            ], 400);
         }
 
         $rules = [

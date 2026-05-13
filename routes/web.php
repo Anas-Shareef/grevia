@@ -239,6 +239,13 @@ Route::get('/setup-banners', function () {
 });
 
 
+Route::get('/debug-products', function () {
+    return [
+        'database' => \DB::connection()->getDatabaseName(),
+        'products' => \App\Models\Product::all(['id', 'name', 'slug'])
+    ];
+});
+
 Route::get('/debug-categories', function () {
     return [
         'categories' => \App\Models\Category::all(['id', 'name', 'slug', 'parent_id']),
@@ -518,4 +525,4 @@ Route::post('/product-feedback/{id}/helpful', [\App\Http\Controllers\Api\ReviewC
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '^(?!api|admin|filament|storage|build|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|sync-filters|fix-db|fix-server|\..*\.php$).*$');
+})->where('any', '^(?!api|admin|filament|storage|build|invoices|test-email|unsubscribe|resubscribe|setup-email-campaigns|sync-moosend|sync-filters|fix-db|fix-server|debug-products|product-feedback|\..*\.php$).*$');
