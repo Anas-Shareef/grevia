@@ -35,8 +35,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
               image: item.image,
             } as Product,
             variantId: item.variant_id,
-            weight: item.weight,
-            packSize: item.pack_size,
+            // Prefer the weight string (e.g. '250g') over the numeric pack_size (e.g. 1)
+            weight: item.weight || null,
+            packSize: item.weight || item.pack_size || null,
             quantity: item.quantity,
             selectedAttributes: item.selected_attributes,
           }));

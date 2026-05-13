@@ -107,19 +107,19 @@ const CartDrawer = () => {
                           </button>
                         </div>
 
-                        {/* Row 1.5: Concentration / Potency / Size */}
-                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                          {item.selectedAttributes?.concentration && (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31] bg-[#F0FAE8] px-2 py-0.5 rounded-full border border-[#77CB4D]/30">
-                              Potency: {item.selectedAttributes.concentration}
-                            </span>
-                          )}
-                          {(variant?.weight || variant?.pack_size) && (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
-                              Weight: {variant?.weight || variant?.pack_size}
-                            </span>
-                          )}
-                        </div>
+                          {/* Row 1.5: Concentration / Potency / Size */}
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                            {item.selectedAttributes?.concentration && (
+                              <span className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31] bg-[#F0FAE8] px-2 py-0.5 rounded-full border border-[#77CB4D]/30">
+                                Potency: {item.selectedAttributes.concentration}
+                              </span>
+                            )}
+                            {(variant?.weight || item.weight || item.packSize) && (
+                              <span className="text-[10px] font-black uppercase tracking-widest text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                Pack Weight: {variant?.weight || item.weight || item.packSize}
+                              </span>
+                            )}
+                          </div>
                         
                         {/* Row 2: Price string */}
                         <p className="text-sm font-bold text-lime mt-1">

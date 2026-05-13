@@ -487,9 +487,9 @@ const CheckoutPage = () => {
                               {item.selectedAttributes.concentration}
                             </span>
                           )}
-                          {(item.packSize || item.weight) && (
+                          {(item.weight || item.packSize) && (
                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-secondary px-1.5 py-0.5 rounded border border-border">
-                              Weight: {item.packSize || item.weight}
+                              Pack Weight: {item.weight || item.packSize}
                             </span>
                           )}
                         </div>
