@@ -230,21 +230,21 @@ const CollectionsPage = () => {
       </section>
 
       {/* Mobile Sticky Filter/Sort Bar */}
-      <div className={`lg:hidden sticky top-[72px] z-40 w-full transition-all duration-300 ${isSticky ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
-        <div className="bg-background/80 backdrop-blur-xl border-y border-border/50 px-4 py-3">
-          <div className="container mx-auto flex gap-3">
+      <div className={`lg:hidden sticky top-[70px] z-40 w-full transition-all duration-300 ${isSticky ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+        <div className="bg-white/95 backdrop-blur-md border-b border-border/50 px-4 py-3 shadow-sm">
+          <div className="container mx-auto flex gap-2 sm:gap-3">
             <button 
               onClick={() => setShowMobileFilters(true)}
-              className="flex-1 flex items-center justify-center gap-3 bg-card border border-border/50 py-3.5 rounded-squircle eyebrow !text-foreground shadow-soft active:scale-95 transition-all"
+              className="flex-1 flex items-center justify-center gap-2 bg-card border border-border/50 py-3 rounded-xl eyebrow !text-foreground shadow-sm active:scale-95 transition-all text-[11px]"
             >
-              <SlidersHorizontal className="w-4 h-4 text-primary" />
-              Filter {activeChips.length > 0 && `(${activeChips.length})`}
+              <SlidersHorizontal className="w-3.5 h-3.5 text-primary" />
+              Filters {activeChips.length > 0 && `(${activeChips.length})`}
             </button>
             <div className="flex-1 relative">
               <select
                 value={filters.sort_by}
                 onChange={e => setFilter('sort_by', e.target.value)}
-                className="w-full h-full bg-card border border-border/50 py-3.5 px-6 rounded-squircle eyebrow !text-foreground outline-none appearance-none shadow-soft text-center cursor-pointer hover:border-primary/30 transition-colors"
+                className="w-full h-full bg-card border border-border/50 py-3 px-4 rounded-xl eyebrow !text-foreground outline-none appearance-none shadow-sm text-center cursor-pointer hover:border-primary/30 transition-colors text-[11px]"
               >
                 {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
@@ -411,9 +411,9 @@ const CollectionsPage = () => {
           {/* Grid Area */}
           <div className="flex-1">
             {/* Toolbar - Header & Desktop Sort */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 py-6 border-b border-border/50">
-              <p className="eyebrow text-center md:text-left">
-                Showing {products.length} Premium Essentials
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 md:mb-12 py-4 md:py-6 border-b border-border/50">
+              <p className="eyebrow text-[11px] md:text-xs text-center sm:text-left opacity-60">
+                Found {products.length} Premium Essentials
               </p>
               <div className="hidden lg:flex gap-4 items-center">
                 <div className="flex bg-secondary/50 rounded-lg p-1 mr-4">
