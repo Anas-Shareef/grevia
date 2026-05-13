@@ -65,9 +65,15 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
   const defaultVariant = product.variants?.find(v => v.status === 'active') || product.variants?.[0];
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(defaultVariant);
   const [activeImage, setActiveImage] = useState(product.image);
+  
+  const concentrationOptions = product.attributes?.concentrations || [];
+  const [selectedConcentration, setSelectedConcentration] = useState(
+    concentrationOptions.find((c: any) => c.is_default)?.value || concentrationOptions[0]?.value || '1:10'
+  );
+
   const handleAddToCart = () => {
     const variantId = selectedVariant?.id || product.variants?.[0]?.id;
-    addToCart(product, quantity, variantId);
+    addToCart(product, quantity, variantId, { concentration: selectedConcentration });
     setIsAdded(true);
     toast.success(`${product.name} Added!`, {
       style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' }
@@ -161,7 +167,12 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               </div>
               
               <div className="flex flex-wrap gap-2 mb-8">
-                {product.tags && product.tags.length > 0 ? (
+                {product.attributes?.trust_badges && product.attributes.trust_badges.length > 0 ? (
+                   product.attributes.trust_badges.map((badge: any) => {
+                     const Icon = TAG_ICONS[badge.label] || TAG_ICONS[badge.slug] || Check;
+                     return <BenefitChip key={badge.id || badge.slug} icon={Icon} text={badge.label} />;
+                   })
+                ) : product.tags && product.tags.length > 0 ? (
                   product.tags.map((tag) => {
                     const Icon = TAG_ICONS[tag] || Check;
                     return <BenefitChip key={tag} icon={Icon} text={tag} />;
@@ -174,13 +185,35 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 )}
               </div>
 
-              <p className="text-gray-500 text-[15px] leading-relaxed mb-8 font-medium">
-                {product.description || "Experience the pure, plant-based sweetness of Grevia."}
-              </p>
+              <div 
+                className="text-gray-500 text-[15px] leading-relaxed mb-8 font-medium line-clamp-3 prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: product.description || "Experience the pure, plant-based sweetness of Grevia." }}
+              />
 
               {/* Selection Pills */}
               <div className="space-y-8 mb-10">
-
+                {/* Potency / Concentration Selection */}
+                {concentrationOptions.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-[#2E4D31]/40 mb-4">Select Potency</p>
+                    <div className="flex flex-wrap gap-3">
+                      {concentrationOptions.map((opt: any) => (
+                        <button
+                          key={opt.id || opt.value}
+                          onClick={() => setSelectedConcentration(opt.value)}
+                          className={cn(
+                            "w-12 h-12 rounded-full flex items-center justify-center text-[12px] font-bold border-2 transition-all",
+                            selectedConcentration === opt.value
+                              ? "bg-[#77CB4D] text-white border-[#77CB4D] shadow-lg shadow-[#77CB4D]/20"
+                              : "bg-white text-[#2E4D31] border-[#E5E7EB] hover:border-[#77CB4D]"
+                          )}
+                        >
+                          {opt.value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Pack Weight */}
                 {product.variants && product.variants.length > 0 && (
