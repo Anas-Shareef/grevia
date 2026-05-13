@@ -497,7 +497,11 @@ const CheckoutPage = () => {
                           Qty: {item.quantity}
                         </p>
                         <p className="text-sm font-bold text-foreground">
-                          ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
+                          ₹{(() => {
+                            const variant = item.product.variants?.find(v => v.id == item.variantId);
+                            const unitPrice = variant ? Number(variant.discount_price || variant.price) : Number(item.product.price);
+                            return (unitPrice * item.quantity).toLocaleString('en-IN');
+                          })()}
                         </p>
                       </div>
                     </div>

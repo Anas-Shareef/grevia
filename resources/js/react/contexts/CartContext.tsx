@@ -45,23 +45,41 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const localCart = getLocalCart();
           const mergedCart = mergeCart(localCart, cartItems);
 
-          setItems(mergedCart);
+          // WISE FIX: Clean up old '500' ghost data immediately
+          const cleanedItems = mergedCart.filter(item => {
+            if (item.product.slug === 'stevia-jar' && (item.packSize == 500 || item.weight == '500g' || item.weight == '500')) {
+                return false;
+            }
+            return true;
+          });
+
+          setItems(cleanedItems);
 
           // Sync merged cart back to server
-          if (mergedCart.length > 0) {
-            await syncToServer(mergedCart);
+          if (cleanedItems.length > 0) {
+            await syncToServer(cleanedItems);
           }
 
           // Update localStorage
-          saveToLocalStorage(mergedCart);
+          saveToLocalStorage(cleanedItems);
         } catch (error) {
           console.error('Failed to load cart from server:', error);
           // Fallback to localStorage
-          setItems(getLocalCart());
+          const localCart = getLocalCart();
+          const cleanedLocal = localCart.filter(item => {
+            if (item.product.slug === 'stevia-jar' && (item.packSize == 500 || item.weight == '500')) return false;
+            return true;
+          });
+          setItems(cleanedLocal);
         }
       } else {
         // Guest user: load from localStorage
-        setItems(getLocalCart());
+        const localCart = getLocalCart();
+        const cleanedLocal = localCart.filter(item => {
+          if (item.product.slug === 'stevia-jar' && (item.packSize == 500 || item.weight == '500')) return false;
+          return true;
+        });
+        setItems(cleanedLocal);
       }
       setIsInitialized(true);
     };
