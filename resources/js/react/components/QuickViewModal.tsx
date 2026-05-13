@@ -99,8 +99,6 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
     }
   };
 
-  const concentrationOptions = product.concentration_options || ['1:10', '1:50', '1:100'];
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white border-none rounded-[32px] shadow-2xl Montserrat">
