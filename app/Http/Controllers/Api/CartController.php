@@ -72,6 +72,17 @@ class CartController extends Controller
             }
 
             $variantId = $item['variant_id'] ?? null;
+            
+            // Validate variant exists if provided
+            if ($variantId) {
+                $variantExists = \App\Models\ProductVariant::where('id', $variantId)
+                    ->where('product_id', $product->id)
+                    ->exists();
+                if (!$variantExists) {
+                    $variantId = null; // Fallback to no variant or skip if required
+                }
+            }
+
             $selectedAttributes = $item['selected_attributes'] ?? null;
             $comboKey = $product->id . '_' . ($variantId ?? '0') . '_' . json_encode($selectedAttributes);
 

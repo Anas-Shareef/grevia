@@ -29,7 +29,7 @@ class RecoverySeeder extends Seeder
         // 3. Create THE JAR (The exact one from your request)
         $jar = Product::create([
             'name' => 'Grevia Stevia Jar',
-            'slug' => 'stevia-jar',
+            'slug' => 'grevia-stevia-jar',
             'price' => 600, 
             'category_id' => $stevia->id,
             'image' => 'products/01KF58XGGZXZCPHWQ77KXRFCZ1.jpeg', 
