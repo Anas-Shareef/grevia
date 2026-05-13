@@ -56,10 +56,10 @@ const CollectionsPage = () => {
     {
       // Concentration: sweetener potency ratio
       key: 'concentration' as const,
-      label: 'Concentration',
+      label: 'Potency',
       options: (response?.filters?.ratios || []).map((r: any) => ({
         label: r.display || r.label,
-        value: r.label,
+        value: r.slug,
         count: r.count,
         disabled: (r.count ?? 0) === 0,
       })),

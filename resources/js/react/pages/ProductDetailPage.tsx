@@ -401,10 +401,10 @@ const ProductDetailPage = () => {
               </p>
             )}
 
-            {/* Concentration / Potency — EAV Bubble Pills */}
+            {/* Potency — EAV Bubble Pills */}
             {hasEavConcentrations ? (
               <div className="mb-8">
-                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Concentration / Potency</label>
+                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Potency</label>
                 <div className="flex flex-wrap gap-2.5">
                   {concentrations.map((conc: any) => {
                     const isActive = selectedRatio === (conc.slug || conc.value);
@@ -436,7 +436,7 @@ const ProductDetailPage = () => {
               </div>
             ) : legacyConcOptions.length > 0 ? (
               <div className="mb-8">
-                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Concentration / Potency</label>
+                <label className="text-[11px] font-bold text-[#1E3A1F] uppercase tracking-[0.1em] mb-4 block Montserrat">Potency</label>
                 <div className="flex flex-wrap gap-2.5">
                   {legacyConcOptions.map((r: string) => (
                     <button

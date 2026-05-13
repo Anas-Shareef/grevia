@@ -28,12 +28,12 @@ class ProductForm
                     ->hidden() // Redundant with Dynamic Attributes (EAV)
                     ->components([
                         TagsInput::make('concentration_options')
-                            ->label('Concentration Ratios')
+                            ->label('Potency Ratios')
                             ->placeholder('e.g. 1:10, 1:50')
                             ->helperText('These drive the selectable potency pills on the store frontend.')
                             ->separator(','),
                         Select::make('concentration')
-                            ->label('Default Concentration')
+                            ->label('Default Potency')
                             ->options(function ($get) {
                                 $options = $get('concentration_options');
                                 if (!is_array($options)) return [];
@@ -251,7 +251,7 @@ class ProductForm
                             }),
 
                         Select::make('attr_concentration')
-                            ->label('Concentration (multi)')
+                            ->label('Potency (multi)')
                             ->helperText('All concentrations this product offers')
                             ->multiple()
                             ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
@@ -267,7 +267,7 @@ class ProductForm
                             }),
 
                         Select::make('attr_default_concentration')
-                            ->label('Default Concentration (PDP pre-select)')
+                            ->label('Default Potency (PDP pre-select)')
                             ->helperText('Pre-selected pill when customer views product page')
                             ->options(fn () => \Illuminate\Support\Facades\Schema::hasTable('attributes')
                                 ? (\App\Models\Attribute::where('name', 'concentration')->first()?->values->pluck('value_text', 'slug')->toArray() ?? [])

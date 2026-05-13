@@ -71,7 +71,7 @@ class ProductsTable
                     ->toggleable(),
 
                 TextColumn::make('concentration_badge')
-                    ->label('Concentration')
+                    ->label('Potency')
                     ->state(function (Model $record): string {
                         return $record->attributeValues()
                             ->whereHas('attribute', fn($q) => $q->where('name', 'concentration'))
@@ -136,9 +136,9 @@ class ProductsTable
                         'jar'     => 'Jar',
                     ]),
 
-                // ── Filter by Concentration ──────────────────────────────
+                // ── Filter by Potency ──────────────────────────────
                 SelectFilter::make('concentration')
-                    ->label('Concentration')
+                    ->label('Potency')
                     ->options([
                         '1:10'  => '1:10 (High Potency)',
                         '1:50'  => '1:50 (Medium)',
@@ -191,7 +191,7 @@ class ProductsTable
                                 ->placeholder('Leave blank to keep existing'),
 
                             Select::make('concentration')
-                                ->label('Sweetener Concentration')
+                                ->label('Sweetener Potency')
                                 ->options([
                                     '1:10'  => '1:10 (High Potency)',
                                     '1:50'  => '1:50 (Medium)',
