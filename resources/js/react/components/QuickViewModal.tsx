@@ -146,13 +146,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
 
           {/* Right: Content Area */}
           <div className="w-full md:w-[55%] p-6 md:p-10 lg:p-12 flex flex-col bg-white">
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex text-[#F59E0B]">
-                  {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-current" />)}
-                </div>
-                <span className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Premium Quality</span>
-              </div>
+
               
               <h2 className="text-[28px] md:text-[36px] font-bold text-[#2E4D31] leading-[1.1] mb-4">
                 {product.name}
@@ -219,25 +213,25 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center gap-4 pt-4">
-                  <div className="flex items-center bg-[#F8F5F0] rounded-full p-1 border border-[#E5E7EB]">
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-10 h-10 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-full transition-all"><Minus className="w-4 h-4" /></button>
-                    <span className="w-10 text-center font-bold text-sm">{quantity}</span>
-                    <button onClick={() => setQuantity(q => q + 1)} className="w-10 h-10 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-full transition-all"><Plus className="w-4 h-4" /></button>
+                <div className="flex flex-row items-center gap-3 pt-4">
+                  <div className="flex items-center bg-[#F8F5F0] rounded-full h-14 border border-[#E5E7EB] px-2">
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-8 h-8 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-full transition-all"><Minus className="w-3.5 h-3.5" /></button>
+                    <span className="w-8 text-center font-bold text-sm">{quantity}</span>
+                    <button onClick={() => setQuantity(q => q + 1)} className="w-8 h-8 flex items-center justify-center text-[#2E4D31] hover:bg-white rounded-full transition-all"><Plus className="w-3.5 h-3.5" /></button>
                   </div>
 
                   <button 
                     onClick={handleAddToCart}
                     disabled={isAdded}
-                    className="flex-1 h-14 bg-[#77CB4D] hover:bg-[#5fb33a] text-white rounded-full font-black text-[12px] uppercase tracking-widest transition-all shadow-lg shadow-[#77CB4D]/25 active:scale-95"
+                    className="flex-1 h-14 bg-[#77CB4D] hover:bg-[#5fb33a] text-white rounded-full font-black text-[12px] uppercase tracking-widest transition-all shadow-lg shadow-[#77CB4D]/25 active:scale-95 whitespace-nowrap"
                   >
-                    {isAdded ? "Added to Cart" : "Add to Cart"}
+                    {isAdded ? "Added!" : "Add to Cart"}
                   </button>
 
                   <button 
                     onClick={toggleWishlist}
                     className={cn(
-                      "w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all",
+                      "w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-all",
                       isWishlisted ? "bg-white border-red-100 text-red-500 shadow-sm" : "bg-white border-[#E5E7EB] text-gray-300 hover:border-[#2E4D31]"
                     )}
                   >
