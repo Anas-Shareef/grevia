@@ -50,7 +50,7 @@ class RecoverySeeder extends Seeder
             'slug' => 'stevia-powder',
             'price' => 349,
             'category_id' => $stevia->id,
-            'image' => 'products/01KF3XGBHBW2CRQY49NX836YJX.jpg',
+            'image' => 'https://grevia.in/grevia-logo.png', // Temporary backup logo
             'is_featured' => true,
             'in_stock' => true,
             'concentration_options' => ['1:30'],
@@ -62,7 +62,7 @@ class RecoverySeeder extends Seeder
             'slug' => 'monkfruit-drops',
             'price' => 299,
             'category_id' => $monkfruit->id,
-            'image' => 'https://placehold.co/600x600?text=Monkfruit+Drops',
+            'image' => 'https://grevia.in/grevia-logo.png', // Temporary backup logo
             'in_stock' => true,
         ]);
 
@@ -71,7 +71,7 @@ class RecoverySeeder extends Seeder
             'slug' => 'whole-grain-bread',
             'price' => 189,
             'category_id' => $bakery->id,
-            'image' => 'https://placehold.co/600x600?text=Artisan+Bread',
+            'image' => 'https://grevia.in/grevia-logo.png', // Temporary backup logo
             'in_stock' => true,
         ]);
 
@@ -80,7 +80,7 @@ class RecoverySeeder extends Seeder
             'slug' => 'mango-pickle',
             'price' => 249,
             'category_id' => $pickles->id,
-            'image' => 'https://placehold.co/600x600?text=Mango+Pickle',
+            'image' => 'https://grevia.in/grevia-logo.png', // Temporary backup logo
             'in_stock' => true,
         ]);
     }

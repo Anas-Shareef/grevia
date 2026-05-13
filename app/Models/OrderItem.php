@@ -22,6 +22,18 @@ class OrderItem extends Model
         'selected_attributes' => 'array',
     ];
 
+    public function getWeightAttribute($value)
+    {
+        if ($value) return $value;
+        return $this->variant?->weight;
+    }
+
+    public function getPackSizeAttribute($value)
+    {
+        if ($value) return $value;
+        return $this->variant?->pack_size;
+    }
+
     public function order()
     {
         return $this->belongsTo(Order::class);

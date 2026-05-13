@@ -260,20 +260,6 @@ const OrderDetailPage = () => {
                                             <span>Qty: {item.quantity}</span>
                                             <span className="mx-2">•</span>
                                             <span>₹{parseFloat(item.price as unknown as string).toLocaleString()} per unit</span>
-                                            
-                                            {(item.pack_size || item.weight) && (
-                                                <>
-                                                    <span className="mx-2">•</span>
-                                                    <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Size: {item.pack_size || item.weight}g</span>
-                                                </>
-                                            )}
-                                            
-                                            {item.selected_attributes?.concentration && (
-                                                <>
-                                                    <span className="mx-2">•</span>
-                                                    <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Potency: {item.selected_attributes.concentration}</span>
-                                                </>
-                                            )}
                                         </div>
                                     </div>
 
