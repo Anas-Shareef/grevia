@@ -54,26 +54,34 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info("Review submission attempt", $request->all());
-        // Check both Sanctum and Session auth
-        $user = $request->user('sanctum') ?? $request->user(); 
-        
-        if (!$request->has('product_id')) {
-            return response()->json(['message' => 'Product ID is missing in request.'], 400);
+        \Log::info("DEBUG: Review submission started", [
+            'all_input' => $request->all(),
+            'product_id_input' => $request->input('product_id'),
+            'has_product_id' => $request->has('product_id'),
+            'user' => $request->user() ? $request->user()->id : 'guest'
+        ]);
+
+        if (!$request->has('product_id') || empty($request->input('product_id'))) {
+            return response()->json(['message' => 'Product ID is missing or empty.'], 400);
         }
 
         $productId = $request->input('product_id');
-        \Log::info("Looking up product for review", ['product_id' => $productId]);
-
-        $product = \App\Models\Product::find($productId);
+        $product = \App\Models\Product::where('id', $productId)->first();
         
         if (!$product) {
-            \Log::warning("Review failed: Product not found in database", ['id' => $productId]);
+            $allIds = \App\Models\Product::pluck('id')->toArray();
+            \Log::warning("DEBUG: Product lookup failed", [
+                'searched_id' => $productId,
+                'available_ids' => $allIds
+            ]);
             return response()->json([
-                'message' => 'Product not found in database (ID: ' . $productId . ')',
-                'received_id' => $productId
+                'message' => 'Product not found in database',
+                'received_id' => $productId,
+                'available_ids' => $allIds
             ], 400);
         }
+
+        \Log::info("DEBUG: Product found", ['name' => $product->name]);
 
         $rules = [
             'product_id' => 'required|exists:products,id',
