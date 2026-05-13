@@ -101,7 +101,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white border-none rounded-[32px] shadow-2xl Montserrat">
+      <DialogContent className="w-[95vw] sm:w-full max-w-4xl p-0 overflow-hidden bg-white border-none rounded-[24px] md:rounded-[32px] shadow-2xl Montserrat">
         <VisuallyHidden.Root>
           <DialogTitle>{product.name} Quick View</DialogTitle>
           <DialogDescription>Quickly view details and add {product.name} to your cart.</DialogDescription>
@@ -109,7 +109,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
         <div className="flex flex-col md:flex-row h-full max-h-[90vh] overflow-y-auto no-scrollbar">
           
           {/* Left: Media Area */}
-          <div className="w-full md:w-[45%] bg-[#F8F5F0] relative p-8 flex flex-col items-center justify-center min-h-[400px]">
+          <div className="w-full md:w-[45%] bg-[#F8F5F0] relative p-6 md:p-8 flex flex-col items-center justify-center min-h-[300px] md:min-h-[400px]">
              {/* Main Image */}
              <div className="relative w-full aspect-square flex items-center justify-center">
                 <AnimatePresence mode="wait">
@@ -145,7 +145,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
           </div>
 
           {/* Right: Content Area */}
-          <div className="w-full md:w-[55%] p-10 md:p-12 flex flex-col bg-white">
+          <div className="w-full md:w-[55%] p-6 md:p-10 lg:p-12 flex flex-col bg-white">
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex text-[#F59E0B]">
@@ -159,7 +159,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               </h2>
               
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-[28px] font-black text-[#2E4D31]">
+                <span className="text-[24px] md:text-[28px] font-black text-[#2E4D31]">
                   ₹{selectedVariant?.price || product.price}
                 </span>
               </div>
@@ -247,8 +247,8 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               </div>
 
               {/* Footer Links */}
-              <div className="mt-auto pt-8 border-t border-gray-100 flex items-center justify-between">
-                <Link to={`/products/${product.slug || product.id}`} onClick={() => onOpenChange(false)} className="text-[13px] font-bold text-[#2E4D31] flex items-center gap-2 group">
+              <div className="mt-auto pt-6 md:pt-8 border-t border-gray-100 flex items-center justify-between">
+                <Link to={`/products/${product.slug || product.id}`} onClick={() => onOpenChange(false)} className="text-[12px] md:text-[13px] font-bold text-[#2E4D31] flex items-center gap-2 group">
                   View Full Product Story
                   <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
