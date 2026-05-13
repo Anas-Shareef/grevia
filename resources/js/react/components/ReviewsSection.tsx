@@ -111,6 +111,11 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
     setIsSubmitting(true);
 
     try {
+      if (!productId || productId === "undefined") {
+        toast.error("Invalid Product ID. Please refresh the page.");
+        return;
+      }
+
       const formData = new FormData();
       formData.append('product_id', productId);
       formData.append('rating', String(rating));
