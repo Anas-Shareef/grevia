@@ -249,8 +249,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogContent>
     </Dialog>
   );
 };
