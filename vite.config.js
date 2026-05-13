@@ -32,5 +32,11 @@ export default defineConfig(({ mode }) => ({
                 secure: false,
             }
         }
+    },
+    build: {
+        rollupOptions: {
+            maxParallelFileOps: 2, // Limit parallel operations for shared hosting
+        },
+        chunkSizeWarningLimit: 2000,
     }
 }));
