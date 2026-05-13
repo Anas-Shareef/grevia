@@ -244,6 +244,18 @@ const OrderDetailPage = () => {
                                         <p className="text-sm text-gray-500 mt-1">
                                             SKU: {item.product?.slug || 'N/A'}
                                         </p>
+                                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                                            {item.selected_attributes?.concentration && (
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-[#2E4D31] bg-[#F0FAE8] px-2 py-0.5 rounded-full border border-[#77CB4D]/30">
+                                                    Potency: {item.selected_attributes.concentration}
+                                                </span>
+                                            )}
+                                            {(item.pack_size || item.weight) && (
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                                    Size: {item.pack_size || item.weight}
+                                                </span>
+                                            )}
+                                        </div>
                                         <div className="mt-2 flex flex-wrap items-center gap-y-1 text-sm text-gray-500">
                                             <span>Qty: {item.quantity}</span>
                                             <span className="mx-2">•</span>
