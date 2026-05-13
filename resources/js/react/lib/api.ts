@@ -15,7 +15,10 @@ export const api = {
             ...options.headers,
         };
 
-        const response = await fetch(`${BASE_URL}${endpoint}`, {
+        const isRoot = endpoint.startsWith('ROOT:');
+        const finalEndpoint = isRoot ? endpoint.replace('ROOT:', '') : `${BASE_URL}${endpoint}`;
+
+        const response = await fetch(finalEndpoint, {
             ...options,
             headers,
         });

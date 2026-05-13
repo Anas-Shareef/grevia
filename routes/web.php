@@ -510,6 +510,11 @@ Route::get('/sync-filters', function () {
     return "Database synced successfully! 'Other Products' parent created, Sweeteners merged, Corrupted names cleaned, and Bakery/Pickles organized.";
 });
 
+// Product Reviews (Moved to web to bypass Hostinger API issues)
+Route::get('/product-feedback', [\App\Http\Controllers\Api\ReviewController::class, 'index']);
+Route::post('/product-feedback', [\App\Http\Controllers\Api\ReviewController::class, 'store']);
+Route::post('/product-feedback/{id}/helpful', [\App\Http\Controllers\Api\ReviewController::class, 'helpful']);
+
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
 Route::get('/{any?}', function () {
     return view('app');

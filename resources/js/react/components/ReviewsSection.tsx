@@ -43,7 +43,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
 
   const fetchReviews = async () => {
     try {
-      const response = await api.get(`/product-feedback?product_id=${productId}`);
+      const response = await api.get(`ROOT:/product-feedback?product_id=${productId}`);
       setReviews(response.data || response || []);
     } catch (error) {
       console.error("Failed to fetch reviews:", error);
@@ -131,7 +131,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
         formData.append(`media[${i}]`, file);
       });
 
-      await api.post("/product-feedback", formData);
+      await api.post("ROOT:/product-feedback", formData);
       
       toast.success("Review submitted! Approval pending.", {
         style: { background: '#2E4D31', color: '#fff', borderRadius: '20px' }
