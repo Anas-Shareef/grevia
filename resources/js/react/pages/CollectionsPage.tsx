@@ -161,7 +161,7 @@ const CollectionsPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className={`pt-48 pb-20 relative overflow-hidden ${currentCategory?.hero_banner_url ? 'bg-forest/5 shadow-inner' : 'bg-[#F9F9F7]'}`}>
+      <section className={`pt-32 md:pt-48 pb-12 md:pb-20 relative overflow-hidden ${currentCategory?.hero_banner_url ? 'bg-forest/5 shadow-inner' : 'bg-[#F9F9F7]'}`}>
         {/* Dynamic Background Image if Hero Banner exists */}
         {currentCategory?.hero_banner_url && (
           <div 
@@ -209,7 +209,7 @@ const CollectionsPage = () => {
               </span>
             </motion.div>
             
-            <h1 className="text-6xl md:text-8xl font-display font-black leading-[0.9] tracking-tight mb-8 text-foreground uppercase">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-black leading-[0.9] tracking-tight mb-0 text-foreground uppercase">
               {currentCategory ? (
                 <>
                   {currentCategory.name.split(' ')[0]}<br />
@@ -223,9 +223,7 @@ const CollectionsPage = () => {
               )}
             </h1>
             
-            <p className="text-muted-foreground text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-16">
-              {currentCategory?.description || "Experience uncompromising taste without the calories. Meticulously extracted, plant-based sweetness for your daily ritual."}
-            </p>
+
 
           </div>
         </div>
