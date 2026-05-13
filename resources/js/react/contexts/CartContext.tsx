@@ -6,7 +6,6 @@ import { api } from "@/lib/api";
 
 import { CartContext, CartItem, CartContextType } from "./Definitions";
 
-const CART_STORAGE_KEY = 'grevia_cart';
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -99,30 +98,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(key, JSON.stringify(cart));
   };
 
-  // Clear cart when user logs out - REMOVED as it clears guest cart on init
-  // logic is handled by loadCart switching to local storage on logout
-  // useEffect(() => {
-  //   if (!user && isInitialized) {
-  //     console.log('[CartContext] User logged out, clearing cart');
-  //     setItems([]);
-  //   }
-  // }, [user, isInitialized]);
 
-  // Helper: Get cart from localStorage
-  const getLocalCart = (): CartItem[] => {
-    try {
-      const stored = localStorage.getItem(CART_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  };
-
-  // Helper: Save to localStorage
-  const saveToLocalStorage = (cart: CartItem[]) => {
-    console.log('[CartContext] Saving to localStorage:', cart);
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-  };
 
   // Helper: Merge two carts (sum quantities if item exists in both)
   const mergeCart = (cart1: CartItem[], cart2: CartItem[]): CartItem[] => {
