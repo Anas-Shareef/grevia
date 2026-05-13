@@ -167,13 +167,14 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
           </h3>
         </Link>
 
-        {/* Description - Stripped of HTML tags */}
-        <p className={viewMode === 'list'
-          ? "text-gray-500 text-[13px] mt-3 line-clamp-2 md:line-clamp-3"
-          : "text-[12px] md:text-[13px] text-[#6B7280] line-clamp-1 md:line-clamp-2 mt-1 md:mt-1.5"
-        }>
-          {(product.description || "Premium stevia in elegant packaging").replace(/<[^>]*>?/gm, '')}
-        </p>
+        {/* Description - Rendered as HTML to avoid showing literal tags like <p> */}
+        <div 
+          className={viewMode === 'list'
+            ? "text-gray-500 text-[13px] mt-3 line-clamp-2 md:line-clamp-3 prose-p:m-0"
+            : "text-[12px] md:text-[13px] text-[#6B7280] line-clamp-1 md:line-clamp-2 mt-1 md:mt-1.5 prose-p:m-0"
+          }
+          dangerouslySetInnerHTML={{ __html: product.description || "Premium stevia in elegant packaging" }}
+        />
         
 
 

@@ -5,7 +5,7 @@
         "dev": "vite",
         "build": "vite build",
         "build:low": "vite build",
-        "build:hostinger": "UV_THREADPOOL_SIZE=1 vite build",
+        "build:hostinger": "GOMAXPROCS=1 UV_THREADPOOL_SIZE=1 vite build",
         "build:dev": "vite build --mode development"
     },
     "dependencies": {
