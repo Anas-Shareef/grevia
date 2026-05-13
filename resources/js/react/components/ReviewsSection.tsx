@@ -126,9 +126,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
         formData.append(`media[${i}]`, file);
       });
 
-      await api.post("/reviews", formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post("/reviews", formData);
       
       toast.success("Review submitted! Approval pending.", {
         style: { background: '#2E4D31', color: '#fff', borderRadius: '20px' }

@@ -6,8 +6,10 @@ export const STORAGE_URL = `${BASE_URL.replace('/api', '')}/storage`;
 export const api = {
     request: async (endpoint: string, options: RequestInit = {}): Promise<any> => {
         const token = localStorage.getItem('token');
+        const isFormData = options.body instanceof FormData;
+        
         const headers: HeadersInit = {
-            'Content-Type': 'application/json',
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             'Accept': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             ...options.headers,
@@ -33,17 +35,19 @@ export const api = {
         });
     },
 
-    post: async (endpoint: string, data: any) => {
+    post: async (endpoint: string, data: any, options: Partial<RequestInit> = {}) => {
         return api.request(endpoint, {
             method: 'POST',
-            body: JSON.stringify(data),
+            body: data instanceof FormData ? data : JSON.stringify(data),
+            ...options,
         });
     },
 
-    put: async (endpoint: string, data: any) => {
+    put: async (endpoint: string, data: any, options: Partial<RequestInit> = {}) => {
         return api.request(endpoint, {
             method: 'PUT',
-            body: JSON.stringify(data),
+            body: data instanceof FormData ? data : JSON.stringify(data),
+            ...options,
         });
     },
 
