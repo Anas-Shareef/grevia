@@ -96,10 +96,23 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
   };
 
   const handleHelpful = async (reviewId: number) => {
+    // Check if user has already voted for this review in this session/browser
+    const votedReviews = JSON.parse(localStorage.getItem('voted_reviews') || '[]');
+    if (votedReviews.includes(reviewId)) {
+      toast.info("You have already voted this review as helpful.");
+      return;
+    }
+
     try {
-      // In a real app, send to API
-      // await api.post(`/reviews/${reviewId}/helpful`);
+      await api.post(`ROOT:/product-feedback/${reviewId}/helpful`, {});
+      
+      // Update local state
       setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, helpful_count: (r.helpful_count || 0) + 1 } : r));
+      
+      // Save to localStorage
+      votedReviews.push(reviewId);
+      localStorage.setItem('voted_reviews', JSON.stringify(votedReviews));
+      
       toast.success("Thanks for your feedback!");
     } catch (e) {
       toast.error("Failed to update.");
