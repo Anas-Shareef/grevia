@@ -149,7 +149,7 @@ class OrdersTable
                 TrashedFilter::make(),
             ])
             ->actions([
-                \Filament\Tables\Actions\Action::make('download_invoice')
+                \Filament\Actions\Action::make('download_invoice')
                     ->label('Invoice')
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('gray')
