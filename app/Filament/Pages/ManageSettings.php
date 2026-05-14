@@ -62,51 +62,6 @@ class ManageSettings extends Page
                                     ->rows(3),
                             ]),
 
-                        Tabs\Tab::make('Logistics')
-                            ->icon('heroicon-o-truck')
-                            ->schema([
-                                Grid::make(2)
-                                    ->components([
-                                        TextInput::make('free_shipping_threshold')
-                                            ->label('Free Shipping Above (₹)')
-                                            ->numeric()
-                                            ->prefix('₹')
-                                            ->required(),
-                                        TextInput::make('flat_shipping_rate')
-                                            ->label('Flat Shipping Rate (₹)')
-                                            ->numeric()
-                                            ->prefix('₹')
-                                            ->required(),
-                                        TextInput::make('estimated_delivery_days')
-                                            ->label('Est. Delivery (e.g. 3-5 days)')
-                                            ->placeholder('3-5 days'),
-                                    ]),
-                            ]),
-
-                        Tabs\Tab::make('Payments')
-                            ->icon('heroicon-o-credit-card')
-                            ->schema([
-                                Grid::make(2)
-                                    ->components([
-                                        Toggle::make('razorpay_enabled')
-                                            ->label('Enable Razorpay'),
-                                        Toggle::make('cod_enabled')
-                                            ->label('Enable COD'),
-                                    ]),
-                                Section::make('Razorpay Configuration')
-                                    ->components([
-                                        TextInput::make('razorpay_key_id')
-                                            ->label('Key ID')
-                                            ->password()
-                                            ->revealable(),
-                                        TextInput::make('razorpay_key_secret')
-                                            ->label('Key Secret')
-                                            ->password()
-                                            ->revealable(),
-                                    ])
-                                    ->collapsible(),
-                            ]),
-
                         Tabs\Tab::make('SEO & Social')
                             ->icon('heroicon-o-globe-alt')
                             ->schema([
@@ -128,13 +83,11 @@ class ManageSettings extends Page
                                             ->placeholder('G-XXXXXXXXXX'),
                                     ]),
                             ]),
-
                     ])
                     ->columnSpanFull(),
             ])
             ->statePath('data');
     }
-
 
     public function save(): void
     {
