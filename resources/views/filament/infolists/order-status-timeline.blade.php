@@ -1,64 +1,84 @@
 @php
     $order = $getRecord();
     $history = $order->statusHistory()->orderBy('created_at', 'asc')->get();
-    $currentStatus = $order->status;
-    
-    $statuses = [
-        'pending' => ['label' => 'Order Placed', 'icon' => 'heroicon-o-shopping-cart'],
-        'processing' => ['label' => 'Processing', 'icon' => 'heroicon-o-cog'],
-        'shipped' => ['label' => 'Shipped', 'icon' => 'heroicon-o-truck'],
-        'delivered' => ['label' => 'Delivered', 'icon' => 'heroicon-o-check-circle'],
-        'completed' => ['label' => 'Completed', 'icon' => 'heroicon-o-sparkles'],
-    ];
 @endphp
 
-<div class="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-    <div class="flow-root">
-        <ul role="list" class="-mb-8">
-            @foreach ($statuses as $statusKey => $data)
-                @php
-                    $occurrence = $history->where('new_status', $statusKey)->first();
-                    $isCompleted = $occurrence !== null;
-                    $isActive = $currentStatus === $statusKey;
-                @endphp
-                <li>
-                    <div class="relative pb-8">
-                        @if (!$loop->last)
-                            <span class="absolute left-5 top-5 -ml-px h-full w-0.5 {{ $isCompleted ? 'bg-success-500' : 'bg-gray-200 dark:bg-gray-700' }}" aria-hidden="true"></span>
-                        @endif
-                        <div class="relative flex items-start space-x-3">
-                            <div>
-                                <div class="relative px-1">
-                                    <div class="flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white dark:ring-gray-900 {{ $isCompleted ? 'bg-success-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">
-                                        @svg($data['icon'], 'h-5 w-5')
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="min-w-0 flex-1 py-1.5">
-                                <div class="flex justify-between space-x-4">
-                                    <div>
-                                        <p class="text-sm font-bold {{ $isCompleted ? 'text-gray-900 dark:text-white' : 'text-gray-500' }}">
-                                            {{ $data['label'] }}
-                                        </p>
-                                    </div>
-                                    <div class="whitespace-nowrap text-right text-xs text-gray-500">
-                                        @if($occurrence)
-                                            <time datetime="{{ $occurrence->created_at }}">{{ $occurrence->created_at->format('M d, h:i A') }}</time>
-                                        @else
-                                            <span class="italic">Pending</span>
-                                        @endif
-                                    </div>
-                                </div>
-                                @if($occurrence && $occurrence->note)
-                                    <p class="mt-1 text-xs text-gray-500 italic">
-                                        "{{ $occurrence->note }}"
-                                    </p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            @endforeach
-        </ul>
+<div style="
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    overflow:hidden;
+    background:#ffffff;
+">
+
+    <div style="
+        padding:18px 20px;
+        font-size:20px;
+        font-weight:600;
+        border-bottom:1px solid #e5e7eb;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+    ">
+        Order Lifecycle
+
     </div>
+
+    <table style="
+        width:100%;
+        border-collapse:collapse;
+        text-align:center;
+        font-size:14px;
+    ">
+
+        <thead>
+            <tr style="background:#fafafa;">
+                <th style="padding:16px;border-bottom:1px solid #e5e7eb;">Status</th>
+                <th style="padding:16px;border-bottom:1px solid #e5e7eb;">Date</th>
+                <th style="padding:16px;border-bottom:1px solid #e5e7eb;">Time</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (['pending','processing','shipped','delivered','completed'] as $status)
+
+                @php
+                    $record = $history->where('new_status', $status)->first();
+
+                    $badge = match($status) {
+                        'pending' =>
+                            'background:#f3f4f6;color:#374151;',
+                        'processing' =>
+                            'background:#dbeafe;color:#1e40af;',
+                        'shipped' =>
+                            'background:#ffedd5;color:#9a3412;',
+                        'delivered','completed' =>
+                            'background:#d1fae5;color:#065f46;',
+                    };
+                @endphp
+
+                <tr>
+                    <td style="padding:18px;border-bottom:1px solid #e5e7eb;">
+                        <span style="
+                            padding:6px 16px;
+                            border-radius:999px;
+                            font-weight:500;
+                            {{ $badge }}
+                        ">
+                            {{ ucfirst($status) }}
+                        </span>
+                    </td>
+
+                    <td style="padding:18px;border-bottom:1px solid #e5e7eb;color:#6b7280;">
+                        {{ $record ? $record->created_at->format('M d, Y') : '—' }}
+                    </td>
+
+                    <td style="padding:18px;border-bottom:1px solid #e5e7eb;color:#6b7280;">
+                        {{ $record ? $record->created_at->format('h:i A') : '—' }}
+                    </td>
+                </tr>
+
+            @endforeach
+        </tbody>
+
+    </table>
 </div>
