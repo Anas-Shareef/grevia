@@ -33,6 +33,20 @@ class ViewOrder extends ViewRecord
         return OrderInfolist::configure($schema);
     }
 
+    public function addNote(array $data): void
+    {
+        $this->getRecord()->notes()->create([
+            'note' => $data['note'],
+            'is_customer_visible' => $data['is_customer_visible'] ?? false,
+            'user_id' => auth()->id(),
+        ]);
+
+        \Filament\Notifications\Notification::make()
+            ->title('Note added successfully')
+            ->success()
+            ->send();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
