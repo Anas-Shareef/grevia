@@ -17,7 +17,7 @@ class ManageSettings extends Page
 {
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static string $view = 'filament.pages.manage-settings';
+    protected string $view = 'filament.pages.manage-settings';
 
     protected static \UnitEnum|string|null $navigationGroup = 'Administration';
 
