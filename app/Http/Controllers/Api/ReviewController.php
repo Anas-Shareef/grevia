@@ -66,13 +66,16 @@ class ReviewController extends Controller
         }
 
         $productId = $request->input('product_id');
-        $product = \App\Models\Product::find($productId);
+        
+        // Find by ID (if numeric) or Slug (if string)
+        $product = is_numeric($productId) 
+            ? \App\Models\Product::find($productId)
+            : \App\Models\Product::where('slug', $productId)->first();
         
         if (!$product) {
             $allIds = \App\Models\Product::pluck('id', 'slug')->toArray();
-            $idList = implode(', ', array_keys($allIds));
             return response()->json([
-                'message' => "ERROR: Product ID [{$productId}] not found. Server has IDs: [{$idList}]",
+                'message' => "ERROR: Product [{$productId}] not found.",
                 'received_id' => $productId,
                 'available_ids' => $allIds
             ], 400);

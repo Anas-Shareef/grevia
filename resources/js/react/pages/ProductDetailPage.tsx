@@ -635,7 +635,7 @@ const ProductDetailPage = () => {
 
         {/* Reviews Section */}
         <div id="reviews-anchor">
-          <ReviewsSection productId={String(product.id)} />
+          <ReviewsSection productId={String((product as any).dbId || product.id)} />
         </div>
 
         {/* Related Products Slider */}
