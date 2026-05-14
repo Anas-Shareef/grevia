@@ -262,6 +262,48 @@ class ViewOrder extends ViewRecord
                 ->icon('heroicon-o-table-cells')
                 ->url(fn ($record) => route('orders.csv', $record)),
 
+            Actions\Action::make('whatsapp')
+                ->label('Chat on WhatsApp')
+                ->icon('heroicon-o-chat-bubble-left-right')
+                ->color('success')
+                ->url(fn ($record) => "https://wa.me/" . preg_replace('/[^0-9]/', '', $record->phone))
+                ->openUrlInNewTab(),
+
+            Actions\Action::make('google_maps')
+                ->label('View on Maps')
+                ->icon('heroicon-o-map-pin')
+                ->color('gray')
+                ->url(function ($record) {
+                    $address = $record->shipping_address;
+                    if (!$address) return null;
+                    $query = urlencode(($address['address'] ?? '') . ' ' . ($address['city'] ?? '') . ' ' . ($address['state'] ?? '') . ' ' . ($address['pincode'] ?? ''));
+                    return "https://www.google.com/maps/search/?api=1&query={$query}";
+                })
+                ->openUrlInNewTab(),
+
+            Actions\Action::make('forcePaid')
+                ->label('Mark as Paid Manually')
+                ->icon('heroicon-o-check-badge')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->visible(fn ($record) => $record->payment_status !== 'paid' && auth()->user()->email === 'admin@grevia.in')
+                ->action(function ($record) {
+                    $record->update(['payment_status' => 'paid']);
+                    
+                    \App\Models\OrderActivity::log(
+                        $record->id,
+                        'manual_payment',
+                        'Order manually marked as PAID by Admin',
+                        null,
+                        'paid'
+                    );
+
+                    \Filament\Notifications\Notification::make()
+                        ->title('Order marked as Paid')
+                        ->success()
+                        ->send();
+                }),
+
             Actions\DeleteAction::make()
                 ->visible(fn ($record) => $record->status === 'cancelled'),
         ];

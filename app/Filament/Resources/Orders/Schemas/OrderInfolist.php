@@ -109,6 +109,14 @@ class OrderInfolist
                             ->visible(fn ($record) => $record->refunds->count() > 0)
                             ->collapsible()
                             ->collapsed(),
+
+                        // Internal Notes (NEW)
+                        Section::make('Internal Staff Notes')
+                            ->schema([
+                                View::make('filament.infolists.order-notes'),
+                            ])
+                            ->collapsible()
+                            ->collapsed(),
                     ])
                     ->columnSpan([
                         'default' => 1,

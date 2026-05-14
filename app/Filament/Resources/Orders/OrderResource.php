@@ -44,6 +44,7 @@ class OrderResource extends Resource
             OrderResource\RelationManagers\StatusHistoryRelationManager::class,
             OrderResource\RelationManagers\ShipmentsRelationManager::class,
             OrderResource\RelationManagers\RefundsRelationManager::class,
+            OrderResource\RelationManagers\NotesRelationManager::class,
             RelationManagers\TransactionsRelationManager::class,
         ];
     }
