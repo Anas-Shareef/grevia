@@ -51,7 +51,7 @@ const ReviewsSection = ({ productId }: { productId: string }) => {
   };
 
   useEffect(() => {
-    if (productId && productId !== "undefined" && /^\d+$/.test(productId)) {
+    if (productId && productId !== "undefined") {
       fetchReviews();
     }
   }, [productId]);

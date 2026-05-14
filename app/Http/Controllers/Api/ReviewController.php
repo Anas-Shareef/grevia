@@ -14,13 +14,24 @@ class ReviewController extends Controller
      */
     public function index(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-        ]);
+        $productId = $request->query('product_id');
+        
+        if (!$productId) {
+            return response()->json(['message' => 'Product ID is required.'], 400);
+        }
+
+        // Find product by ID or Slug
+        $product = is_numeric($productId)
+            ? \App\Models\Product::find($productId)
+            : \App\Models\Product::where('slug', $productId)->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found.'], 404);
+        }
 
         $reviews = ProductReview::with(['user:id,name', 'images'])
-            ->where('product_id', $request->product_id)
-            ->approved()
+            ->where('product_id', $product->id)
+            ->where('status', 'approved')
             ->latest()
             ->paginate(10);
 
