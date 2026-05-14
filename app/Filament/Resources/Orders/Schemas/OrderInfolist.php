@@ -113,7 +113,7 @@ class OrderInfolist
                         // Internal Notes (NEW)
                         Section::make('Internal Staff Notes')
                             ->schema([
-                                View::make('filament.infolists.order-notes'),
+                                View::make('filament.infolists.admin-notes'),
                             ])
                             ->collapsible()
                             ->collapsed(),
