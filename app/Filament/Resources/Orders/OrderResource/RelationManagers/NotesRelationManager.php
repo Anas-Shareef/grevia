@@ -2,13 +2,14 @@
 
 namespace App\Filament\Resources\Orders\OrderResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Components\Toggle;
 
 class NotesRelationManager extends RelationManager
 {
@@ -18,17 +19,17 @@ class NotesRelationManager extends RelationManager
 
     protected static ?string $modelLabel = 'Note';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Textarea::make('note')
+                Textarea::make('note')
                     ->label('Internal Message')
                     ->placeholder('Add a private note about this order...')
                     ->required()
                     ->rows(4)
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('is_customer_visible')
+                Toggle::make('is_customer_visible')
                     ->label('Visible to Customer?')
                     ->default(false)
                     ->hint('If enabled, the customer will see this in their dashboard.')
