@@ -128,10 +128,50 @@ class ManageSettings extends Page
                                             ->placeholder('G-XXXXXXXXXX'),
                                     ]),
                             ]),
+
+                        Tabs\Tab::make('Backups')
+                            ->icon('heroicon-o-cloud-arrow-down')
+                            ->schema([
+                                Section::make('Data Export')
+                                    ->description('Download your store data for safe keeping.')
+                                    ->components([
+                                        \Filament\Schemas\Components\View::make('filament.settings.backup-actions'),
+                                    ]),
+                            ]),
                     ])
                     ->columnSpanFull(),
             ])
             ->statePath('data');
+    }
+
+    public function exportOrders()
+    {
+        return \pxlrbt\FilamentExcel\Actions\Pages\ExportAction::make()
+            ->exports([
+                \pxlrbt\FilamentExcel\Exports\ExcelExport::make()
+                    ->fromModel(\App\Models\Order::class)
+                    ->withFilename('Grevia_Orders_' . now()->format('Y-m-d'))
+            ]);
+    }
+
+    public function exportProducts()
+    {
+        return \pxlrbt\FilamentExcel\Actions\Pages\ExportAction::make()
+            ->exports([
+                \pxlrbt\FilamentExcel\Exports\ExcelExport::make()
+                    ->fromModel(\App\Models\Product::class)
+                    ->withFilename('Grevia_Products_' . now()->format('Y-m-d'))
+            ]);
+    }
+
+    public function exportUsers()
+    {
+        return \pxlrbt\FilamentExcel\Actions\Pages\ExportAction::make()
+            ->exports([
+                \pxlrbt\FilamentExcel\Exports\ExcelExport::make()
+                    ->fromModel(\App\Models\User::class)
+                    ->withFilename('Grevia_Customers_' . now()->format('Y-m-d'))
+            ]);
     }
 
     public function save(): void
