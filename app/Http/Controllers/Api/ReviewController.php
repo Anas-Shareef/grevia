@@ -70,12 +70,11 @@ class ReviewController extends Controller
         
         if (!$product) {
             $allIds = \App\Models\Product::pluck('id', 'slug')->toArray();
+            $idList = implode(', ', array_keys($allIds));
             return response()->json([
-                'message' => 'Product not found in database',
+                'message' => "ERROR: Product ID [{$productId}] not found. Server has IDs: [{$idList}]",
                 'received_id' => $productId,
-                'received_type' => gettype($productId),
-                'available_ids' => $allIds,
-                'request_keys' => array_keys($request->all())
+                'available_ids' => $allIds
             ], 400);
         }
 
