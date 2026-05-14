@@ -54,12 +54,8 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info("DEBUG: Review submission started", [
-            'all_input' => $request->all(),
-            'product_id_input' => $request->input('product_id'),
-            'has_product_id' => $request->has('product_id'),
-            'user' => $request->user() ? $request->user()->id : 'guest'
-        ]);
+        // Check both Sanctum and Session auth
+        $user = $request->user('sanctum') ?? $request->user();
 
         if (!$request->has('product_id') || empty($request->input('product_id'))) {
             return response()->json(['message' => 'Product ID is missing or empty.'], 400);
@@ -73,15 +69,10 @@ class ReviewController extends Controller
             : \App\Models\Product::where('slug', $productId)->first();
         
         if (!$product) {
-            $allIds = \App\Models\Product::pluck('id', 'slug')->toArray();
             return response()->json([
-                'message' => "ERROR: Product [{$productId}] not found.",
-                'received_id' => $productId,
-                'available_ids' => $allIds
+                'message' => "Product [{$productId}] not found.",
             ], 400);
         }
-
-        \Log::info("DEBUG: Product found", ['name' => $product->name]);
 
         $rules = [
             'product_id' => 'required|exists:products,id',
