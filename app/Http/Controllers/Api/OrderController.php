@@ -36,7 +36,7 @@ class OrderController extends Controller
         // Find order belonging to the user
         $order = Order::where('id', $id)
             ->where('user_id', $user->id)
-            ->with(['orderItems.product', 'orderItems.variant', 'transactions', 'payments'])
+            ->with(['orderItems.product', 'orderItems.variant', 'transactions', 'payments', 'invoices'])
             ->first();
 
         if (!$order) {

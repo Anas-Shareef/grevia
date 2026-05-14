@@ -145,6 +145,20 @@ const OrderDetailPage = () => {
                         </Button>
                     )}
 
+                    {/* Download Invoice Button */}
+                    {order.invoices && order.invoices.length > 0 && (
+                        <Button
+                            variant="outline"
+                            className="border-gray-200 text-gray-700 hover:bg-gray-50 gap-2"
+                            onClick={() => window.open(`/invoices/${order.invoices[0].id}/download`, '_blank')}
+                        >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Invoice
+                        </Button>
+                    )}
+
                     {showCancel && (
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -228,19 +242,21 @@ const OrderDetailPage = () => {
                             {order.order_items?.map((item: OrderItem) => (
                                 <div key={item.id} className="flex gap-4 p-4 sm:p-6 border-b border-gray-100 last:border-0 hover:bg-gray-50/30 transition-colors">
                                     {/* Image */}
-                                    <div className="h-20 w-20 sm:h-24 sm:w-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                                    <Link to={`/products/${item.product?.slug}`} className="h-20 w-20 sm:h-24 sm:w-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 hover:opacity-80 transition-opacity">
                                         <img
                                             src={item.product?.image_url || 'https://placehold.co/100'}
                                             alt={item.product?.name}
                                             className="w-full h-full object-cover"
                                         />
-                                    </div>
+                                    </Link>
 
                                     {/* Info */}
                                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                        <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">
-                                            {item.product?.name || item.product_name}
-                                        </h3>
+                                        <Link to={`/products/${item.product?.slug}`} className="hover:text-primary transition-colors">
+                                            <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                                                {item.product?.name || item.product_name}
+                                            </h3>
+                                        </Link>
                                         <p className="text-sm text-gray-500 mt-1">
                                             SKU: {item.product?.slug || 'N/A'}
                                         </p>
@@ -263,11 +279,18 @@ const OrderDetailPage = () => {
                                         </div>
                                     </div>
 
-                                    {/* Price */}
-                                    <div className="text-right flex flex-col justify-center">
+                                    {/* Price and Review */}
+                                    <div className="text-right flex flex-col justify-center gap-3">
                                         <span className="font-semibold text-gray-900">
                                             ₹{parseFloat(item.total as unknown as string).toLocaleString()}
                                         </span>
+                                        {['delivered', 'completed'].includes(order.status) && (
+                                            <Link to={`/products/${item.product?.slug}#reviews-anchor`}>
+                                                <Button variant="ghost" size="sm" className="text-[10px] h-7 px-2 font-black uppercase tracking-widest text-[#2E4D31] bg-[#F0FAE8] hover:bg-[#EAF2EB] border border-[#77CB4D]/20 rounded-full">
+                                                    Post a Review
+                                                </Button>
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
                             ))}

@@ -115,7 +115,8 @@ class OrdersTable
                 TextColumn::make('name')
                     ->label('Customer')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn ($record) => $record->user_id ? \App\Filament\Resources\Users\UserResource::getUrl('edit', ['record' => $record->user_id]) : null),
                 TextColumn::make('total')
                     ->money('INR')
                     ->sortable(),
@@ -124,6 +125,8 @@ class OrdersTable
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'processing' => 'info',
+                        'shipped' => 'primary',
+                        'delivered' => 'success',
                         'completed' => 'success',
                         'cancelled' => 'danger',
                         default => 'gray',
@@ -144,6 +147,16 @@ class OrdersTable
             ])
             ->filters([
                 TrashedFilter::make(),
+            ])
+            ->actions([
+                \Filament\Tables\Actions\Action::make('download_invoice')
+                    ->label('Invoice')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('gray')
+                    ->url(fn ($record) => $record->invoices->first() ? route('invoices.download', $record->invoices->first()) : null)
+                    ->openUrlInNewTab()
+                    ->visible(fn ($record) => $record->invoices()->exists()),
+                EditAction::make(),
             ])
             ->recordActions([
                 EditAction::make(),
