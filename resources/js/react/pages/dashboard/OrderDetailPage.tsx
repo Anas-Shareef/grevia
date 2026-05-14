@@ -41,22 +41,6 @@ const OrderDetailPage = () => {
         fetchOrder();
     }, [id]);
 
-    const handleReorder = async () => {
-        setActionLoading(true);
-        try {
-            const response = await api.post(`/orders/${order.id}/reorder`);
-            if (response.data?.success) {
-                toast.success(response.data.message || "Items added to cart successfully");
-                // Force reload to sync cart context from server
-                window.location.href = '/cart';
-            }
-        } catch (error) {
-            console.error("Reorder failed", error);
-            toast.error("Failed to reorder items");
-        } finally {
-            setActionLoading(false);
-        }
-    };
 
     const handleCancelOrder = async () => {
         setActionLoading(true);
@@ -88,7 +72,7 @@ const OrderDetailPage = () => {
 
     // Button Logic
     const showCancel = ['pending', 'processing'].includes(order.status);
-    const showReorder = ['delivered', 'completed', 'cancelled', 'shipped'].includes(order.status);
+    const showCancel = ['pending', 'processing'].includes(order.status);
 
     const getStatusIcon = (step: string, index: number) => {
         if (isCancelled || isRefunded) return <XCircle className="h-5 w-5 text-gray-400" />;
@@ -132,18 +116,6 @@ const OrderDetailPage = () => {
                         {order.status}
                     </Badge>
 
-                    {/* Action Buttons */}
-                    {showReorder && (
-                        <Button
-                            variant="outline"
-                            className="border-primary text-primary hover:bg-primary/5 gap-2"
-                            onClick={handleReorder}
-                            disabled={actionLoading}
-                        >
-                            {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
-                            Reorder
-                        </Button>
-                    )}
 
                     {/* Download Invoice Button */}
                     {order.invoices && order.invoices.length > 0 && (
