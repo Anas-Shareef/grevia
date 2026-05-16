@@ -56,10 +56,10 @@ const ProductsSection = () => {
           >
             Premium
             <br />
-            <span className="text-primary">Sweeteners</span>
+            <span className="text-primary">Products</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Discover our range of pure, natural sweeteners crafted for the
+            Discover our range of pure, natural products crafted for the
             health-conscious.
           </p>
         </motion.div>
@@ -73,17 +73,17 @@ const ProductsSection = () => {
 
         {/* View All Products CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mt-12"
-        >
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mt-12"
+          >
           <Link
-            to="/collections"
+            to="/collections/all"
             className="inline-flex items-center justify-center bg-[#2E4D31] text-white font-bold rounded-full shadow-lg hover:bg-[#1a3320] hover:scale-105 active:scale-95 transition-all duration-300 h-14 px-12 text-base md:text-lg Montserrat"
           >
-            View All Collections
+            View All Products
           </Link>
         </motion.div>
       </div>
