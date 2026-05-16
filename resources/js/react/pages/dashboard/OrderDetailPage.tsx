@@ -72,7 +72,6 @@ const OrderDetailPage = () => {
 
     // Button Logic
     const showCancel = ['pending', 'processing'].includes(order.status);
-    const showCancel = ['pending', 'processing'].includes(order.status);
 
     const getStatusIcon = (step: string, index: number) => {
         if (isCancelled || isRefunded) return <XCircle className="h-5 w-5 text-gray-400" />;
