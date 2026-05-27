@@ -93,8 +93,7 @@ class ManageSettings extends Page
                                         Tabs\Tab::make('Privacy Policy')
                                             ->schema([
                                                 RichEditor::make('policy_privacy_content')
-                                                    ->label('Privacy Policy Content')
-                                                    ->rows(15),
+                                                    ->label('Privacy Policy Content'),
                                                 TextInput::make('policy_privacy_meta_title')
                                                     ->label('SEO Meta Title')
                                                     ->placeholder('Privacy Policy | Grevia'),
@@ -105,8 +104,7 @@ class ManageSettings extends Page
                                         Tabs\Tab::make('Terms & Conditions')
                                             ->schema([
                                                 RichEditor::make('policy_terms_content')
-                                                    ->label('Terms & Conditions Content')
-                                                    ->rows(15),
+                                                    ->label('Terms & Conditions Content'),
                                                 TextInput::make('policy_terms_meta_title')
                                                     ->label('SEO Meta Title')
                                                     ->placeholder('Terms & Conditions | Grevia'),
@@ -117,8 +115,7 @@ class ManageSettings extends Page
                                         Tabs\Tab::make('Return Policy')
                                             ->schema([
                                                 RichEditor::make('policy_return_content')
-                                                    ->label('Return Policy Content')
-                                                    ->rows(15),
+                                                    ->label('Return Policy Content'),
                                                 TextInput::make('policy_return_meta_title')
                                                     ->label('SEO Meta Title')
                                                     ->placeholder('Return Policy | Grevia'),
@@ -129,8 +126,7 @@ class ManageSettings extends Page
                                         Tabs\Tab::make('FAQ')
                                             ->schema([
                                                 RichEditor::make('policy_faq_content')
-                                                    ->label('Frequently Asked Questions Content')
-                                                    ->rows(15),
+                                                    ->label('Frequently Asked Questions Content'),
                                                 TextInput::make('policy_faq_meta_title')
                                                     ->label('SEO Meta Title')
                                                     ->placeholder('FAQ | Grevia'),
@@ -141,8 +137,7 @@ class ManageSettings extends Page
                                         Tabs\Tab::make('Shipping Policy')
                                             ->schema([
                                                 RichEditor::make('policy_shipping_content')
-                                                    ->label('Shipping Policy Content')
-                                                    ->rows(15),
+                                                    ->label('Shipping Policy Content'),
                                                 TextInput::make('policy_shipping_meta_title')
                                                     ->label('SEO Meta Title')
                                                     ->placeholder('Shipping Policy (India) | Grevia'),
