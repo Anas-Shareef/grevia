@@ -17,9 +17,9 @@ const Footer = () => {
     ],
     support: [
       { label: "Contact", href: "/contact" },
-      { label: "FAQ", href: "/contact" },
-      { label: "Shipping", href: "/contact" },
-      { label: "Returns", href: "/contact" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Shipping", href: "/shipping-policy" },
+      { label: "Returns", href: "/return-policy" },
     ],
   };
 
@@ -137,16 +137,16 @@ const Footer = () => {
             </p>
             <div className="flex gap-6">
               <Link
-                to="#"
+                to="/privacy-policy"
                 className="text-xs text-white/30 hover:text-white transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
-                to="#"
+                to="/terms-conditions"
                 className="text-xs text-white/30 hover:text-white transition-colors"
               >
-                Terms of Service
+                Terms & Conditions
               </Link>
             </div>
           </div>

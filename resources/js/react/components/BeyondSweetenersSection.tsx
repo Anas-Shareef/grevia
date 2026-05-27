@@ -12,6 +12,7 @@ interface Category {
   card_image_full_url: string;
   availability_status: 'active' | 'coming_soon' | 'hidden';
   overlay_density: number;
+  is_featured?: boolean;
 }
 
 const EditorialCard = ({ category, index }: { category: Category, index: number }) => {
@@ -89,14 +90,19 @@ const BeyondSweetenersSection = () => {
   useEffect(() => {
     api.get('/categories')
       .then(data => {
-        // We pick specific categories for the homepage or just the first few
-        // For now, let's show categories that aren't the primary sweeteners if possible, 
-        // or just the first 2 editorial-ready categories.
-        const editorialReady = data.filter((c: any) => 
+        let editorialReady = data.filter((c: any) => 
           c.availability_status === 'active' && 
-          !c.slug.includes('stevia') && 
-          !c.slug.includes('monk')
+          c.is_featured
         );
+        
+        if (editorialReady.length === 0) {
+          // Fallback to active categories excluding stevia/monk
+          editorialReady = data.filter((c: any) => 
+            c.availability_status === 'active' && 
+            !c.slug.includes('stevia') && 
+            !c.slug.includes('monk')
+          );
+        }
         setCategories(editorialReady.slice(0, 2));
       })
       .catch(err => console.error("Failed to fetch home categories:", err));

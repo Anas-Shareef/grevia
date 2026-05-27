@@ -22,6 +22,21 @@
             facebook_url: "{{ $siteSettings['facebook_url'] ?? '#' }}",
             store_phone: "{{ $siteSettings['store_phone'] ?? '' }}",
             store_email: "{{ $siteSettings['store_email'] ?? '' }}",
+            policy_privacy_content: {!! json_encode($siteSettings['policy_privacy_content'] ?? '') !!},
+            policy_privacy_meta_title: {!! json_encode($siteSettings['policy_privacy_meta_title'] ?? '') !!},
+            policy_privacy_meta_description: {!! json_encode($siteSettings['policy_privacy_meta_description'] ?? '') !!},
+            policy_terms_content: {!! json_encode($siteSettings['policy_terms_content'] ?? '') !!},
+            policy_terms_meta_title: {!! json_encode($siteSettings['policy_terms_meta_title'] ?? '') !!},
+            policy_terms_meta_description: {!! json_encode($siteSettings['policy_terms_meta_description'] ?? '') !!},
+            policy_return_content: {!! json_encode($siteSettings['policy_return_content'] ?? '') !!},
+            policy_return_meta_title: {!! json_encode($siteSettings['policy_return_meta_title'] ?? '') !!},
+            policy_return_meta_description: {!! json_encode($siteSettings['policy_return_meta_description'] ?? '') !!},
+            policy_faq_content: {!! json_encode($siteSettings['policy_faq_content'] ?? '') !!},
+            policy_faq_meta_title: {!! json_encode($siteSettings['policy_faq_meta_title'] ?? '') !!},
+            policy_faq_meta_description: {!! json_encode($siteSettings['policy_faq_meta_description'] ?? '') !!},
+            policy_shipping_content: {!! json_encode($siteSettings['policy_shipping_content'] ?? '') !!},
+            policy_shipping_meta_title: {!! json_encode($siteSettings['policy_shipping_meta_title'] ?? '') !!},
+            policy_shipping_meta_description: {!! json_encode($siteSettings['policy_shipping_meta_description'] ?? '') !!},
         };
     </script>
     <link rel="icon" href="/favicon.png" />

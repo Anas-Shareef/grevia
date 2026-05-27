@@ -9,6 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
 use Filament\Pages\Page;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
@@ -82,6 +83,75 @@ class ManageSettings extends Page
                                             ->label('GA4 Measurement ID')
                                             ->placeholder('G-XXXXXXXXXX'),
                                     ]),
+                            ]),
+
+                        Tabs\Tab::make('Pages & Policies')
+                            ->icon('heroicon-o-document-text')
+                            ->schema([
+                                Tabs::make('PolicyPages')
+                                    ->tabs([
+                                        Tabs\Tab::make('Privacy Policy')
+                                            ->schema([
+                                                RichEditor::make('policy_privacy_content')
+                                                    ->label('Privacy Policy Content')
+                                                    ->rows(15),
+                                                TextInput::make('policy_privacy_meta_title')
+                                                    ->label('SEO Meta Title')
+                                                    ->placeholder('Privacy Policy | Grevia'),
+                                                Textarea::make('policy_privacy_meta_description')
+                                                    ->label('SEO Meta Description')
+                                                    ->rows(3),
+                                            ]),
+                                        Tabs\Tab::make('Terms & Conditions')
+                                            ->schema([
+                                                RichEditor::make('policy_terms_content')
+                                                    ->label('Terms & Conditions Content')
+                                                    ->rows(15),
+                                                TextInput::make('policy_terms_meta_title')
+                                                    ->label('SEO Meta Title')
+                                                    ->placeholder('Terms & Conditions | Grevia'),
+                                                Textarea::make('policy_terms_meta_description')
+                                                    ->label('SEO Meta Description')
+                                                    ->rows(3),
+                                            ]),
+                                        Tabs\Tab::make('Return Policy')
+                                            ->schema([
+                                                RichEditor::make('policy_return_content')
+                                                    ->label('Return Policy Content')
+                                                    ->rows(15),
+                                                TextInput::make('policy_return_meta_title')
+                                                    ->label('SEO Meta Title')
+                                                    ->placeholder('Return Policy | Grevia'),
+                                                Textarea::make('policy_return_meta_description')
+                                                    ->label('SEO Meta Description')
+                                                    ->rows(3),
+                                            ]),
+                                        Tabs\Tab::make('FAQ')
+                                            ->schema([
+                                                RichEditor::make('policy_faq_content')
+                                                    ->label('Frequently Asked Questions Content')
+                                                    ->rows(15),
+                                                TextInput::make('policy_faq_meta_title')
+                                                    ->label('SEO Meta Title')
+                                                    ->placeholder('FAQ | Grevia'),
+                                                Textarea::make('policy_faq_meta_description')
+                                                    ->label('SEO Meta Description')
+                                                    ->rows(3),
+                                            ]),
+                                        Tabs\Tab::make('Shipping Policy')
+                                            ->schema([
+                                                RichEditor::make('policy_shipping_content')
+                                                    ->label('Shipping Policy Content')
+                                                    ->rows(15),
+                                                TextInput::make('policy_shipping_meta_title')
+                                                    ->label('SEO Meta Title')
+                                                    ->placeholder('Shipping Policy (India) | Grevia'),
+                                                Textarea::make('policy_shipping_meta_description')
+                                                    ->label('SEO Meta Description')
+                                                    ->rows(3),
+                                            ]),
+                                    ])
+                                    ->columnSpanFull(),
                             ]),
                     ])
                     ->columnSpanFull(),

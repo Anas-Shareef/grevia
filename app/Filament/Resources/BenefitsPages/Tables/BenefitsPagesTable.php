@@ -15,6 +15,9 @@ class BenefitsPagesTable
     {
         return $table
             ->columns([
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('created_at')

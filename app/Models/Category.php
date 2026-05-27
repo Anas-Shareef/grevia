@@ -27,7 +27,8 @@ class Category extends Model
         'card_image_url',
         'card_description',
         'availability_status',
-        'overlay_density'
+        'overlay_density',
+        'is_featured'
     ];
 
     protected $casts = [
@@ -35,7 +36,8 @@ class Category extends Model
         'rules' => 'array',
         'show_in_filter' => 'boolean',
         'status' => 'boolean',
-        'overlay_density' => 'integer'
+        'overlay_density' => 'integer',
+        'is_featured' => 'boolean'
     ];
 
     protected $appends = ['image_url', 'hero_banner_url', 'icon_url', 'card_image_full_url'];

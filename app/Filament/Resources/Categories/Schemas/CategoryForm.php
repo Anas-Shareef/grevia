@@ -30,10 +30,6 @@ class CategoryForm
                             ->unique(Category::class, 'slug', ignoreRecord: true),
                         Textarea::make('description')
                             ->columnSpanFull(),
-                        FileUpload::make('image')
-                            ->image()
-                            ->disk('public')
-                            ->directory('categories'),
                         Select::make('parent_id')
                             ->label('Parent Category')
                             ->relationship('parent', 'name', fn (\Illuminate\Database\Eloquent\Builder $query) => $query->whereNull('parent_id'))
@@ -46,6 +42,10 @@ class CategoryForm
                             ->label('Show in Navigation Menu')
                             ->helperText('Enable this to show the category in the "Shop by Category" dropdown mega-menu.')
                             ->default(true),
+                        Toggle::make('is_featured')
+                            ->label('Featured')
+                            ->helperText('Show this category on the homepage.')
+                            ->default(false),
                         TextInput::make('order')
                             ->required()
                             ->numeric()

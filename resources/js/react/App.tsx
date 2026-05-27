@@ -15,6 +15,7 @@ import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import BenefitsPage from "./pages/BenefitsPage";
 import ContactPage from "./pages/ContactPage";
 import WishlistPage from "./pages/WishlistPage";
+import PolicyPage from "./pages/PolicyPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CollectionsIndex from "./pages/CollectionsIndex";
 import CartDrawer from "./components/CartDrawer";
@@ -99,6 +100,14 @@ const App = () => {
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+                
+                {/* Policies Routes */}
+                <Route path="/privacy-policy" element={<PolicyPage type="privacy" />} />
+                <Route path="/terms-conditions" element={<PolicyPage type="terms" />} />
+                <Route path="/return-policy" element={<PolicyPage type="return" />} />
+                <Route path="/faq" element={<PolicyPage type="faq" />} />
+                <Route path="/shipping-policy" element={<PolicyPage type="shipping" />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </WishlistProvider>
