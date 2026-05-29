@@ -29,6 +29,49 @@ class ManageSettings extends Page
     public function mount(): void
     {
         $settings = SiteSetting::all()->pluck('value', 'key')->toArray();
+
+        $expectedKeys = [
+            'store_name',
+            'store_email',
+            'store_phone',
+            'support_phone',
+            'store_address',
+            'homepage_title',
+            'homepage_description',
+            'instagram_url',
+            'facebook_url',
+            'google_analytics_id',
+            'policy_privacy_content',
+            'policy_privacy_meta_title',
+            'policy_privacy_meta_description',
+            'policy_terms_content',
+            'policy_terms_meta_title',
+            'policy_terms_meta_description',
+            'policy_refund_content',
+            'policy_refund_meta_title',
+            'policy_refund_meta_description',
+            'policy_shipping_content',
+            'policy_shipping_meta_title',
+            'policy_shipping_meta_description',
+        ];
+
+        // Automatic migration/fallback from return policy to refund policy if empty
+        if (empty($settings['policy_refund_content']) && !empty($settings['policy_return_content'])) {
+            $settings['policy_refund_content'] = $settings['policy_return_content'];
+        }
+        if (empty($settings['policy_refund_meta_title']) && !empty($settings['policy_return_meta_title'])) {
+            $settings['policy_refund_meta_title'] = $settings['policy_return_meta_title'];
+        }
+        if (empty($settings['policy_refund_meta_description']) && !empty($settings['policy_return_meta_description'])) {
+            $settings['policy_refund_meta_description'] = $settings['policy_return_meta_description'];
+        }
+
+        foreach ($expectedKeys as $key) {
+            if (!array_key_exists($key, $settings)) {
+                $settings[$key] = '';
+            }
+        }
+
         $this->data = $settings;
     }
 
