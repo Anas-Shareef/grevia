@@ -5,14 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @php
         $siteSettings = \App\Models\SiteSetting::pluck('value', 'key');
-        $siteTitle = $siteSettings['homepage_title'] ?? 'Grevia - Premium Organic Stevia & Monkfruit Sweeteners | Zero Calories';
-        $siteDescription = $siteSettings['homepage_description'] ?? "Discover Grevia's premium organic sweeteners. 100% natural Stevia and Monkfruit with zero calories, zero glycemic impact.";
+        
+        $path = request()->path();
+        $siteTitle = null;
+        $siteDescription = null;
+        
+        if ($path === 'privacy-policy') {
+            $siteTitle = $siteSettings['policy_privacy_meta_title'] ?? null;
+            $siteDescription = $siteSettings['policy_privacy_meta_description'] ?? null;
+        } elseif ($path === 'terms-conditions') {
+            $siteTitle = $siteSettings['policy_terms_meta_title'] ?? null;
+            $siteDescription = $siteSettings['policy_terms_meta_description'] ?? null;
+        } elseif ($path === 'refund-policy' || $path === 'return-policy') {
+            $siteTitle = $siteSettings['policy_refund_meta_title'] ?? $siteSettings['policy_return_meta_title'] ?? null;
+            $siteDescription = $siteSettings['policy_refund_meta_description'] ?? $siteSettings['policy_return_meta_description'] ?? null;
+        } elseif ($path === 'shipping-policy') {
+            $siteTitle = $siteSettings['policy_shipping_meta_title'] ?? null;
+            $siteDescription = $siteSettings['policy_shipping_meta_description'] ?? null;
+        }
+        
+        $siteTitle = $siteTitle ?: ($siteSettings['homepage_title'] ?? 'Grevia - Premium Organic Stevia & Monkfruit Sweeteners | Zero Calories');
+        $siteDescription = $siteDescription ?: ($siteSettings['homepage_description'] ?? "Discover Grevia's premium organic sweeteners. 100% natural Stevia and Monkfruit with zero calories, zero glycemic impact.");
     @endphp
     <title>{{ $siteTitle }}</title>
     <meta name="description" content="{{ $siteDescription }}" />
     <meta name="author" content="{{ $siteSettings['store_name'] ?? 'Grevia' }}" />
     
-    <meta property="og:title" content="{{ $siteSettings['homepage_title'] ?? 'Grevia - Sweetness Without Sacrifice' }}" />
+    <meta property="og:title" content="{{ $siteTitle }}" />
     <meta property="og:description" content="{{ $siteDescription }}" />
     <meta property="og:type" content="website" />
 
