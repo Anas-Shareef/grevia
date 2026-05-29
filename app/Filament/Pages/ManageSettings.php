@@ -194,7 +194,20 @@ class ManageSettings extends Page
                 continue;
             }
 
-            // Handle array values to prevent "Array to string conversion" QueryException
+            // If the value is a JSON string representing a ProseMirror document, decode it
+            if (is_string($value) && str_starts_with(trim($value), '{"type":"doc"')) {
+                $decoded = json_decode($value, true);
+                if (is_array($decoded)) {
+                    $value = $decoded;
+                }
+            }
+
+            // Convert ProseMirror/TipTap array structure to HTML
+            if (is_array($value) && isset($value['type']) && $value['type'] === 'doc') {
+                $value = $this->proseMirrorToHtml($value);
+            }
+
+            // Handle fallback for other array values
             if (is_array($value)) {
                 if (isset($value['html'])) {
                     $value = $value['html'];
@@ -215,5 +228,72 @@ class ManageSettings extends Page
             ->title('Settings saved successfully')
             ->success()
             ->send();
+    }
+
+    private function proseMirrorToHtml(array $node): string
+    {
+        $type = $node['type'] ?? '';
+        $content = $node['content'] ?? [];
+        $text = $node['text'] ?? '';
+        $attrs = $node['attrs'] ?? [];
+        $marks = $node['marks'] ?? [];
+
+        // Recurse child nodes
+        $htmlContent = '';
+        foreach ($content as $child) {
+            if (is_array($child)) {
+                $htmlContent .= $this->proseMirrorToHtml($child);
+            }
+        }
+
+        switch ($type) {
+            case 'doc':
+                return $htmlContent;
+            case 'paragraph':
+                $align = isset($attrs['textAlign']) ? " style=\"text-align: {$attrs['textAlign']}\"" : '';
+                return "<p{$align}>{$htmlContent}</p>";
+            case 'heading':
+                $level = $attrs['level'] ?? 1;
+                return "<h{$level}>{$htmlContent}</h{$level}>";
+            case 'text':
+                $result = htmlspecialchars($text);
+                foreach ($marks as $mark) {
+                    $markType = $mark['type'] ?? '';
+                    $markAttrs = $mark['attrs'] ?? [];
+                    if ($markType === 'bold') {
+                        $result = "<strong>{$result}</strong>";
+                    } elseif ($markType === 'italic') {
+                        $result = "<em>{$result}</em>";
+                    } elseif ($markType === 'underline') {
+                        $result = "<u>{$result}</u>";
+                    } elseif ($markType === 'strike') {
+                        $result = "<s>{$result}</s>";
+                    } elseif ($markType === 'link') {
+                        $href = htmlspecialchars($markAttrs['href'] ?? '');
+                        $target = isset($markAttrs['target']) ? " target=\"{$markAttrs['target']}\"" : '';
+                        $result = "<a href=\"{$href}\"{$target}>{$result}</a>";
+                    }
+                }
+                return $result;
+            case 'bulletList':
+            case 'bullet_list':
+                return "<ul>{$htmlContent}</ul>";
+            case 'orderedList':
+            case 'ordered_list':
+                return "<ol>{$htmlContent}</ol>";
+            case 'listItem':
+            case 'list_item':
+                return "<li>{$htmlContent}</li>";
+            case 'blockquote':
+                return "<blockquote>{$htmlContent}</blockquote>";
+            case 'hardBreak':
+            case 'hard_break':
+                return "<br />";
+            case 'horizontalRule':
+            case 'horizontal_rule':
+                return "<hr />";
+            default:
+                return $htmlContent ?: htmlspecialchars($text);
+        }
     }
 }
