@@ -99,7 +99,7 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
             <div className="min-h-[200px]">
               {content ? (
                 <div 
-                  className="prose prose-slate max-w-none prose-headings:text-[#1A3C2E] prose-headings:font-bold prose-headings:font-display prose-p:text-[#555555] prose-p:leading-relaxed prose-a:text-[#2D6A4F] prose-a:font-semibold"
+                  className="prose prose-slate max-w-none prose-headings:text-[#1A3C2E] prose-headings:font-bold prose-headings:font-display prose-h2:text-xl md:prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-lg md:prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-[#555555] prose-p:leading-relaxed prose-p:mb-6 prose-a:text-[#2D6A4F] prose-a:font-semibold prose-a:underline prose-a:hover:text-[#74B49B] prose-a:transition-colors prose-strong:text-[#1A3C2E] prose-strong:font-bold prose-li:text-[#555555] prose-li:my-2 prose-li:marker:text-[#74B49B] prose-ul:list-disc prose-ol:list-decimal prose-blockquote:border-l-4 prose-blockquote:border-[#74B49B] prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-500"
                   dangerouslySetInnerHTML={{ __html: content }}
                 />
               ) : (
