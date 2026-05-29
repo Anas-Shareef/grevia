@@ -4,7 +4,7 @@ import { Product } from "@/data/products";
 import { FilterState } from "./useProductFilters";
 
 // Helper to handle various image path formats
-const getImageUrl = (path: string | null | undefined) => {
+export const getImageUrl = (path: string | null | undefined) => {
     if (!path) return '';
     if (path.startsWith('http')) return path;
 
@@ -21,7 +21,7 @@ const getImageUrl = (path: string | null | undefined) => {
 };
 
 // Helper to transform backend product to frontend product
-const transformProduct = (data: any): Product => {
+export const transformProduct = (data: any): Product => {
     if (!data) return {} as Product;
     
     return {

@@ -1,11 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X, ChevronDown, Heart, User, Leaf, Grape, Gift, Library, Package, Sparkles } from "lucide-react";
+import { ShoppingCart, Menu, X, ChevronDown, Heart, User, Leaf, Grape, Gift, Library, Package, Sparkles, Search } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import SearchPopup from "./SearchPopup";
 
 type DropdownItem = {
   label: string;
@@ -36,6 +37,7 @@ type Category = {
 };
 
 const Header = () => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -299,6 +301,15 @@ const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-4">
+            {/* Search */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="p-2 text-foreground/60 hover:text-primary hover:bg-primary/5 rounded-full transition-all"
+              aria-label="Search products"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
             {/* Wishlist */}
             <Link
               to="/wishlist"
@@ -347,6 +358,16 @@ const Header = () => {
 
           {/* Mobile Actions */}
           <div className="lg:hidden flex items-center gap-1">
+            {/* Search */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="p-2 text-foreground/70"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Wishlist */}
             <Link
               to="/wishlist"
               className="relative p-2 text-foreground/70"
@@ -515,6 +536,7 @@ const Header = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <SearchPopup isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </header>
   );
 };
