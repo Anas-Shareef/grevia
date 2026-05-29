@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import { motion } from "framer-motion";
-import { ArrowLeft, CreditCard, Smartphone, Building2, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, CreditCard, Building2, Check, Tag, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,10 +19,20 @@ type PaymentMethod = "upi" | "card" | "netbanking";
 const CheckoutPage = () => {
   const { items, getCartTotal, clearCart } = useCart();
   const navigate = useNavigate();
-  const location = useLocation(); // Import useLocation
-  const { user, isLoading: authLoading } = useAuth(); // Import useAuth
+  const location = useLocation();
+  const { user, isLoading: authLoading } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Coupon state
+  const [couponInput, setCouponInput] = useState("");
+  const [couponStatus, setCouponStatus] = useState<"idle" | "loading" | "valid" | "invalid">("idle");
+  const [couponData, setCouponData] = useState<{
+    code: string;
+    discount_amount: number;
+    message: string;
+  } | null>(null);
+  const [couponError, setCouponError] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -72,7 +82,8 @@ const CheckoutPage = () => {
     return parseFloat(method.cost);
   }, [shippingMethods, getCartTotal]);
 
-  const finalTotal = getCartTotal() + shippingCost;
+  const discountAmount = couponData?.discount_amount ?? 0;
+  const finalTotal = Math.max(0, getCartTotal() + shippingCost - discountAmount);
 
   const addresses = addressData?.addresses || [];
 
@@ -106,6 +117,44 @@ const CheckoutPage = () => {
       }
     }
   }, [addressData, user]);
+
+  // Apply coupon code
+  const applyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setCouponStatus("loading");
+    setCouponError("");
+    setCouponData(null);
+    try {
+      const res = await api.post('/coupon/apply', {
+        code,
+        subtotal: getCartTotal(),
+      });
+      if (res.valid) {
+        setCouponStatus("valid");
+        setCouponData({
+          code: res.code,
+          discount_amount: res.discount_amount,
+          message: res.message,
+        });
+        toast.success(res.message);
+      } else {
+        setCouponStatus("invalid");
+        setCouponError(res.message || "Invalid coupon code.");
+      }
+    } catch (err: any) {
+      setCouponStatus("invalid");
+      const msg = err?.response?.data?.message || "Invalid coupon code.";
+      setCouponError(msg);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCouponData(null);
+    setCouponInput("");
+    setCouponStatus("idle");
+    setCouponError("");
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -150,6 +199,8 @@ const CheckoutPage = () => {
       billing_address: addressSnapshot,
       payment_method: 'cod',
       amount: finalTotal,
+      coupon_code: couponData?.code ?? null,
+      discount: discountAmount,
       items: items.map(item => ({
         product_id: item.product.dbId || item.product.id,
         variant_id: item.variantId,
@@ -194,6 +245,8 @@ const CheckoutPage = () => {
       billing_address: addressSnapshot,
       payment_method: 'razorpay',
       amount: finalTotal, // Validation happens on backend too
+      coupon_code: couponData?.code ?? null,
+      discount: discountAmount,
       items: items.map(item => ({
         product_id: item.product.dbId || item.product.id,
         variant_id: item.variantId,
@@ -456,7 +509,7 @@ const CheckoutPage = () => {
                   className="w-full"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Processing..." : `Place Order - ₹${finalTotal}`}
+                  {isSubmitting ? "Processing..." : `Place Order - ₹${finalTotal.toLocaleString('en-IN')}`}
                 </Button>
               </form>
             </motion.div>
@@ -513,7 +566,7 @@ const CheckoutPage = () => {
                 <div className="border-t border-border pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-bold">₹{getCartTotal()}</span>
+                    <span className="font-bold">₹{getCartTotal().toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
@@ -521,9 +574,102 @@ const CheckoutPage = () => {
                       {shippingCost === 0 ? "Free" : `₹${shippingCost}`}
                     </span>
                   </div>
-                  <div className="flex justify-between text-lg font-black pt-2 border-t border-border mt-2">
+
+                  {/* Coupon Section */}
+                  <div className="pt-3 pb-1 border-t border-dashed border-border">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                      <Tag className="w-3.5 h-3.5" /> Have a promo code?
+                    </p>
+                    <AnimatePresence mode="wait">
+                      {couponStatus === "valid" && couponData ? (
+                        <motion.div
+                          key="coupon-applied"
+                          initial={{ opacity: 0, scale: 0.97 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.97 }}
+                          className="flex items-center justify-between bg-lime/10 border border-lime/40 rounded-xl px-3 py-2.5"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-lime/20 flex items-center justify-center shrink-0">
+                              <Check className="w-3.5 h-3.5 text-lime" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-foreground font-mono tracking-wider">{couponData.code}</p>
+                              <p className="text-[10px] text-muted-foreground leading-tight">{couponData.message}</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={removeCoupon}
+                            className="text-muted-foreground hover:text-destructive transition-colors ml-2 p-1 rounded-full hover:bg-destructive/10"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="coupon-input"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="space-y-1.5"
+                        >
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={couponInput}
+                              onChange={e => {
+                                setCouponInput(e.target.value.toUpperCase());
+                                setCouponError("");
+                              }}
+                              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), applyCoupon())}
+                              placeholder="Enter promo code"
+                              className="flex-1 px-3 py-2 text-sm border border-border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-lime/50 focus:border-lime transition-all font-mono tracking-widest uppercase placeholder:normal-case placeholder:tracking-normal placeholder:font-sans"
+                              disabled={couponStatus === "loading"}
+                            />
+                            <button
+                              type="button"
+                              onClick={applyCoupon}
+                              disabled={couponStatus === "loading" || !couponInput.trim()}
+                              className="px-4 py-2 text-sm font-bold bg-lime text-foreground rounded-xl hover:bg-lime/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1.5 whitespace-nowrap min-w-[70px] justify-center"
+                            >
+                              {couponStatus === "loading" ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : "Apply"}
+                            </button>
+                          </div>
+                          {couponStatus === "invalid" && couponError && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="text-xs text-destructive flex items-center gap-1"
+                            >
+                              <X className="w-3 h-3 shrink-0" />
+                              {couponError}
+                            </motion.p>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Discount Line */}
+                  {discountAmount > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="flex justify-between text-sm"
+                    >
+                      <span className="text-lime font-semibold flex items-center gap-1">
+                        <Tag className="w-3 h-3" /> Discount ({couponData?.code})
+                      </span>
+                      <span className="font-bold text-lime">−₹{discountAmount.toLocaleString('en-IN')}</span>
+                    </motion.div>
+                  )}
+
+                  <div className="flex justify-between text-lg font-black pt-2 border-t border-border mt-1">
                     <span>Total</span>
-                    <span>₹{finalTotal}</span>
+                    <span>₹{finalTotal.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
               </div>

@@ -41,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources/Invoices'), for: 'App\Filament\Resources\Invoices')
             ->discoverResources(in: app_path('Filament/Resources/Refunds'), for: 'App\Filament\Resources\Refunds')
             ->discoverResources(in: app_path('Filament/Resources/Transactions'), for: 'App\Filament\Resources\Transactions')
+            ->discoverResources(in: app_path('Filament/Resources/Coupons'), for: 'App\Filament\Resources\Coupons')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,

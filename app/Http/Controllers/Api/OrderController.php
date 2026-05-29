@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Coupon;
 use App\Models\Order;
 
 class OrderController extends Controller
@@ -56,14 +57,39 @@ class OrderController extends Controller
         ]);
 
         $user = $request->user();
-        $finalAmount = $request->amount; 
+
+        // Resolve coupon discount server-side (re-validate to prevent tampering)
+        $discountAmount = 0;
+        $couponCode = null;
+        if ($request->filled('coupon_code')) {
+            $coupon = Coupon::whereRaw('UPPER(code) = ?', [strtoupper($request->coupon_code)])
+                ->where('status', true)
+                ->first();
+            if ($coupon) {
+                $subtotalForCoupon = (float) $request->amount + (float) ($request->discount ?? 0);
+                if (!$coupon->expiry_date || now()->isBefore($coupon->expiry_date)) {
+                    if ($coupon->usage_limit === null || $coupon->usage_count < $coupon->usage_limit) {
+                        if ($subtotalForCoupon >= (float) $coupon->min_order_value) {
+                            $discountAmount = $coupon->type === 'percentage'
+                                ? round(($subtotalForCoupon * (float) $coupon->value) / 100, 2)
+                                : min((float) $coupon->value, $subtotalForCoupon);
+                            $couponCode = strtoupper($coupon->code);
+                        }
+                    }
+                }
+            }
+        }
+
+        $subtotal = (float) $request->amount + $discountAmount; // gross subtotal before discount
+        $finalAmount = max(0, (float) $request->amount);        // net amount after discount (what client sent)
         
         $order = Order::create([
             'user_id' => $user->id,
             'status' => 'pending',
-            'subtotal' => $finalAmount,
+            'subtotal' => $subtotal,
             'shipping' => 0,
-            'discount' => 0,
+            'discount' => $discountAmount,
+            'coupon_code' => $couponCode,
             'total' => $finalAmount,
             'payment_method' => $request->payment_method,
             'payment_status' => 'pending',
@@ -110,6 +136,11 @@ class OrderController extends Controller
                      'selected_attributes' => $item['selected_attributes'] ?? null,
                  ]);
              }
+        }
+
+        // Increment coupon usage count after successful order creation
+        if ($couponCode) {
+            Coupon::whereRaw('UPPER(code) = ?', [$couponCode])->increment('usage_count');
         }
 
         // Subscribe customer to Moosend (for order automations / re-engagement)

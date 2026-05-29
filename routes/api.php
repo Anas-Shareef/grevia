@@ -13,10 +13,12 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\NewsletterController;
+use App\Http\Controllers\Api\CouponController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
+Route::post('/coupon/apply', [CouponController::class, 'apply']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();

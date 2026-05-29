@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
@@ -46,9 +47,31 @@ class RazorpayController extends Controller
 
             $user = $request->user();
             
+            // Resolve coupon discount server-side (re-validate to prevent tampering)
+            $discountAmount = 0;
+            $couponCode = null;
+            if ($request->filled('coupon_code')) {
+                $coupon = Coupon::whereRaw('UPPER(code) = ?', [strtoupper($request->coupon_code)])
+                    ->where('status', true)
+                    ->first();
+                if ($coupon) {
+                    $grossAmount = (float) $request->amount + (float) ($request->discount ?? 0);
+                    if (!$coupon->expiry_date || now()->isBefore($coupon->expiry_date)) {
+                        if ($coupon->usage_limit === null || $coupon->usage_count < $coupon->usage_limit) {
+                            if ($grossAmount >= (float) $coupon->min_order_value) {
+                                $discountAmount = $coupon->type === 'percentage'
+                                    ? round(($grossAmount * (float) $coupon->value) / 100, 2)
+                                    : min((float) $coupon->value, $grossAmount);
+                                $couponCode = strtoupper($coupon->code);
+                            }
+                        }
+                    }
+                }
+            }
+
             // 1. Calculate amount in paise and ensure it's an integer
             // Floating point amounts can cause Razorpay API to reject the request
-            $finalAmount = (float) $request->amount;
+            $finalAmount = (float) $request->amount; // net amount after discount
             $amountInPaise = (int) round($finalAmount * 100);
 
             if ($amountInPaise <= 0) {
@@ -59,9 +82,10 @@ class RazorpayController extends Controller
             $order = Order::create([
                 'user_id' => $user->id,
                 'status' => 'pending',
-                'subtotal' => $finalAmount,
-                'shipping' => 0, // Should ideally be passed or calculated
-                'discount' => 0,
+                'subtotal' => $finalAmount + $discountAmount,
+                'shipping' => 0,
+                'discount' => $discountAmount,
+                'coupon_code' => $couponCode,
                 'total' => $finalAmount,
                 'payment_method' => 'razorpay',
                 'payment_status' => 'pending',
@@ -143,6 +167,11 @@ class RazorpayController extends Controller
             }
 
             DB::commit();
+
+            // Increment coupon usage count after DB commit (order is fully saved)
+            if ($couponCode) {
+                Coupon::whereRaw('UPPER(code) = ?', [$couponCode])->increment('usage_count');
+            }
 
             return response()->json([
                 'success' => true,
