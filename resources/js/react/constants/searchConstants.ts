@@ -1,10 +1,10 @@
 export const POPULAR_TAGS = [
   'Stevia Drops',
+  'Stevia Powder',
   'Monk Fruit',
-  'Zero Calorie',
-  'Keto Sweetener',
-  'Liquid Stevia',
-  'Sugar Free'
+  'Monkfruit Drops',
+  'Vanilla',
+  'Stevia Jar'
 ];
 
 export const PLACEHOLDER_PHRASES = [

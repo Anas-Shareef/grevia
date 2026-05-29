@@ -19,6 +19,7 @@ class ProductController extends Controller
             // ── 1. Search ──────────────────────────────────────────────────
             if ($request->filled('search')) {
                 $search = $request->search;
+                $cleanSearch = str_replace(' ', '', strtolower($search));
 
                 // Log search term in database for dynamic popular searches
                 $trimmedSearch = trim(strtolower($search));
@@ -33,11 +34,13 @@ class ProductController extends Controller
                     }
                 }
 
-                $query->where(function ($q) use ($search) {
+                $query->where(function ($q) use ($search, $cleanSearch) {
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('subcategory', 'like', "%{$search}%")
                       ->orWhereJsonContains('tags', strtolower($search))
-                      ->orWhere('subcategory', 'like', "%{$search}%");
+                      ->orWhere(\DB::raw("REPLACE(LOWER(name), ' ', '')"), 'like', "%{$cleanSearch}%")
+                      ->orWhere(\DB::raw("REPLACE(LOWER(description), ' ', '')"), 'like', "%{$cleanSearch}%");
                 });
             }
 
@@ -414,36 +417,48 @@ class ProductController extends Controller
 
     public function getPopularSearches()
     {
+        $fallback = [
+            'Stevia Drops',
+            'Stevia Powder',
+            'Monk Fruit',
+            'Monkfruit Drops',
+            'Vanilla',
+            'Stevia Jar'
+        ];
+
         try {
-            $queries = \App\Models\SearchLog::orderBy('hits', 'desc')
-                ->limit(6)
-                ->pluck('query')
-                ->map(fn($q) => ucwords($q))
-                ->toArray();
+            $queries = \App\Models\SearchLog::orderBy('hits', 'desc')->get();
 
-            $fallback = [
-                'Stevia Drops',
-                'Monk Fruit',
-                'Zero Calorie',
-                'Keto Sweetener',
-                'Liquid Stevia',
-                'Sugar Free'
-            ];
+            $validQueries = [];
+            foreach ($queries as $log) {
+                $term = $log->query;
+                $cleanSearch = str_replace(' ', '', strtolower($term));
 
-            $merged = array_unique(array_merge($queries, $fallback));
+                // Verify this query actually yields at least 1 product
+                $hasProducts = \App\Models\Product::where('in_stock', true)
+                    ->where(function ($q) use ($term, $cleanSearch) {
+                        $q->where('name', 'like', "%{$term}%")
+                          ->orWhere('description', 'like', "%{$term}%")
+                          ->orWhere('subcategory', 'like', "%{$term}%")
+                          ->orWhere(\DB::raw("REPLACE(LOWER(name), ' ', '')"), 'like', "%{$cleanSearch}%");
+                    })
+                    ->exists();
+
+                if ($hasProducts) {
+                    $validQueries[] = ucwords($term);
+                    if (count($validQueries) >= 6) {
+                        break;
+                    }
+                }
+            }
+
+            $merged = array_unique(array_merge($validQueries, $fallback));
             $result = array_slice($merged, 0, 6);
 
             return response()->json($result);
         } catch (\Throwable $e) {
             \Log::warning("Failed to fetch popular searches from DB: " . $e->getMessage());
-            return response()->json([
-                'Stevia Drops',
-                'Monk Fruit',
-                'Zero Calorie',
-                'Keto Sweetener',
-                'Liquid Stevia',
-                'Sugar Free'
-            ]);
+            return response()->json($fallback);
         }
     }
 
