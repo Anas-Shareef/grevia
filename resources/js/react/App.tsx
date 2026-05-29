@@ -101,10 +101,10 @@ const App = () => {
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
                 
-                {/* Policies Routes */}
                 <Route path="/privacy-policy" element={<PolicyPage type="privacy" />} />
                 <Route path="/terms-conditions" element={<PolicyPage type="terms" />} />
-                <Route path="/return-policy" element={<PolicyPage type="return" />} />
+                <Route path="/refund-policy" element={<PolicyPage type="refund" />} />
+                <Route path="/return-policy" element={<Navigate to="/refund-policy" replace />} />
                 <Route path="/faq" element={<PolicyPage type="faq" />} />
                 <Route path="/shipping-policy" element={<PolicyPage type="shipping" />} />
                 

@@ -17,9 +17,10 @@ const Footer = () => {
     ],
     support: [
       { label: "Contact", href: "/contact" },
-      { label: "FAQ", href: "/faq" },
-      { label: "Shipping", href: "/shipping-policy" },
-      { label: "Returns", href: "/return-policy" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms-conditions" },
+      { label: "Refund Policy", href: "/refund-policy" },
+      { label: "Shipping Policy", href: "/shipping-policy" },
     ],
   };
 
@@ -135,7 +136,7 @@ const Footer = () => {
             <p className="text-xs text-white/30">
               © 2026 Grevia. All rights reserved.
             </p>
-            <div className="flex gap-6">
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
               <Link
                 to="/privacy-policy"
                 className="text-xs text-white/30 hover:text-white transition-colors"
@@ -147,6 +148,18 @@ const Footer = () => {
                 className="text-xs text-white/30 hover:text-white transition-colors"
               >
                 Terms & Conditions
+              </Link>
+              <Link
+                to="/refund-policy"
+                className="text-xs text-white/30 hover:text-white transition-colors"
+              >
+                Refund Policy
+              </Link>
+              <Link
+                to="/shipping-policy"
+                className="text-xs text-white/30 hover:text-white transition-colors"
+              >
+                Shipping Policy
               </Link>
             </div>
           </div>

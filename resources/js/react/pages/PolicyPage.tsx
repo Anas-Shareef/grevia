@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ShieldCheck, FileText, Sparkles } from "lucide-react";
 
 interface PolicyPageProps {
-  type: "privacy" | "terms" | "return" | "faq" | "shipping";
+  type: "privacy" | "terms" | "refund" | "faq" | "shipping";
 }
 
 const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
@@ -14,7 +15,7 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
   let content = "";
   let metaTitle = "";
   let metaDescription = "";
-  let icon = <FileText className="w-8 h-8 text-white" />;
+  let icon = <FileText className="w-8 h-8 text-[#2D6A4F]" />;
 
   switch (type) {
     case "privacy":
@@ -22,7 +23,7 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
       content = settings.policy_privacy_content || "";
       metaTitle = settings.policy_privacy_meta_title || "Privacy Policy | Grevia - Premium Organic Sweeteners";
       metaDescription = settings.policy_privacy_meta_description || "Read our privacy policy to understand how we collect, use, and protect your personal information.";
-      icon = <ShieldCheck className="w-8 h-8 text-white" />;
+      icon = <ShieldCheck className="w-8 h-8 text-[#2D6A4F]" />;
       break;
     case "terms":
       title = "Terms & Conditions";
@@ -30,21 +31,21 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
       metaTitle = settings.policy_terms_meta_title || "Terms & Conditions | Grevia - Premium Organic Sweeteners";
       metaDescription = settings.policy_terms_meta_description || "Review the terms and conditions for using our website and purchasing our premium sweeteners.";
       break;
-    case "return":
-      title = "Return Policy";
-      content = settings.policy_return_content || "";
-      metaTitle = settings.policy_return_meta_title || "Return Policy | Grevia - Premium Organic Sweeteners";
-      metaDescription = settings.policy_return_meta_description || "Learn about our return, refund, and replacement policies for Grevia sweeteners.";
+    case "refund":
+      title = "Refund Policy";
+      content = settings.policy_refund_content || settings.policy_return_content || "";
+      metaTitle = settings.policy_refund_meta_title || settings.policy_return_meta_title || "Refund Policy | Grevia - Premium Organic Sweeteners";
+      metaDescription = settings.policy_refund_meta_description || settings.policy_return_meta_description || "Learn about our refund and cancellation policies for Grevia sweeteners.";
       break;
     case "faq":
       title = "Frequently Asked Questions (FAQ)";
       content = settings.policy_faq_content || "";
       metaTitle = settings.policy_faq_meta_title || "FAQ | Grevia - Premium Organic Sweeteners";
       metaDescription = settings.policy_faq_meta_description || "Find answers to frequently asked questions about our organic Stevia and Monkfruit products.";
-      icon = <Sparkles className="w-8 h-8 text-white" />;
+      icon = <Sparkles className="w-8 h-8 text-[#2D6A4F]" />;
       break;
     case "shipping":
-      title = "Shipping Policy (India)";
+      title = "Shipping Policy";
       content = settings.policy_shipping_content || "";
       metaTitle = settings.policy_shipping_meta_title || "Shipping Policy (India) | Grevia - Premium Organic Sweeteners";
       metaDescription = settings.policy_shipping_meta_description || "Read about our domestic shipping rates, delivery timelines, and order tracking information.";
@@ -67,51 +68,65 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
   }, [metaTitle, metaDescription, type]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDFDF7] font-['Montserrat']">
+    <div className="min-h-screen flex flex-col bg-white relative overflow-hidden font-['Montserrat']">
       <Header />
 
-      <main className="flex-grow pt-32 pb-24">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="max-w-4xl mx-auto">
-            {/* Page Header Card */}
-            <div className="bg-[#2E4D31] text-white p-8 md:p-12 rounded-[24px] shadow-lg mb-12 relative overflow-hidden">
-              <div className="absolute top-[-20%] right-[-10%] w-[40%] h-[80%] bg-white/5 rounded-full blur-[60px]" />
-              <div className="absolute bottom-[-10%] left-[-10%] w-[30%] h-[60%] bg-[#77cb4d]/10 rounded-full blur-[50px]" />
-              
-              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#77cb4d] mb-3 inline-block">
-                    Grevia Policies
-                  </span>
-                  <h1 className="text-3xl md:text-5xl font-black leading-tight">
-                    {title}
-                  </h1>
-                </div>
-                <div className="bg-white/10 border border-white/20 p-4 rounded-2xl self-start md:self-auto backdrop-blur-sm">
-                  {icon}
-                </div>
-              </div>
+      {/* Decorative Background - Soft circular blurs matching Lykha styling */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-0 right-0 w-1/2 rounded-full h-1/2 bg-[#2D6A4F]/5 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-1/2 rounded-full h-1/2 bg-[#74B49B]/5 blur-3xl" />
+      </div>
+
+      <main className="flex-grow pt-32 pb-24 relative z-10">
+        <div className="container mx-auto px-4 md:px-8 max-w-4xl">
+          {/* Unified Policy Card */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-[#E8F2EC] shadow-[0_8px_30px_rgba(45,106,79,0.06)] p-6 sm:p-10 md:p-16">
+            
+            {/* Header with Centered Styling */}
+            <div className="mb-10 text-center">
+              <span className="text-[#74B49B] text-[10px] sm:text-xs tracking-[0.3em] uppercase block mb-3 font-bold">
+                Grevia Trust & Policy
+              </span>
+              <h1 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#1A3C2E] mb-3 uppercase tracking-tight">
+                {title}
+              </h1>
+              <p className="max-w-md mx-auto text-xs sm:text-sm text-gray-400">
+                Everything you need to know about our {title.toLowerCase()}
+              </p>
             </div>
 
-            {/* Content Card */}
-            <div className="bg-white border border-[#E5E7EB] rounded-[24px] p-8 md:p-12 shadow-sm">
+            {/* Policy Content */}
+            <div className="min-h-[200px]">
               {content ? (
                 <div 
-                  className="prose prose-slate max-w-none prose-headings:text-[#2E4D31] prose-headings:font-black prose-p:text-[#4A4A4A] prose-p:leading-relaxed prose-a:text-[#77cb4d] prose-a:font-semibold"
+                  className="prose prose-slate max-w-none prose-headings:text-[#1A3C2E] prose-headings:font-bold prose-headings:font-display prose-p:text-[#555555] prose-p:leading-relaxed prose-a:text-[#2D6A4F] prose-a:font-semibold"
                   dangerouslySetInnerHTML={{ __html: content }}
                 />
               ) : (
                 <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-[#F0FAE8] rounded-full flex items-center justify-center mx-auto mb-6">
-                    <FileText className="w-8 h-8 text-[#2E4D31]" />
+                  <div className="w-16 h-16 bg-[#F0F7F3] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <FileText className="w-8 h-8 text-[#2D6A4F]" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#2E4D31] mb-2">Content Coming Soon</h3>
+                  <h3 className="text-xl font-bold text-[#1A3C2E] mb-2">Content Coming Soon</h3>
                   <p className="text-gray-400 font-medium max-w-md mx-auto">
                     We are currently updating this policy page. Please check back shortly for the full updated details.
                   </p>
                 </div>
               )}
             </div>
+
+            {/* Footer Trust & Navigation */}
+            <div className="text-center mt-12 pt-8 border-t border-[#E8F2EC]">
+              <p className="text-lg font-display font-bold text-[#1A3C2E] mb-2">Thank you for choosing Grevia.</p>
+              <p className="text-xs text-gray-400 mb-6">Sweetness Without Sacrifice</p>
+              <Link
+                to="/collections/all"
+                className="inline-flex items-center gap-2 bg-[#2D6A4F]/10 hover:bg-[#2D6A4F]/20 text-[#2D6A4F] px-6 py-2.5 rounded-full transition-all duration-300 font-bold text-xs uppercase tracking-wider"
+              >
+                Back to Shopping
+              </Link>
+            </div>
+
           </div>
         </div>
       </main>

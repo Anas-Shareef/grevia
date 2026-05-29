@@ -112,25 +112,14 @@ class ManageSettings extends Page
                                                     ->label('SEO Meta Description')
                                                     ->rows(3),
                                             ]),
-                                        Tabs\Tab::make('Return Policy')
+                                        Tabs\Tab::make('Refund Policy')
                                             ->schema([
-                                                RichEditor::make('policy_return_content')
-                                                    ->label('Return Policy Content'),
-                                                TextInput::make('policy_return_meta_title')
+                                                RichEditor::make('policy_refund_content')
+                                                    ->label('Refund Policy Content'),
+                                                TextInput::make('policy_refund_meta_title')
                                                     ->label('SEO Meta Title')
-                                                    ->placeholder('Return Policy | Grevia'),
-                                                Textarea::make('policy_return_meta_description')
-                                                    ->label('SEO Meta Description')
-                                                    ->rows(3),
-                                            ]),
-                                        Tabs\Tab::make('FAQ')
-                                            ->schema([
-                                                RichEditor::make('policy_faq_content')
-                                                    ->label('Frequently Asked Questions Content'),
-                                                TextInput::make('policy_faq_meta_title')
-                                                    ->label('SEO Meta Title')
-                                                    ->placeholder('FAQ | Grevia'),
-                                                Textarea::make('policy_faq_meta_description')
+                                                    ->placeholder('Refund Policy | Grevia'),
+                                                Textarea::make('policy_refund_meta_description')
                                                     ->label('SEO Meta Description')
                                                     ->rows(3),
                                             ]),
