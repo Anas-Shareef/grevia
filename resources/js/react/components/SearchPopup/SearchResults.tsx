@@ -7,6 +7,7 @@ interface SearchResultsProps {
   results: Product[];
   onResultClick: () => void;
   onSuggestionClick: (tag: string) => void;
+  tags: string[];
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
@@ -14,17 +15,19 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   results,
   onResultClick,
   onSuggestionClick,
+  tags,
 }) => {
   const showNoResults = results.length === 0;
 
   if (showNoResults) {
+    const suggestions = tags.slice(0, 3);
     return (
       <div className="sp-no-results">
         <p className="sp-no-results-text">
           Nothing found for "{query}". Try:
         </p>
         <div className="sp-no-results-suggestions">
-          {["Stevia", "Monk Fruit", "Zero Calorie"].map((tag) => (
+          {suggestions.map((tag) => (
             <button
               key={tag}
               type="button"

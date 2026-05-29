@@ -1,16 +1,16 @@
 import React from "react";
-import { POPULAR_TAGS } from "@/constants/searchConstants";
 
 interface PopularTagsProps {
   onTagClick: (tag: string) => void;
+  tags: string[];
 }
 
-export const PopularTags: React.FC<PopularTagsProps> = ({ onTagClick }) => {
+export const PopularTags: React.FC<PopularTagsProps> = ({ onTagClick, tags }) => {
   return (
     <div>
       <h3 className="sp-section-title">Popular Searches</h3>
       <div className="sp-tags-container">
-        {POPULAR_TAGS.map((tag) => (
+        {tags.map((tag) => (
           <button
             key={tag}
             type="button"

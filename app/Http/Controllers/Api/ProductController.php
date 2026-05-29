@@ -19,6 +19,20 @@ class ProductController extends Controller
             // ── 1. Search ──────────────────────────────────────────────────
             if ($request->filled('search')) {
                 $search = $request->search;
+
+                // Log search term in database for dynamic popular searches
+                $trimmedSearch = trim(strtolower($search));
+                if (strlen($trimmedSearch) >= 2) {
+                    try {
+                        \App\Models\SearchLog::updateOrCreate(
+                            ['query' => $trimmedSearch],
+                            ['hits' => \DB::raw('hits + 1')]
+                        );
+                    } catch (\Throwable $e) {
+                        \Log::warning("Failed to log search term: " . $e->getMessage());
+                    }
+                }
+
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('description', 'like', "%{$search}%")
@@ -397,6 +411,42 @@ class ProductController extends Controller
             'tip' => "1g replaces {$multiplier}g of sugar"
         ]);
     }
+
+    public function getPopularSearches()
+    {
+        try {
+            $queries = \App\Models\SearchLog::orderBy('hits', 'desc')
+                ->limit(6)
+                ->pluck('query')
+                ->map(fn($q) => ucwords($q))
+                ->toArray();
+
+            $fallback = [
+                'Stevia Drops',
+                'Monk Fruit',
+                'Zero Calorie',
+                'Keto Sweetener',
+                'Liquid Stevia',
+                'Sugar Free'
+            ];
+
+            $merged = array_unique(array_merge($queries, $fallback));
+            $result = array_slice($merged, 0, 6);
+
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            \Log::warning("Failed to fetch popular searches from DB: " . $e->getMessage());
+            return response()->json([
+                'Stevia Drops',
+                'Monk Fruit',
+                'Zero Calorie',
+                'Keto Sweetener',
+                'Liquid Stevia',
+                'Sugar Free'
+            ]);
+        }
+    }
+
     private function formatStructuredAttributes($product, $hasEav)
     {
         $structuredAttributes = [
