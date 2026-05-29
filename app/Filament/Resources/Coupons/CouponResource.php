@@ -28,7 +28,7 @@ class CouponResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
-    protected static ?string $navigationGroup = 'Marketing';
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
 
     protected static ?string $navigationLabel = 'Coupons & Promos';
 
