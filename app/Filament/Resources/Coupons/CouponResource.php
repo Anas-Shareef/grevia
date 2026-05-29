@@ -16,7 +16,7 @@ class CouponResource extends Resource
 {
     protected static ?string $model = Coupon::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    protected static string|\BackedEnum|null $navigationIcon = null; // Marketing group already has an icon
 
     protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
 
