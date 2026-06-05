@@ -11,8 +11,8 @@ class ShippingMethodSeeder extends Seeder
     {
         ShippingMethod::create([
             'name' => 'Standard Shipping',
-            'cost' => 100.00,
-            'rule_free_above' => 500.00,
+            'cost' => 60.00,
+            'rule_free_above' => 499.00,
             'is_active' => true,
         ]);
     }

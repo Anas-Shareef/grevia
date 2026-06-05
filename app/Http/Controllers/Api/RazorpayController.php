@@ -47,6 +47,34 @@ class RazorpayController extends Controller
 
             $user = $request->user();
             
+            // Calculate true items subtotal server-side to prevent tampering
+            $itemsSubtotal = 0;
+            foreach ($request->items as $item) {
+                 $product = \App\Models\Product::where('slug', $item['product_id'])
+                    ->orWhere('id', $item['product_id'])
+                    ->first();
+                 if ($product) {
+                     $price = $product->price;
+                     if (!empty($item['variant_id'])) {
+                         $variant = \App\Models\ProductVariant::find($item['variant_id']);
+                         if ($variant && $variant->product_id == $product->id) {
+                             $price = $variant->effective_price;
+                         }
+                     }
+                     $itemsSubtotal += (float) $price * (int) $item['quantity'];
+                 }
+            }
+
+            // Calculate dynamic shipping cost
+            $shippingCost = 0;
+            $shippingMethod = \App\Models\ShippingMethod::where('is_active', true)->first();
+            if ($shippingMethod) {
+                $shippingCost = (float) $shippingMethod->cost;
+                if ($shippingMethod->rule_free_above !== null && $itemsSubtotal >= (float) $shippingMethod->rule_free_above) {
+                    $shippingCost = 0;
+                }
+            }
+
             // Resolve coupon discount server-side (re-validate to prevent tampering)
             $discountAmount = 0;
             $couponCode = null;
@@ -55,13 +83,12 @@ class RazorpayController extends Controller
                     ->where('status', true)
                     ->first();
                 if ($coupon) {
-                    $grossAmount = (float) $request->amount + (float) ($request->discount ?? 0);
                     if (!$coupon->expiry_date || now()->isBefore($coupon->expiry_date)) {
                         if ($coupon->usage_limit === null || $coupon->usage_count < $coupon->usage_limit) {
-                            if ($grossAmount >= (float) $coupon->min_order_value) {
+                            if ($itemsSubtotal >= (float) $coupon->min_order_value) {
                                 $discountAmount = $coupon->type === 'percentage'
-                                    ? round(($grossAmount * (float) $coupon->value) / 100, 2)
-                                    : min((float) $coupon->value, $grossAmount);
+                                    ? round(($itemsSubtotal * (float) $coupon->value) / 100, 2)
+                                    : min((float) $coupon->value, $itemsSubtotal);
                                 $couponCode = strtoupper($coupon->code);
                             }
                         }
@@ -71,7 +98,7 @@ class RazorpayController extends Controller
 
             // 1. Calculate amount in paise and ensure it's an integer
             // Floating point amounts can cause Razorpay API to reject the request
-            $finalAmount = (float) $request->amount; // net amount after discount
+            $finalAmount = max(0, $itemsSubtotal + $shippingCost - $discountAmount); // net amount after discount
             $amountInPaise = (int) round($finalAmount * 100);
 
             if ($amountInPaise <= 0) {
@@ -82,8 +109,8 @@ class RazorpayController extends Controller
             $order = Order::create([
                 'user_id' => $user->id,
                 'status' => 'pending',
-                'subtotal' => $finalAmount + $discountAmount,
-                'shipping' => 0,
+                'subtotal' => $itemsSubtotal,
+                'shipping' => $shippingCost,
                 'discount' => $discountAmount,
                 'coupon_code' => $couponCode,
                 'total' => $finalAmount,
