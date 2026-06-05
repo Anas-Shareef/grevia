@@ -87,7 +87,7 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
               <span className="text-[#74B49B] text-[10px] sm:text-xs tracking-[0.3em] uppercase block mb-3 font-bold">
                 Grevia Trust & Policy
               </span>
-              <h1 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#1A3C2E] mb-3 uppercase tracking-tight">
+              <h1 className="font-['Montserrat'] font-black text-3xl sm:text-4xl md:text-5xl text-[#1A3C2E] mb-3 uppercase tracking-tight">
                 {title}
               </h1>
               <p className="max-w-md mx-auto text-xs sm:text-sm text-gray-400">
@@ -99,7 +99,7 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
             <div className="min-h-[200px]">
               {content ? (
                 <div 
-                  className="prose prose-slate max-w-none prose-headings:text-[#1A3C2E] prose-headings:font-bold prose-headings:font-display prose-headings:first:mt-0 prose-h2:text-xl md:prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-lg md:prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-[#555555] prose-p:leading-relaxed prose-p:mt-0 prose-p:mb-5 prose-a:text-[#2D6A4F] prose-a:font-semibold prose-a:underline prose-a:hover:text-[#74B49B] prose-a:transition-colors prose-strong:text-[#1A3C2E] prose-strong:font-bold prose-li:text-[#555555] prose-li:my-1.5 prose-li:marker:text-[#74B49B] prose-ul:list-disc prose-ul:mt-0 prose-ul:mb-4 prose-ol:list-decimal prose-ol:mt-0 prose-ol:mb-4 prose-blockquote:border-l-4 prose-blockquote:border-[#74B49B] prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-500"
+                  className="prose prose-slate max-w-none font-['Montserrat'] prose-headings:text-[#1A3C2E] prose-headings:font-bold prose-headings:font-['Montserrat'] prose-headings:first:mt-0 prose-h2:text-xl md:prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-lg md:prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-[#555555] prose-p:leading-relaxed prose-p:mt-0 prose-p:mb-5 prose-a:text-[#2D6A4F] prose-a:font-semibold prose-a:underline prose-a:hover:text-[#74B49B] prose-a:transition-colors prose-strong:text-[#1A3C2E] prose-strong:font-bold prose-li:text-[#555555] prose-li:my-1.5 prose-li:marker:text-[#74B49B] prose-ul:list-disc prose-ul:mt-0 prose-ul:mb-4 prose-ol:list-decimal prose-ol:mt-0 prose-ol:mb-4 prose-blockquote:border-l-4 prose-blockquote:border-[#74B49B] prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-500"
                   dangerouslySetInnerHTML={{ __html: content }}
                 />
               ) : (
@@ -117,7 +117,7 @@ const PolicyPage: React.FC<PolicyPageProps> = ({ type }) => {
 
             {/* Footer Trust & Navigation */}
             <div className="text-center mt-12 pt-8 border-t border-[#E8F2EC]">
-              <p className="text-lg font-display font-bold text-[#1A3C2E] mb-2">Thank you for choosing Grevia.</p>
+              <p className="text-lg font-['Montserrat'] font-bold text-[#1A3C2E] mb-2">Thank you for choosing Grevia.</p>
               <p className="text-xs text-gray-400 mb-6">Sweetness Without Sacrifice</p>
               <Link
                 to="/collections/all"
