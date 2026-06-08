@@ -1,8 +1,34 @@
-import { Send, Instagram, Twitter, Facebook } from "lucide-react";
+import { Send, Instagram, Twitter, Facebook, Linkedin, Youtube, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../lib/api";
 
 const Footer = () => {
-  const footerLinks = {
+  const { data: footerSections } = useQuery<any[]>({
+    queryKey: ['footer-sections'],
+    queryFn: () => api.get('/content/footer'),
+  });
+
+  const getSocialIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'instagram':
+        return <Instagram className="w-5 h-5" />;
+      case 'facebook':
+        return <Facebook className="w-5 h-5" />;
+      case 'twitter':
+      case 'x':
+        return <Twitter className="w-5 h-5" />;
+      case 'linkedin':
+        return <Linkedin className="w-5 h-5" />;
+      case 'youtube':
+        return <Youtube className="w-5 h-5" />;
+      default:
+        return <LinkIcon className="w-5 h-5" />;
+    }
+  };
+
+  // Fallback defaults
+  const defaultLinks = {
     shop: [
       { label: "All Products", href: "/collections/all" },
       { label: "Stevia", href: "/collections/stevia" },
@@ -24,10 +50,30 @@ const Footer = () => {
     ],
   };
 
-  const socials = [
+  const defaultSocials = [
     { label: "Instagram", icon: <Instagram className="w-5 h-5" />, href: (window as any).GreviaSettings?.instagram_url || "#" },
     { label: "Facebook", icon: <Facebook className="w-5 h-5" />, href: (window as any).GreviaSettings?.facebook_url || "#" },
   ];
+
+  // 1. Text description
+  const textSection = footerSections?.find(s => s.type === 'text' && !s.section_name.toLowerCase().includes('copyright'));
+  const footerText = textSection?.content?.text || "Experience the pure taste of nature with our premium organic sweeteners. Zero calories, zero guilt, endless flavor.";
+
+  // 2. Link Columns
+  const linkSections = footerSections?.filter(s => s.type === 'links');
+  const hasLinkSections = linkSections && linkSections.length > 0;
+
+  // 3. Social profiles
+  const socialSection = footerSections?.find(s => s.type === 'social');
+  const socialsList = socialSection?.content?.socials;
+  const hasSocials = socialsList && socialsList.length > 0;
+
+  // 4. Copyright
+  const copyrightSection = footerSections?.find(s => s.type === 'text' && s.section_name.toLowerCase().includes('copyright'));
+  const rawCopyright = copyrightSection?.content?.text;
+  const copyrightText = rawCopyright 
+    ? rawCopyright.replace(/<[^>]*>/g, '') 
+    : "© 2026 Grevia. All rights reserved.";
 
   return (
     <footer className="bg-primary text-white pt-20 pb-10 overflow-hidden" role="contentinfo">
@@ -42,10 +88,16 @@ const Footer = () => {
                 className="h-10 w-auto brightness-0 invert"
               />
             </Link>
-            <p className="text-white/60 max-w-sm mb-8 leading-relaxed text-sm">
-              Experience the pure taste of nature with our premium organic
-              sweeteners. Zero calories, zero guilt, endless flavor.
-            </p>
+            {textSection?.content?.text ? (
+              <div 
+                className="text-white/60 max-w-sm mb-8 leading-relaxed text-sm prose prose-invert"
+                dangerouslySetInnerHTML={{ __html: textSection.content.text }}
+              />
+            ) : (
+              <p className="text-white/60 max-w-sm mb-8 leading-relaxed text-sm">
+                {footerText}
+              </p>
+            )}
 
             {/* Newsletter */}
             <div className="max-w-md">
@@ -72,69 +124,108 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Shop Column */}
-          <div className="lg:col-span-1">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-5">
-              Shop
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.shop.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Dynamic or Fallback Columns */}
+          {hasLinkSections ? (
+            linkSections.map((section: any) => (
+              <div key={section.id} className="lg:col-span-1">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-5">
+                  {section.section_name}
+                </h3>
+                <ul className="space-y-3">
+                  {(section.content?.links || []).map((link: any, idx: number) => {
+                    const isExternal = link.url.startsWith('http') || link.url.startsWith('//');
+                    return (
+                      <li key={idx}>
+                        {isExternal ? (
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-white/70 hover:text-white text-sm transition-colors"
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <Link
+                            to={link.url}
+                            className="text-white/70 hover:text-white text-sm transition-colors"
+                          >
+                            {link.label}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))
+          ) : (
+            <>
+              {/* Shop Column Fallback */}
+              <div className="lg:col-span-1">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-5">
+                  Shop
+                </h3>
+                <ul className="space-y-3">
+                  {defaultLinks.shop.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        to={link.href}
+                        className="text-white/70 hover:text-white text-sm transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          {/* Company Column */}
-          <div className="lg:col-span-1">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-5">
-              Company
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+              {/* Company Column Fallback */}
+              <div className="lg:col-span-1">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-5">
+                  Company
+                </h3>
+                <ul className="space-y-3">
+                  {defaultLinks.company.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        to={link.href}
+                        className="text-white/70 hover:text-white text-sm transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          {/* Support Column */}
-          <div className="lg:col-span-1">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-5">
-              Support
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.support.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+              {/* Support Column Fallback */}
+              <div className="lg:col-span-1">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-5">
+                  Support
+                </h3>
+                <ul className="space-y-3">
+                  {defaultLinks.support.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        to={link.href}
+                        className="text-white/70 hover:text-white text-sm transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <p className="text-xs text-white/30">
-              © 2026 Grevia. All rights reserved.
+              {copyrightText}
             </p>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               <Link
@@ -165,16 +256,31 @@ const Footer = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {socials.map((social) => (
-              <a
-                key={social.label}
-                href={social.href}
-                aria-label={social.label}
-                className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-300"
-              >
-                {social.icon}
-              </a>
-            ))}
+            {hasSocials ? (
+              socialsList.map((social: any, idx: number) => (
+                <a
+                  key={idx}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.platform}
+                  className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-300"
+                >
+                  {getSocialIcon(social.platform)}
+                </a>
+              ))
+            ) : (
+              defaultSocials.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  aria-label={social.label}
+                  className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-300"
+                >
+                  {social.icon}
+                </a>
+              ))
+            )}
           </div>
         </div>
       </div>
