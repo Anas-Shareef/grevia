@@ -23,6 +23,29 @@ class CreateProduct extends CreateRecord
         $this->saveEavAttribute($record, 'format',       $data['attr_format'] ?? null,        false);
         $this->saveEavAttribute($record, 'concentration', $data['attr_concentration'] ?? [],   true);
         $this->saveEavAttribute($record, 'trust_badges',  $data['attr_trust_badges'] ?? [],    true);
+
+        // Set is_default_concentration
+        if (!empty($data['attr_default_concentration']) && Schema::hasColumn('product_attribute_value', 'is_default_concentration')) {
+            $concAttr = \App\Models\Attribute::where('name', 'concentration')->first();
+            if ($concAttr) {
+                // Reset all concentrations for this product
+                DB::table('product_attribute_value')
+                    ->where('product_id', $record->id)
+                    ->whereIn('value_id', $concAttr->values->pluck('id'))
+                    ->update(['is_default_concentration' => 0]);
+
+                // Set the chosen default
+                $defaultVal = \App\Models\AttributeValue::where('attribute_id', $concAttr->id)
+                    ->where('slug', $data['attr_default_concentration'])
+                    ->first();
+                if ($defaultVal) {
+                    DB::table('product_attribute_value')
+                        ->where('product_id', $record->id)
+                        ->where('value_id', $defaultVal->id)
+                        ->update(['is_default_concentration' => 1]);
+                }
+            }
+        }
     }
 
     private function saveEavAttribute(\App\Models\Product $record, string $attrName, mixed $state, bool $multiple): void

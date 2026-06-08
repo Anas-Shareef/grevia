@@ -60,7 +60,7 @@ class AddressesRelationManager extends RelationManager
                 Tables\Columns\IconColumn::make('is_default_billing')->boolean()->label('Default Billing'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                \Filament\Actions\ViewAction::make(),
             ]);
     }
 }

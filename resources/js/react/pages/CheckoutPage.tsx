@@ -68,7 +68,7 @@ const CheckoutPage = () => {
 
   const { data: shippingMethods } = useQuery<any[]>({
     queryKey: ['shipping-methods'],
-    queryFn: api.get('/shipping-methods') as unknown as () => Promise<any[]>,
+    queryFn: () => api.get('/shipping-methods') as Promise<any[]>,
   });
 
   const shippingCost = React.useMemo(() => {
