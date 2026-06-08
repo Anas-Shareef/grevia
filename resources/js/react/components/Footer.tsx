@@ -283,11 +283,6 @@ const Footer = () => {
             )}
           </div>
         </div>
-
-        {/* Debug Info */}
-        <div className="text-[10px] text-white/20 mt-6 text-center border-t border-white/5 pt-4">
-          Debug - Footer Sections: {footerSections ? JSON.stringify(footerSections) : 'undefined/null'}
-        </div>
       </div>
     </footer>
   );
