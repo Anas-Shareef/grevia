@@ -51,13 +51,13 @@ class DateFilterWidget extends Widget implements HasForms
                         
                         DatePicker::make('start_date')
                             ->label('Start Date')
-                            ->visible(fn (Get $get) => $get('date_range') === 'custom')
+                            ->visible(fn ($get) => $get('date_range') === 'custom')
                             ->live()
                             ->afterStateUpdated(fn () => $this->updateFilter()),
 
                         DatePicker::make('end_date')
                             ->label('End Date')
-                            ->visible(fn (Get $get) => $get('date_range') === 'custom')
+                            ->visible(fn ($get) => $get('date_range') === 'custom')
                             ->live()
                             ->afterStateUpdated(fn () => $this->updateFilter()),
                     ]),

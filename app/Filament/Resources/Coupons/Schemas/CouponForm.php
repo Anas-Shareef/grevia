@@ -51,12 +51,12 @@ class CouponForm
                         ->live(),
 
                     TextInput::make('value')
-                        ->label(fn (Forms\Get $get): string => $get('type') === 'percentage' ? 'Discount (%)' : 'Discount Amount (₹)')
+                        ->label(fn ($get): string => $get('type') === 'percentage' ? 'Discount (%)' : 'Discount Amount (₹)')
                         ->required()
                         ->numeric()
                         ->minValue(0.01)
-                        ->placeholder(fn (Forms\Get $get): string => $get('type') === 'percentage' ? 'e.g. 10 for 10% off' : 'e.g. 50 for ₹50 off')
-                        ->suffix(fn (Forms\Get $get): string => $get('type') === 'percentage' ? '%' : '₹'),
+                        ->placeholder(fn ($get): string => $get('type') === 'percentage' ? 'e.g. 10 for 10% off' : 'e.g. 50 for ₹50 off')
+                        ->suffix(fn ($get): string => $get('type') === 'percentage' ? '%' : '₹'),
 
                     TextInput::make('min_order_value')
                         ->label('Minimum Order Value (₹)')
