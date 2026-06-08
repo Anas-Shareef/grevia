@@ -49,6 +49,19 @@ class ManageSettings extends Page
         'policy_shipping_content',
         'policy_shipping_meta_title',
         'policy_shipping_meta_description',
+        'cta_badge_text',
+        'cta_heading',
+        'cta_description',
+        'cta_primary_btn_text',
+        'cta_primary_btn_url',
+        'cta_secondary_btn_text',
+        'cta_secondary_btn_url',
+        'cta_stat1_value',
+        'cta_stat1_label',
+        'cta_stat2_value',
+        'cta_stat2_label',
+        'cta_stat3_value',
+        'cta_stat3_label',
     ];
 
     public function mount(): void
@@ -125,6 +138,63 @@ class ManageSettings extends Page
                                         TextInput::make('google_analytics_id')
                                             ->label('GA4 Measurement ID')
                                             ->placeholder('G-XXXXXXXXXX'),
+                                    ]),
+                            ]),
+
+                        Tabs\Tab::make('Homepage CTA')
+                            ->icon('heroicon-o-sparkles')
+                            ->schema([
+                                TextInput::make('cta_badge_text')
+                                    ->label('Badge Text')
+                                    ->placeholder('Limited Time Offer'),
+                                TextInput::make('cta_heading')
+                                    ->label('Heading')
+                                    ->placeholder('Ready to Make the Sweet Switch?'),
+                                Textarea::make('cta_description')
+                                    ->label('Description')
+                                    ->rows(3)
+                                    ->placeholder("Join thousands who've already discovered..."),
+                                Grid::make(2)
+                                    ->components([
+                                        TextInput::make('cta_primary_btn_text')
+                                            ->label('Primary Button Text')
+                                            ->placeholder('Shop Now & Save 20%'),
+                                        TextInput::make('cta_primary_btn_url')
+                                            ->label('Primary Button Link')
+                                            ->placeholder('/collections/all'),
+                                        TextInput::make('cta_secondary_btn_text')
+                                            ->label('Secondary Button Text')
+                                            ->placeholder('Learn More'),
+                                        TextInput::make('cta_secondary_btn_url')
+                                            ->label('Secondary Button Link')
+                                            ->placeholder('/benefits'),
+                                    ]),
+                                Section::make('Statistics / Metrics')
+                                    ->schema([
+                                        Grid::make(3)
+                                            ->components([
+                                                TextInput::make('cta_stat1_value')
+                                                    ->label('Stat 1 Value')
+                                                    ->placeholder('50K+'),
+                                                TextInput::make('cta_stat1_label')
+                                                    ->label('Stat 1 Label')
+                                                    ->placeholder('Happy Customers'),
+                                                TextInput::make('cta_stat2_value')
+                                                    ->label('Stat 2 Value')
+                                                    ->placeholder('4.9★'),
+                                            ]),
+                                        Grid::make(3)
+                                            ->components([
+                                                TextInput::make('cta_stat2_label')
+                                                    ->label('Stat 2 Label')
+                                                    ->placeholder('Average Rating'),
+                                                TextInput::make('cta_stat3_value')
+                                                    ->label('Stat 3 Value')
+                                                    ->placeholder('100%'),
+                                                TextInput::make('cta_stat3_label')
+                                                    ->label('Stat 3 Label')
+                                                    ->placeholder('Natural Ingredients'),
+                                            ]),
                                     ]),
                             ]),
 

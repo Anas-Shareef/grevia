@@ -53,6 +53,19 @@
             policy_shipping_content: {!! json_encode($siteSettings['policy_shipping_content'] ?? '') !!},
             policy_shipping_meta_title: {!! json_encode($siteSettings['policy_shipping_meta_title'] ?? '') !!},
             policy_shipping_meta_description: {!! json_encode($siteSettings['policy_shipping_meta_description'] ?? '') !!},
+            cta_badge_text: {!! json_encode($siteSettings['cta_badge_text'] ?? '') !!},
+            cta_heading: {!! json_encode($siteSettings['cta_heading'] ?? '') !!},
+            cta_description: {!! json_encode($siteSettings['cta_description'] ?? '') !!},
+            cta_primary_btn_text: {!! json_encode($siteSettings['cta_primary_btn_text'] ?? '') !!},
+            cta_primary_btn_url: {!! json_encode($siteSettings['cta_primary_btn_url'] ?? '') !!},
+            cta_secondary_btn_text: {!! json_encode($siteSettings['cta_secondary_btn_text'] ?? '') !!},
+            cta_secondary_btn_url: {!! json_encode($siteSettings['cta_secondary_btn_url'] ?? '') !!},
+            cta_stat1_value: {!! json_encode($siteSettings['cta_stat1_value'] ?? '') !!},
+            cta_stat1_label: {!! json_encode($siteSettings['cta_stat1_label'] ?? '') !!},
+            cta_stat2_value: {!! json_encode($siteSettings['cta_stat2_value'] ?? '') !!},
+            cta_stat2_label: {!! json_encode($siteSettings['cta_stat2_label'] ?? '') !!},
+            cta_stat3_value: {!! json_encode($siteSettings['cta_stat3_value'] ?? '') !!},
+            cta_stat3_label: {!! json_encode($siteSettings['cta_stat3_label'] ?? '') !!},
         };
     </script>
     <link rel="icon" href="/favicon.png" />

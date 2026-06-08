@@ -2,11 +2,41 @@ import { motion } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
+declare global {
+  interface Window {
+    GreviaSettings?: {
+      cta_badge_text?: string;
+      cta_heading?: string;
+      cta_description?: string;
+      cta_primary_btn_text?: string;
+      cta_primary_btn_url?: string;
+      cta_secondary_btn_text?: string;
+      cta_secondary_btn_url?: string;
+      cta_stat1_value?: string;
+      cta_stat1_label?: string;
+      cta_stat2_value?: string;
+      cta_stat2_label?: string;
+      cta_stat3_value?: string;
+      cta_stat3_label?: string;
+    };
+  }
+}
+
 const ConversionBanner = () => {
+  const settings = window.GreviaSettings || {};
+
+  const badgeText = settings.cta_badge_text || "Limited Time Offer";
+  const heading = settings.cta_heading || "Ready to Make\nthe Sweet Switch?";
+  const description = settings.cta_description || "Join thousands who've already discovered the pure taste of nature. Get 20% off your first order with code SWEEVAL20";
+  const primaryBtnText = settings.cta_primary_btn_text || "Shop Now & Save 20%";
+  const primaryBtnUrl = settings.cta_primary_btn_url || "/collections/all";
+  const secondaryBtnText = settings.cta_secondary_btn_text || "Learn More";
+  const secondaryBtnUrl = settings.cta_secondary_btn_url || "/benefits";
+
   const metrics = [
-    { label: "Happy Customers", value: "50K+" },
-    { label: "Average Rating", value: "4.9★" },
-    { label: "Natural Ingredients", value: "100%" },
+    { label: settings.cta_stat1_label || "Happy Customers", value: settings.cta_stat1_value || "50K+" },
+    { label: settings.cta_stat2_label || "Average Rating", value: settings.cta_stat2_value || "4.9★" },
+    { label: settings.cta_stat3_label || "Natural Ingredients", value: settings.cta_stat3_value || "100%" },
   ];
 
   return (
@@ -37,40 +67,34 @@ const ConversionBanner = () => {
           >
             <Sparkles className="w-4 h-4 text-white" />
             <span className="eyebrow !text-white !tracking-[0.2em]">
-              Limited Time Offer
+              {badgeText}
             </span>
           </motion.div>
 
           <h2
             id="cta-heading"
-            className="text-4xl md:text-5xl lg:text-7xl font-black text-white leading-[1.05] tracking-tighter mb-8"
+            className="text-4xl md:text-5xl lg:text-7xl font-black text-white leading-[1.05] tracking-tighter mb-8 whitespace-pre-line"
           >
-            Ready to Make
-            <br />
-            the Sweet Switch?
+            {heading}
           </h2>
 
           <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
-            Join thousands who've already discovered the pure taste of nature.
-            Get 20% off your first order with code{" "}
-            <span className="font-black text-white underline decoration-white/30 underline-offset-8">
-              SWEEVAL20
-            </span>
+            {description}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5 justify-center mb-20">
             <Link
-              to="/collections/all"
+              to={primaryBtnUrl}
               className="inline-flex items-center justify-center gap-3 font-black text-lg bg-white text-primary hover:bg-white/90 hover:-translate-y-1 rounded-full shadow-2xl transition-all duration-300 h-16 px-10 group"
             >
-              Shop Now & Save 20%
+              {primaryBtnText}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              to="/benefits"
+              to={secondaryBtnUrl}
               className="inline-flex items-center justify-center font-bold h-16 px-10 text-white border-2 border-white/20 hover:bg-white/10 hover:border-white/50 rounded-full transition-all duration-300"
             >
-              Learn More
+              {secondaryBtnText}
             </Link>
           </div>
 
