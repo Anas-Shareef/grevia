@@ -26,10 +26,10 @@ class FooterSectionSeeder extends Seeder
             'type' => 'links',
             'content' => [
                 'links' => [
-                    ['label' => 'All Products', 'url' => '/products'],
-                    ['label' => 'Stevia', 'url' => '/products?category=stevia'],
-                    ['label' => 'Monkfruit', 'url' => '/products?category=monkfruit'],
-                    ['label' => 'Bundles', 'url' => '/products?category=bundles'],
+                    ['label' => 'All Products', 'url' => '/collections/all'],
+                    ['label' => 'Stevia', 'url' => '/collections/stevia'],
+                    ['label' => 'Monkfruit', 'url' => '/collections/monk-fruit'],
+                    ['label' => 'Bundles', 'url' => '/collections/all'],
                 ]
             ],
             'is_active' => true,
@@ -42,10 +42,10 @@ class FooterSectionSeeder extends Seeder
             'type' => 'links',
             'content' => [
                 'links' => [
-                    ['label' => 'About Us', 'url' => '/about'],
-                    ['label' => 'Our Story', 'url' => '/story'],
-                    ['label' => 'Sustainability', 'url' => '/sustainability'],
-                    ['label' => 'Press', 'url' => '/press'],
+                    ['label' => 'About Us', 'url' => '/benefits'],
+                    ['label' => 'Our Story', 'url' => '/benefits'],
+                    ['label' => 'Sustainability', 'url' => '/benefits'],
+                    ['label' => 'Press', 'url' => '/contact'],
                 ]
             ],
             'is_active' => true,
@@ -59,9 +59,10 @@ class FooterSectionSeeder extends Seeder
             'content' => [
                 'links' => [
                     ['label' => 'Contact', 'url' => '/contact'],
-                    ['label' => 'FAQ', 'url' => '/faq'],
-                    ['label' => 'Shipping', 'url' => '/shipping'],
-                    ['label' => 'Returns', 'url' => '/returns'],
+                    ['label' => 'Privacy Policy', 'url' => '/privacy-policy'],
+                    ['label' => 'Terms & Conditions', 'url' => '/terms-conditions'],
+                    ['label' => 'Refund Policy', 'url' => '/refund-policy'],
+                    ['label' => 'Shipping Policy', 'url' => '/shipping-policy'],
                 ]
             ],
             'is_active' => true,
