@@ -37,14 +37,33 @@ class AuthController extends Controller
                     'name'          => $request->name,
                 ]
             );
+
+            // Sync to MailerLite Subscribers Group
+            $mailerliteSubGroup = config('services.mailerlite.group_subscribers');
+            if (!empty($mailerliteSubGroup)) {
+                (new \App\Services\MailerLiteService())->subscribe(
+                    email: $request->email,
+                    name:  $request->name,
+                    groups: [$mailerliteSubGroup],
+                    fields: [
+                        'source' => 'register',
+                    ]
+                );
+            }
         }
 
-        // Auto-subscribe to Moosend for welcome email automation
-        (new \App\Services\MoosendService())->subscribe(
-            email: $user->email,
-            name:  $user->name,
-            tags:  ['registered', 'customer']
-        );
+        // Auto-subscribe to MailerLite for welcome email automation
+        $mailerliteCustGroup = config('services.mailerlite.group_customers');
+        if (!empty($mailerliteCustGroup)) {
+            (new \App\Services\MailerLiteService())->subscribe(
+                email: $user->email,
+                name:  $user->name,
+                groups: [$mailerliteCustGroup],
+                fields: [
+                    'registered_at' => now()->toIso8601String(),
+                ]
+            );
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -199,6 +218,32 @@ class AuthController extends Controller
                     'source' => 'register',
                     'user_id' => $user->id,
                     'name' => $displayName,
+                ]
+            );
+
+            // Sync to MailerLite Subscribers Group
+            $mailerliteSubGroup = config('services.mailerlite.group_subscribers');
+            if (!empty($mailerliteSubGroup)) {
+                (new \App\Services\MailerLiteService())->subscribe(
+                    email: $email,
+                    name:  $displayName,
+                    groups: [$mailerliteSubGroup],
+                    fields: [
+                        'source' => 'register_firebase',
+                    ]
+                );
+            }
+        }
+
+        // Auto-subscribe to MailerLite for welcome email automation
+        $mailerliteCustGroup = config('services.mailerlite.group_customers');
+        if (!empty($mailerliteCustGroup)) {
+            (new \App\Services\MailerLiteService())->subscribe(
+                email: $user->email,
+                name:  $user->name,
+                groups: [$mailerliteCustGroup],
+                fields: [
+                    'registered_at' => now()->toIso8601String(),
                 ]
             );
         }

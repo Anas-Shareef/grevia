@@ -71,10 +71,68 @@ class SubscribersTable
                     ->action(fn (Subscriber $record) => $record->update(['is_subscribed' => true])),
             ])
             ->toolbarActions([
+                \Filament\Actions\Action::make('sync_mailerlite')
+                    ->label('Sync all to MailerLite')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->action(function () {
+                        $count = (new \App\Services\MailerLiteService())->syncAllSubscribers();
+                        if ($count !== false) {
+                            \Filament\Notifications\Notification::make()
+                                ->title("Successfully synced {$count} subscribers to MailerLite.")
+                                ->success()
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title("MailerLite sync failed. Please check PHP/Laravel logs.")
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                    \Filament\Actions\BulkAction::make('sync_selected_mailerlite')
+                        ->label('Sync Selected to MailerLite')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('info')
+                        ->action(function (\Illuminate\Support\Collection $records) {
+                            $apiKey = config('services.mailerlite.api_key', '');
+                            $groupSubscribers = config('services.mailerlite.group_subscribers', '');
+                            if (empty($apiKey) || empty($groupSubscribers)) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title("MailerLite API key or subscribers group not configured.")
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                            $service = new \App\Services\MailerLiteService();
+                            $count = 0;
+                            foreach ($records as $subscriber) {
+                                if (!$subscriber->is_subscribed) {
+                                    $service->unsubscribe($subscriber->email);
+                                    continue;
+                                }
+                                $success = $service->subscribe(
+                                    email: $subscriber->email,
+                                    name: $subscriber->name ?? '',
+                                    groups: [$groupSubscribers],
+                                    fields: [
+                                        'source' => $subscriber->source ?? 'unknown',
+                                    ]
+                                );
+                                if ($success) {
+                                    $count++;
+                                }
+                                usleep(500000);
+                            }
+                            \Filament\Notifications\Notification::make()
+                                ->title("Successfully synced {$count} of {$records->count()} selected subscribers to MailerLite.")
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ]);
     }

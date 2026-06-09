@@ -169,14 +169,21 @@ class OrderController extends Controller
             Coupon::whereRaw('UPPER(code) = ?', [$couponCode])->increment('usage_count');
         }
 
-        // Subscribe customer to Moosend (for order automations / re-engagement)
+        // Subscribe customer to MailerLite (for order automations / re-engagement)
         $customerEmail = $order->email ?? ($user ? $user->email : null);
         $customerName  = $order->name  ?? ($user ? $user->name  : 'Customer');
         if ($customerEmail) {
-            (new \App\Services\MoosendService())->subscribe(
+            $mailerliteCustGroup = config('services.mailerlite.group_customers');
+            $groups = $mailerliteCustGroup ? [$mailerliteCustGroup] : [];
+            (new \App\Services\MailerLiteService())->subscribe(
                 email: $customerEmail,
                 name:  $customerName,
-                tags:  ['shopper', 'order']
+                groups: $groups,
+                fields: [
+                    'last_order_id' => $order->id,
+                    'last_order_amount' => $order->total,
+                    'last_order_date' => now()->toIso8601String(),
+                ]
             );
         }
 

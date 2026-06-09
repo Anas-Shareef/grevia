@@ -178,18 +178,25 @@ class RazorpayController extends Controller
                 'status' => 'created',
             ]);
 
-            // 6. Marketing Sync (Moosend)
+            // 6. Marketing Sync (MailerLite)
             $customerEmail = $order->email;
             $customerName  = $order->name;
-            if ($customerEmail && class_exists('\App\Services\MoosendService')) {
+            if ($customerEmail && class_exists('\App\Services\MailerLiteService')) {
                 try {
-                    (new \App\Services\MoosendService())->subscribe(
+                    $mailerliteCustGroup = config('services.mailerlite.group_customers');
+                    $groups = $mailerliteCustGroup ? [$mailerliteCustGroup] : [];
+                    (new \App\Services\MailerLiteService())->subscribe(
                         email: $customerEmail,
                         name:  $customerName,
-                        tags:  ['shopper', 'razorpay-initiated']
+                        groups: $groups,
+                        fields: [
+                            'last_order_id' => $order->id,
+                            'last_order_amount' => $order->total,
+                            'last_order_date' => now()->toIso8601String(),
+                        ]
                     );
-                } catch (\Exception $mooEx) {
-                    Log::warning('Moosend checkout sync failed: ' . $mooEx->getMessage());
+                } catch (\Exception $mlEx) {
+                    Log::warning('MailerLite checkout sync failed: ' . $mlEx->getMessage());
                 }
             }
 

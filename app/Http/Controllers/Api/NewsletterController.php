@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subscriber;
-use App\Services\MoosendService;
+use App\Services\MailerLiteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -62,12 +62,18 @@ class NewsletterController extends Controller
             ]);
         }
 
-        // Sync to Moosend grevia email list
-        (new MoosendService())->subscribe(
-            email: $email,
-            name:  $subscriber->name ?? '',
-            tags:  ['newsletter', $source]
-        );
+        // Sync to MailerLite Subscribers Group
+        $mailerliteSubGroup = config('services.mailerlite.group_subscribers');
+        if (!empty($mailerliteSubGroup)) {
+            (new MailerLiteService())->subscribe(
+                email: $email,
+                name:  $subscriber->name ?? '',
+                groups: [$mailerliteSubGroup],
+                fields: [
+                    'source' => $source,
+                ]
+            );
+        }
 
         return response()->json([
             'message' => 'Successfully subscribed to the newsletter!',

@@ -36,4 +36,10 @@ return [
         'list_id' => env('MOOSEND_LIST_ID', ''),
     ],
 
+    'mailerlite' => [
+        'api_key' => env('MAILERLITE_API_KEY', ''),
+        'group_customers' => env('MAILERLITE_GROUP_CUSTOMERS', ''),
+        'group_subscribers' => env('MAILERLITE_GROUP_SUBSCRIBERS', ''),
+    ],
+
 ];
