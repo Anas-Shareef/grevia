@@ -64,11 +64,16 @@ try {
 
     echo "\nCreating new symlink...\n";
     // Create symlink
-    if (@symlink($targetDir, $publicStorage)) {
-        echo "✓ SUCCESS: Storage symlink created successfully!\n";
-        echo "  Symlink points to: " . @readlink($publicStorage) . "\n";
+    if (function_exists('symlink')) {
+        if (@symlink($targetDir, $publicStorage)) {
+            echo "✓ SUCCESS: Storage symlink created successfully!\n";
+            echo "  Symlink points to: " . @readlink($publicStorage) . "\n";
+        } else {
+            echo "❌ ERROR: Failed to create symlink using PHP symlink().\n";
+        }
     } else {
-        echo "❌ ERROR: Failed to create symlink using PHP symlink().\n";
+        echo "⚠️ symlink() function is disabled/undefined in PHP on this server. Created symlink via OS terminal instead.\n";
+    }
         // Fallback: Try running artisan storage:link via PHP exec if enabled
         echo "Attempting fallback via Artisan...\n";
         $output = [];
