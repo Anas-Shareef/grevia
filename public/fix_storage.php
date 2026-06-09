@@ -85,7 +85,6 @@ try {
         } else {
             echo "exec() is disabled on this server.\n";
         }
-    }
 
     // Check if benefits-page images exist in target
     $benefitsDir = $targetDir . '/benefits-page';
