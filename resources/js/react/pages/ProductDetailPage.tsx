@@ -222,9 +222,34 @@ const ProductDetailPage = () => {
   }
 
   const concentrationOptions = product.concentration_options || ['1:10', '1:50', '1:100', '1:200'];
-  const displayPrice = selectedVariant ? selectedVariant.price : product.price;
-  const originalPrice = selectedVariant?.discount_price ? selectedVariant.price : product.original_price;
-  const discountPercent = originalPrice && displayPrice ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) : 0;
+  
+  // Dynamic Badge & Pricing Calculations
+  const inStock = product.in_stock !== undefined ? product.in_stock : (product.inStock !== undefined ? product.inStock : true);
+  const hasVariants = !!product.variants && product.variants.length > 0;
+  const activeVariants = hasVariants ? (product.variants?.filter((v: any) => v.status === "active") || []) : [];
+  const isOutOfStock = inStock === false || (hasVariants && activeVariants.every((v: any) => Number(v.stock_quantity) === 0));
+
+  const origPrice = product.original_price ?? product.originalPrice;
+  const basePrice = product.price;
+  const hasDiscount = selectedVariant
+    ? !!selectedVariant.discount_price && Number(selectedVariant.discount_price) < Number(selectedVariant.price)
+    : !!origPrice && Number(basePrice) < Number(origPrice);
+
+  const displayPrice = selectedVariant
+    ? (selectedVariant.discount_price || selectedVariant.price)
+    : product.price;
+
+  const originalPrice = selectedVariant
+    ? (selectedVariant.discount_price ? selectedVariant.price : null)
+    : origPrice;
+
+  const discountPercent = originalPrice && displayPrice ? Math.round(((Number(originalPrice) - Number(displayPrice)) / Number(originalPrice)) * 100) : 0;
+
+  const createdAtStr = (product as any).created_at ?? (product as any).createdAt;
+  const isNewProduct = createdAtStr
+    ? (new Date().getTime() - new Date(createdAtStr).getTime()) / (1000 * 60 * 60 * 24) < 14
+    : false;
+
   const wishlisted = isInWishlist(String(product.id));
   
   const formatAttr   = attrs.format || null;
@@ -328,11 +353,37 @@ const ProductDetailPage = () => {
           {/* Left: Image Gallery (Sticky on Desktop) */}
           <div className="w-full lg:w-1/2 flex flex-col lg:flex-row-reverse gap-4 lg:sticky lg:top-36 self-start">
             <div className="relative flex-1 aspect-square rounded-[24px] overflow-hidden bg-[#F8F5F0] group">
-              {product.badge && (
-                <div className="absolute top-6 left-6 bg-[#F59E0B] text-white px-4 py-1.5 text-[11px] font-black uppercase tracking-widest rounded-full z-10 shadow-sm Montserrat">
-                  {product.badge}
-                </div>
-              )}
+              {/* Dynamic Badges */}
+              <div className="absolute top-6 left-6 z-30 flex flex-col gap-1.5">
+                {isOutOfStock ? (
+                  <div className="bg-slate-600/90 text-white font-bold uppercase tracking-widest text-[10px] px-3.5 py-1.5 rounded-full z-10 shadow-sm Montserrat select-none">
+                    Sold Out
+                  </div>
+                ) : (
+                  <>
+                    {/* Sale / Discount Badge */}
+                    {hasDiscount && discountPercent > 0 && (
+                      <div className="bg-[#F59E0B] text-white font-black uppercase tracking-widest text-[10px] px-3.5 py-1.5 rounded-full z-10 shadow-sm Montserrat select-none">
+                        Save {discountPercent}%
+                      </div>
+                    )}
+                    
+                    {/* Manual Badge (Filament admin) */}
+                    {product.badge && (
+                      <div className="bg-[#2E4D31] text-white font-bold uppercase tracking-widest text-[10px] px-3.5 py-1.5 rounded-full z-10 shadow-sm Montserrat select-none">
+                        {product.badge}
+                      </div>
+                    )}
+
+                    {/* New Product Badge */}
+                    {isNewProduct && !product.badge && (
+                      <div className="bg-[#16A34A] text-white font-bold uppercase tracking-widest text-[10px] px-3.5 py-1.5 rounded-full z-10 shadow-sm Montserrat select-none">
+                        New
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
               <button 
                 onClick={toggleWishlist}
                 className="absolute top-6 right-6 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/50 z-10 transition-all hover:scale-110 active:scale-95"

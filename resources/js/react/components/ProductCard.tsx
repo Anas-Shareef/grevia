@@ -36,6 +36,29 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
     : product.price;
   const isWishlisted = isInWishlist(String(product.id));
 
+  // Dynamic Badge Calculations
+  const inStock = product.in_stock !== undefined ? product.in_stock : (product.inStock !== undefined ? product.inStock : true);
+  const hasVariants = !!product.variants && product.variants.length > 0;
+  const activeVariants = hasVariants ? (product.variants?.filter((v) => v.status === "active") || []) : [];
+  const isOutOfStock = inStock === false || (hasVariants && activeVariants.every((v) => Number(v.stock_quantity) === 0));
+
+  const origPrice = product.original_price ?? product.originalPrice;
+  const basePrice = product.price;
+  const hasDiscount = currentVariant
+    ? !!currentVariant.discount_price && Number(currentVariant.discount_price) < Number(currentVariant.price)
+    : !!origPrice && Number(basePrice) < Number(origPrice);
+
+  const discountPercent = hasDiscount
+    ? (currentVariant
+        ? Math.round(((Number(currentVariant.price) - Number(currentVariant.discount_price)) / Number(currentVariant.price)) * 100)
+        : Math.round(((Number(origPrice) - Number(basePrice)) / Number(origPrice)) * 100))
+    : 0;
+
+  const createdAtStr = (product as any).created_at ?? (product as any).createdAt;
+  const isNewProduct = createdAtStr
+    ? (new Date().getTime() - new Date(createdAtStr).getTime()) / (1000 * 60 * 60 * 24) < 14
+    : false;
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -80,23 +103,48 @@ export const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) =>
         ? "w-full md:w-1/3 lg:w-1/4 relative overflow-hidden aspect-[4/3] rounded-xl bg-gray-100 flex-shrink-0"
         : "relative aspect-[4/3] overflow-hidden bg-gray-100 rounded-t-xl flex-shrink-0"
       }>
-        {/* Dynamic Badges from Tags */}
+        {/* Dynamic Badges */}
         <div className="absolute top-2 left-2 z-30 flex flex-col gap-1">
-            {product.badge && (
-                <div className="bg-[#16A34A] text-white font-bold uppercase tracking-widest text-[10px] px-2 py-0.5 rounded-[4px]">
-                    {product.badge}
+          {isOutOfStock ? (
+            <div className="bg-slate-600/90 text-white font-bold uppercase tracking-widest text-[9px] px-2.5 py-1 rounded-[4px] shadow-sm select-none">
+              Sold Out
+            </div>
+          ) : (
+            <>
+              {/* Sale / Discount Badge */}
+              {hasDiscount && discountPercent > 0 && (
+                <div className="bg-[#F59E0B] text-white font-black uppercase tracking-widest text-[9px] px-2.5 py-1 rounded-[4px] shadow-sm select-none">
+                  Save {discountPercent}%
                 </div>
-            )}
-            {product.tags?.includes('Keto-Friendly') && (
-                <div className="bg-blue-500 text-white font-bold uppercase tracking-widest text-[8px] px-2 py-0.5 rounded-[4px] w-fit">
-                    Keto-Friendly
+              )}
+              
+              {/* Manual Badge (Filament admin) */}
+              {product.badge && (
+                <div className="bg-[#2E4D31] text-white font-bold uppercase tracking-widest text-[9px] px-2.5 py-1 rounded-[4px] shadow-sm select-none">
+                  {product.badge}
                 </div>
-            )}
-            {product.tags?.includes('100% Organic') && (
-                <div className="bg-[#2E4D31] text-[#D4AF37] font-bold uppercase tracking-widest text-[8px] px-2 py-0.5 rounded-[4px] w-fit">
-                    100% Organic
+              )}
+
+              {/* New Product Badge */}
+              {isNewProduct && !product.badge && (
+                <div className="bg-[#16A34A] text-white font-bold uppercase tracking-widest text-[9px] px-2.5 py-1 rounded-[4px] shadow-sm select-none">
+                  New
                 </div>
-            )}
+              )}
+            </>
+          )}
+
+          {/* Health Trust Badges */}
+          {!isOutOfStock && product.tags?.includes('Keto-Friendly') && (
+            <div className="bg-blue-500/90 text-white font-bold uppercase tracking-widest text-[8px] px-2 py-0.5 rounded-[4px] w-fit select-none">
+              Keto-Friendly
+            </div>
+          )}
+          {!isOutOfStock && product.tags?.includes('100% Organic') && (
+            <div className="bg-[#2E4D31]/90 text-[#D4AF37] font-bold uppercase tracking-widest text-[8px] px-2 py-0.5 rounded-[4px] w-fit select-none">
+              100% Organic
+            </div>
+          )}
         </div>
 
         {/* Wishlist Heart */}
