@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShoppingCart, Star, Heart, Check, Truck, RotateCcw, 
   Info, ChevronRight, Minus, Plus, ChevronDown, Sparkles,
-  Award, Shield, Zap, Activity, Leaf, Camera, Video
+  Award, Shield, Zap, Activity, Leaf, Camera, Video,
+  Mail, Copy, Share2
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -31,6 +32,36 @@ const BenefitChip = ({ icon: Icon, text }: { icon: any, text: string }) => (
     <Icon className="w-3.5 h-3.5 text-[#2E4D31]" />
     <span className="text-[11px] font-bold text-[#2E4D31] Montserrat uppercase tracking-wider">{text}</span>
   </div>
+);
+
+const WhatsAppIcon = () => (
+  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436.002 9.858-4.42 9.861-9.864.001-2.637-1.03-5.114-2.905-6.989-1.874-1.873-4.364-2.903-7.003-2.904-5.442 0-9.86 4.42-9.863 9.864 0 1.712.446 3.387 1.292 4.873l-.986 3.6 3.69-.968zm13.125-7.587c-.301-.15-1.78-.879-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.179-.175.2-.35.225-.651.075-1.041-.521-1.824-.959-2.529-2.167-.184-.315-.093-.48.016-.628.11-.15.247-.3.37-.45.122-.15.163-.25.244-.416.082-.167.041-.313-.021-.463-.062-.15-.525-1.266-.719-1.731-.19-.456-.399-.393-.547-.4l-.469-.009c-.162 0-.425.061-.647.303-.222.242-.848.828-.848 2.018 0 1.19.867 2.337.989 2.5.122.162 1.706 2.602 4.132 3.649.577.249 1.027.397 1.378.508.58.184 1.109.158 1.527.096.466-.07 1.432-.585 1.633-1.15.201-.565.201-1.05.14-1.15-.061-.1-.225-.15-.526-.3z" />
+  </svg>
+);
+
+const FacebookIcon = () => (
+  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+const PinterestIcon = () => (
+  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.966 1.406-5.966s-.359-.72-.359-1.781c0-1.663.967-2.905 2.167-2.905 1.024 0 1.518.769 1.518 1.69 0 1.03-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.204 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.375-.293 1.198-.334 1.362-.053.21-.174.25-.4.149-1.49-.693-2.421-2.87-2.421-4.615 0-3.76 2.73-7.213 7.87-7.213 4.132 0 7.34 2.944 7.34 6.88 0 4.105-2.586 7.408-6.177 7.408-1.205 0-2.337-.625-2.725-1.363l-.74 2.818c-.267 1.019-1.001 2.3-1.495 3.1 1.092.337 2.245.518 3.44.518 6.627 0 12-5.37 12-11.987C24.017 5.367 18.648 0 12.017 0z" />
+  </svg>
+);
+
+const LinkedInIcon = () => (
+  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+  </svg>
 );
 
 const AccordionItem = ({ title, children, defaultOpen = false, icon: Icon }: { title: string, children: React.ReactNode, defaultOpen?: boolean, icon?: any }) => {
@@ -295,6 +326,7 @@ const ProductDetailPage = () => {
   const galleryImages = variantGallery.length > 0 ? variantGallery : baseGallery;
 
   const mainImageUrl = galleryImages[selectedThumb] || (variantGallery[0] ?? product.image);
+  const absoluteShareImage = mainImageUrl ? (mainImageUrl.startsWith('http') ? mainImageUrl : window.location.origin + mainImageUrl) : '';
 
 
 
@@ -322,6 +354,19 @@ const ProductDetailPage = () => {
       addToWishlist(product);
       toast.success('Added to wishlist ❤️');
     }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => {
+        toast.success("Link copied to clipboard!", {
+          style: { background: '#2E4D31', color: '#fff', borderRadius: '40px' },
+          icon: <Check className="w-4 h-4" />
+        });
+      })
+      .catch(() => {
+        toast.error("Failed to copy link");
+      });
   };
 
   // Fix 5: Prefer admin-picked related products; fallback to same-category then random
@@ -598,6 +643,75 @@ const ProductDetailPage = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Share Widget */}
+            <div className="mt-8 pt-8 border-t border-[#E5E7EB] mb-6">
+              <div className="flex items-center gap-2 text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-4 Montserrat">
+                <Share2 className="w-4 h-4 text-gray-500" />
+                <span>Share This Product</span>
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this on Grevia: ${product.name} - ${window.location.href}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
+                >
+                  <WhatsAppIcon />
+                  WhatsApp
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
+                >
+                  <FacebookIcon />
+                  Facebook
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`Check out ${product.name} on Grevia!`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-black hover:bg-neutral-800 text-white font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
+                >
+                  <XIcon />
+                  X
+                </a>
+                <a
+                  href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(window.location.href)}&media=${encodeURIComponent(absoluteShareImage)}&description=${encodeURIComponent(product.description || '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E60023] hover:bg-[#cc001f] text-white font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
+                >
+                  <PinterestIcon />
+                  Pinterest
+                </a>
+                <a
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0A66C2] hover:bg-[#0956a3] text-white font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
+                >
+                  <LinkedInIcon />
+                  LinkedIn
+                </a>
+                <a
+                  href={`mailto:?subject=${encodeURIComponent(`${product.name} on Grevia`)}&body=${encodeURIComponent(`Check out this amazing product on Grevia: ${product.name}\n\nLink: ${window.location.href}`)}`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#2E4D31] hover:bg-[#1a3320] text-white font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
+                >
+                  <Mail className="w-4 h-4" />
+                  Email
+                </a>
+                <button
+                  onClick={handleCopyLink}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
+                >
+                  <Copy className="w-4 h-4" />
+                  Copy Link
+                </button>
+              </div>
             </div>
             
             {/* Accordions — conditional per PRD §4.4 */}

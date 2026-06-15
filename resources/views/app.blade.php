@@ -10,7 +10,11 @@
         $siteTitle = null;
         $siteDescription = null;
         
-        if ($path === 'privacy-policy') {
+        if (isset($og_product) && $og_product) {
+            $siteTitle = $og_product->name . ' - Rs.' . round($og_product->price) . ' | ' . ($siteSettings['store_name'] ?? 'Grevia');
+            $siteDescription = strip_tags($og_product->description ?? $og_product->product_description ?? '');
+            $siteDescription = mb_strimwidth($siteDescription, 0, 160, '...');
+        } elseif ($path === 'privacy-policy') {
             $siteTitle = $siteSettings['policy_privacy_meta_title'] ?? null;
             $siteDescription = $siteSettings['policy_privacy_meta_description'] ?? null;
         } elseif ($path === 'terms-conditions') {
@@ -34,6 +38,21 @@
     <meta property="og:title" content="{{ $siteTitle }}" />
     <meta property="og:description" content="{{ $siteDescription }}" />
     <meta property="og:type" content="website" />
+    @if(isset($og_product) && $og_product)
+        <meta property="og:image" content="{{ $og_product->image_url ? url($og_product->image_url) : '' }}" />
+        <meta property="og:image:secure_url" content="{{ $og_product->image_url ? url($og_product->image_url) : '' }}" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:url" content="{{ request()->url() }}" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="{{ $siteTitle }}" />
+        <meta name="twitter:description" content="{{ $siteDescription }}" />
+        <meta name="twitter:image" content="{{ $og_product->image_url ? url($og_product->image_url) : '' }}" />
+    @else
+        <meta property="og:image" content="{{ asset('images/logo.png') }}" />
+        <meta property="og:url" content="{{ request()->url() }}" />
+        <meta name="twitter:card" content="summary" />
+    @endif
 
     <script>
         window.GreviaSettings = {

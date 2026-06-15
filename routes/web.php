@@ -522,6 +522,12 @@ Route::get('/product-feedback', [\App\Http\Controllers\Api\ReviewController::cla
 Route::post('/product-feedback', [\App\Http\Controllers\Api\ReviewController::class, 'store']);
 Route::post('/product-feedback/{id}/helpful', [\App\Http\Controllers\Api\ReviewController::class, 'helpful']);
 
+// Intercept product routes for crawler link previews
+Route::get('/products/{slug}', function ($slug) {
+    $product = \App\Models\Product::where('slug', $slug)->orWhere('id', $slug)->first();
+    return view('app', ['og_product' => $product]);
+})->where('slug', '^[a-zA-Z0-9_-]+$');
+
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
 Route::get('/{any?}', function () {
     return view('app');
