@@ -528,6 +528,22 @@ Route::get('/products/{slug}', function ($slug) {
     return view('app', ['og_product' => $product]);
 })->where('slug', '^[a-zA-Z0-9_-]+$');
 
+// Fallback route for storage files when public symlink is missing/broken on shared hosting
+Route::get('/storage/{path}', function ($path) {
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+    
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath) || is_dir($filePath)) {
+        abort(404);
+    }
+    
+    return response()->file($filePath, [
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->where('path', '.*');
+
 // Catch-all route for React SPA - moved to bottom to prevent route conflicts
 Route::get('/{any?}', function () {
     return view('app');
