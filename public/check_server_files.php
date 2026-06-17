@@ -8,7 +8,7 @@ if (empty($_GET['key']) || $_GET['key'] !== $secret) {
     die("Access Denied.");
 }
 
-echo "=== SERVER DIAGNOSTICS: FILE FINDER ===\n\n";
+echo "=== SERVER DIAGNOSTICS: FAST FILE FINDER ===\n\n";
 
 $searchRoots = [
     '/home/u766289801/domains/grevia.in',
@@ -18,44 +18,35 @@ $searchRoots = [
 $foundDirs = [];
 $foundFiles = [];
 
-// Recursive directory iterator to find folders named 'products' or 'variants' or specific image
+function scanDirCustom($dir, &$foundDirs, &$foundFiles) {
+    $files = @scandir($dir);
+    if (!$files) return;
+    
+    foreach ($files as $file) {
+        if ($file === '.' || $file === '..') continue;
+        
+        $path = $dir . '/' . $file;
+        if (is_dir($path)) {
+            // Skip common large directories to prevent timeouts/limits
+            if ($file === 'node_modules' || $file === 'vendor' || $file === '.git' || $file === 'framework' || $file === 'cache') {
+                continue;
+            }
+            if (in_array($file, ['products', 'variants', 'benefits-page'])) {
+                $foundDirs[] = $path;
+            }
+            scanDirCustom($path, $foundDirs, $foundFiles);
+        } else {
+            if (str_contains($file, '01KRG51') || str_contains($file, '01KJ80R')) {
+                $foundFiles[] = $path . " (" . @filesize($path) . " bytes)";
+            }
+        }
+    }
+}
+
 foreach ($searchRoots as $root) {
     if (!is_dir($root)) continue;
     echo "Scanning root: $root...\n";
-    
-    try {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
-        
-        // Limit max scan depth/time to avoid gateway timeout
-        $maxItems = 15000;
-        $count = 0;
-        
-        foreach ($iterator as $item) {
-            $count++;
-            if ($count > $maxItems) {
-                echo "Reached max item limit ($maxItems) for scanning this root.\n";
-                break;
-            }
-            
-            $path = $item->getPathname();
-            $filename = $item->getFilename();
-            
-            // Look for directories named 'products', 'variants', or 'benefits-page'
-            if ($item->isDir() && in_array($filename, ['products', 'variants', 'benefits-page'])) {
-                $foundDirs[] = $path;
-            }
-            
-            // Look for specific jpg filenames
-            if ($item->isFile() && (str_contains($filename, '01KRG51') || str_contains($filename, '01KJ80R'))) {
-                $foundFiles[] = $path . " (" . $item->getSize() . " bytes)";
-            }
-        }
-    } catch (\Exception $e) {
-        echo "Error scanning $root: " . $e->getMessage() . "\n";
-    }
+    scanDirCustom($root, $foundDirs, $foundFiles);
 }
 
 echo "\n--- SEARCH RESULTS ---\n";
