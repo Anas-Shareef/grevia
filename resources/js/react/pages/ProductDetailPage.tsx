@@ -653,7 +653,7 @@ const ProductDetailPage = () => {
               </div>
               <div className="flex flex-wrap gap-2.5">
                 <a
-                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this on Grevia: ${product.name} - ${window.location.href}`)}`}
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(window.location.href)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-[13px] Montserrat transition-all duration-200 hover:scale-[1.03] active:scale-95 shadow-sm"
